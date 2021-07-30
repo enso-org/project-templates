@@ -1,0 +1,8 @@
+name: Stargazers
+namespace: local
+version: 0.0.1
+license: ''
+authors: []
+maintainers: []
+edition: '2021.3'
+prefer-local-libraries: true
