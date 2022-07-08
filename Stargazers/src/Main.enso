@@ -25,7 +25,7 @@ main =
     ## Select only the records for which `"archived"` is `False`.
     operator8 = operator5.where operator7
     ## Create a ranking, showing the repositories starting with the most starred.
-    operator9 = operator8.order_by (Sort_Column_Selector.By_Name [Sort_Column.Name "stargazers_count"])
+    operator9 = operator8.order_by (Sort_Column_Selector.By_Name [Sort_Column.Name "stargazers_count" Sort_Direction.Descending])
     ## Group records by `"language"`.
     operator10 = operator9.aggregate [Aggregate_Column.Group_By "language", Aggregate_Column.Average "stargazers_count"]
 
