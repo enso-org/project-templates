@@ -1,7 +1,7 @@
 from Standard.Base import all
-import Standard.Table.Io.File_Read
-import Standard.Table.Io.File_Format
-from Standard.Table.Io.Excel import Sheet
+import Standard.Table
+import Standard.Table.IO.File_Format
+from Standard.Table.IO.Excel import Sheet
 import Standard.Table.Data.Aggregate_Column
 import Standard.Table.Data.Sort_Column
 import Standard.Table.Data.Sort_Column_Selector

@@ -2,7 +2,7 @@ from Standard.Base import all
 import Standard.Base.Data.Any
 from Standard.Base.Data.Text.Text_Sub_Range import Last, First
 import Standard.Base.Data.Time.Date
-import Standard.Table.Io.File_Read
+import Standard.Table.IO.File_Read
 from Standard.Table.Data.Aggregate_Column import Group_By, Count
 import Standard.Visualization
 
