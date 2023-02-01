@@ -1,8 +1,7 @@
-name: Orders
+name: NASDAQReturns
 namespace: local
 version: 0.0.1
 license: ''
 authors: []
 maintainers: []
-edition: 2022.7.1
 prefer-local-libraries: true
