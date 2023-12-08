@@ -1,0 +1,8 @@
+name: Demo_Fraud_Updated
+namespace: local
+version: 0.0.1
+license: ''
+authors: []
+maintainers: []
+prefer-local-libraries: true
+edition: null

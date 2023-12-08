@@ -4,4 +4,5 @@ version: 0.0.1
 license: ''
 authors: []
 maintainers: []
+edition: 2023.2.1-nightly.2023.12.5
 prefer-local-libraries: true
