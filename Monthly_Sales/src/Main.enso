@@ -1,0 +1,80 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+import Standard.Visualization
+
+## # ![Image](eaep.png)
+   
+   # **Creating Month over Month (MOM) Analytics**
+   
+   **In this example, you will read an Excel workbook containing many worksheets of summarized sales data.  You need to create a comparison of the number of Orders, value of Orders and the increase/decrease in Order values as a percentages by Territory, Product Line and Deal Size.  Here we dynamically choose the most recent worksheets for comparison and will create summary rows for all combinations of data groupings that exist in these comparison periods.**
+   
+   ### ***Next month, the spreadsheet will get a new worksheet for the current month. This workflow will automate not just the current period analysis, but all future month's reporting as well.*** 
+   
+   .
+   
+   ## **Objective 1:  Read the Sales_Sample_Data.xlsx workbook**
+   
+   ### **Things to consider:**
+   
+   Each worksheet name will consistently explain the Year and Month of the sales data.  The format (schema) for each worksheet is consistent while the contents of each month’s combination of data may vary.
+   
+   ![Image](excel1.png)
+   
+   ## **Objective 2:  Read the two (2) months of data from the SalesSampleData.xlsx data**
+   
+   ### **Things to consider:**
+   
+   You will need to summarize the sales metrics as Current and Prior Month metrics.  As you read and begin aggregating the sales metrics, consider that this process may run monthly and the calculations should require no modifications as new worksheets appear in the incoming sales workbook.
+   
+   .
+   
+   ## **Objective 3:  Calculate and Summarize Month over Month comparison data**
+   
+   ### **Things to consider:**
+   
+   **When you calculate the count and value of sales variances, you’ll need to later calculate the percentage of sales changes so do consider the impact of division by zero.**
+   
+   .
+   
+   ## **Objective 4:  Prepare data for display**
+   
+   ### **Things to consider:**
+   
+   **Organize your results and apply format masks as B/(W) (Better/(Worse)) with appropriate symbols for the data.**
+   
+   
+
+
+main =
+    node1 = Data.read enso_project.data/'Sales_Sample_Data.xlsx'
+    vector1 = node1.sheet_names
+    any1 = vector1.sort Sort_Direction.Descending
+    vector2 = any1.take (Index_Sub_Range.First 2)
+    table2 = node1.read_many vector2
+    any7 = table2.aggregate [] [..Maximum 'Sheet Name' 'Current Month', ..Minimum 'Sheet Name' 'Prior Month']
+    any8 = any7.transpose
+    any9 = table2.replace any8 ['Sheet Name'] 'Value' 'Name'
+    any3 = any9.cross_tab ['TERRITORY', 'PRODUCTLINE', 'DEALSIZE'] 'Sheet Name' (..Sum 'SALES' 'Monthly Sales')
+    any2 = any9.cross_tab ['TERRITORY', 'PRODUCTLINE', 'DEALSIZE'] 'Sheet Name' (..Sum 'OrderCount' 'Monthly Orders')
+    table1 = any2.join any3 ..Full [(..Equals 'TERRITORY'), (..Equals 'PRODUCTLINE'), (..Equals 'DEALSIZE')]
+    any4 = table1.remove_columns ['Right TERRITORY', 'Right PRODUCTLINE', 'Right DEALSIZE']
+    any6 = any4.fill_nothing ['Prior Month Monthly Orders', 'Current Month Monthly Orders', 'Prior Month Monthly Sales', 'Current Month Monthly Sales'] 0
+    any5 = any6.set (..Simple_Expr (..Name 'Current Month Monthly Orders') (..Subtract (..Name 'Prior Month Monthly Orders'))) 'Monthly Orders B/(W)'
+    any10 = any5.set (..Simple_Expr (..Name 'Current Month Monthly Sales') (..Subtract (..Name 'Prior Month Monthly Sales'))) 'Monthly Sales B/(W)'
+    any14 = any10.filter 'Prior Month Monthly Sales' (..Greater 0)
+    any15 = any10.filter 'Prior Month Monthly Sales' (..Greater 0)
+    any12 = any14.set (..Simple_Expr (..Name 'Monthly Sales B/(W)') (..Divide (..Name 'Prior Month Monthly Sales'))) 'Sales % B/(W)' on_problems=..Ignore
+    table3 = any12.union any15 ..In_Any ..By_Name
+    any16 = table3.sort [(..Name 'Monthly Sales B/(W)' ..Descending)]
+    any13 = any16.format ['Sales % B/(W)'] '##.##%'
+    any11 = any13.format ['Prior Month Monthly Sales', 'Current Month Monthly Sales', 'Monthly Sales B/(W)'] '$#,##0.00;($#,##0.00)'
+    table4 = any11.fill_nothing ['Sales % B/(W)'] 'N/A'
+
+
+
+#### METADATA ####
+[[{"index":{"value":2270},"size":{"value":9}},"2f6eaeae-360f-418b-ba8e-6f3d8e580076"],[{"index":{"value":2270},"size":{"value":52}},"432ef9fb-9929-4fb0-b01a-13589dc1ff25"],[{"index":{"value":2337},"size":{"value":17}},"79117835-de95-454f-aa7f-5c99efe82d75"],[{"index":{"value":2366},"size":{"value":12}},"20bb37bd-461e-4c5f-a1cf-1cc8c7c81415"],[{"index":{"value":2366},"size":{"value":38}},"94e5eb17-7503-4e08-89fb-95d093747b18"],[{"index":{"value":2419},"size":{"value":9}},"cd458e69-ef26-47ca-9355-d6b2b50276dd"],[{"index":{"value":2419},"size":{"value":35}},"d2b1c17a-4123-4f25-972d-735249f1aa3c"],[{"index":{"value":2468},"size":{"value":15}},"7d13702f-6420-4ebc-80b1-323bfcf12ddd"],[{"index":{"value":2468},"size":{"value":23}},"452a5e38-dbe0-4233-aa24-e47227b65244"],[{"index":{"value":2503},"size":{"value":16}},"8987b2e3-1a9b-4a71-9c5a-2da55e43294c"],[{"index":{"value":2503},"size":{"value":19}},"37cd16f6-4625-488b-b801-16a4ad3c5dce"],[{"index":{"value":2503},"size":{"value":98}},"0c3dcf06-583a-4218-98a2-8d52959e5f3b"],[{"index":{"value":2613},"size":{"value":14}},"2db6a97f-faf0-4f57-97d8-0f51f05b59c8"],[{"index":{"value":2639},"size":{"value":14}},"968b11bc-2f46-47f0-988d-9914d0d995e2"],[{"index":{"value":2639},"size":{"value":19}},"87e236ff-463a-4add-948f-02995e9b693b"],[{"index":{"value":2639},"size":{"value":34}},"30171d24-dac4-4489-8f02-ffd4c4838672"],[{"index":{"value":2639},"size":{"value":42}},"03520088-4c00-4f4d-9420-79a099138c1b"],[{"index":{"value":2639},"size":{"value":49}},"361653ed-fa09-47fc-a8da-71a985ea9954"],[{"index":{"value":2700},"size":{"value":14}},"255ca0c6-2b44-4a8e-89a3-f5c555d6d790"],[{"index":{"value":2700},"size":{"value":55}},"b3380d8e-917f-4ef5-8c1b-d5678fb3bc5c"],[{"index":{"value":2700},"size":{"value":68}},"de426f05-ff98-489c-a931-7da347eec2d4"],[{"index":{"value":2700},"size":{"value":100}},"5cf3c502-811f-4dad-a012-febda7461eac"],[{"index":{"value":2812},"size":{"value":14}},"c2fef32c-263c-422b-8537-9cb63734b358"],[{"index":{"value":2812},"size":{"value":55}},"7c2003f1-5969-4788-93d4-463d581dc945"],[{"index":{"value":2812},"size":{"value":68}},"a5e4a2cc-c31c-4daa-b723-631eafef9b57"],[{"index":{"value":2812},"size":{"value":106}},"ee82ab6d-433e-4362-ac99-92ec9c662118"],[{"index":{"value":2932},"size":{"value":9}},"d486c78f-3e54-4408-8ffb-5bf1ca2f07fb"],[{"index":{"value":2932},"size":{"value":14}},"405df2a4-6b0b-4af0-9e39-e566a9c2309f"],[{"index":{"value":2932},"size":{"value":21}},"97a991e8-9851-4eac-af74-2d8386f0f896"],[{"index":{"value":2932},"size":{"value":95}},"d1575af9-bfbe-4cbe-9129-5bdbed032a40"],[{"index":{"value":3039},"size":{"value":21}},"f94c62b0-effd-4b16-a01e-d5f7a8a7e0d5"],[{"index":{"value":3039},"size":{"value":80}},"b38a5db2-aa5d-4701-af6c-c050b7bbbe73"],[{"index":{"value":3131},"size":{"value":17}},"269e768e-12a5-497a-964c-b6cc7d75e56c"],[{"index":{"value":3131},"size":{"value":140}},"3a75e903-4dab-4d5c-adb2-7e2431c22add"],[{"index":{"value":3131},"size":{"value":142}},"d90d277f-57fb-4b1a-92e6-7477453a62eb"],[{"index":{"value":3285},"size":{"value":8}},"8c6fee92-fe40-459f-977a-40117a93e5e1"],[{"index":{"value":3285},"size":{"value":115}},"8afc8a37-7c26-4f9a-9eb5-22937f40eb7f"],[{"index":{"value":3285},"size":{"value":138}},"0cb2930d-4cea-447a-b5f7-a2390da0bc71"],[{"index":{"value":3436},"size":{"value":135}},"84cfb09c-587f-45d7-b80f-7154f209729f"],[{"index":{"value":3584},"size":{"value":12}},"b8ba30f4-0ad4-4839-a3ab-3a06fba178c3"],[{"index":{"value":3584},"size":{"value":40}},"4338287c-b9c4-4b5d-af57-68dfde6bd4ed"],[{"index":{"value":3584},"size":{"value":54}},"d2c98322-84c8-4e18-abb1-075dbc2a538e"],[{"index":{"value":3651},"size":{"value":54}},"014a8541-ad4e-4455-acaf-4847c3216af1"],[{"index":{"value":3718},"size":{"value":9}},"6b203451-862c-4ffe-8487-ed8c3181f82d"],[{"index":{"value":3718},"size":{"value":104}},"a86a890e-b56c-455b-9a0f-574b19e3f9b9"],[{"index":{"value":3718},"size":{"value":120}},"fe6265f5-ec26-4121-ab9e-06ac0f09d32a"],[{"index":{"value":3718},"size":{"value":141}},"7482dd4e-f2e4-4f0f-bc51-81a4e7463fb3"],[{"index":{"value":3873},"size":{"value":11}},"125f4384-4522-4bce-b8f0-73eb65f0dd00"],[{"index":{"value":3873},"size":{"value":17}},"49326479-ebec-4602-a048-373ce8766bc3"],[{"index":{"value":3873},"size":{"value":26}},"f78afa1c-543e-4b04-b101-3821f7cca58b"],[{"index":{"value":3873},"size":{"value":36}},"87fbd0eb-9505-44be-b433-8478678d34a9"],[{"index":{"value":3922},"size":{"value":11}},"706c0d23-9332-4ff2-8385-7cc26f2f1693"],[{"index":{"value":3922},"size":{"value":57}},"ca14d7a3-14f1-4b04-a230-6de6f8983d72"],[{"index":{"value":3992},"size":{"value":12}},"ae0a5a68-1f5d-4c99-bd57-a1df5c327d51"],[{"index":{"value":3992},"size":{"value":30}},"08ee887a-568c-4666-8844-833997543b9d"],[{"index":{"value":3992},"size":{"value":39}},"f6b45b63-76ac-4bf6-b920-e602163efdfc"],[{"index":{"value":4044},"size":{"value":12}},"ee367b81-5f01-47d2-aff8-e147e06db889"],[{"index":{"value":4044},"size":{"value":96}},"94ccdfe4-9bd4-4bd7-8a2e-6a5a8893b5cb"],[{"index":{"value":4044},"size":{"value":120}},"063bac03-6747-4b1d-bf8e-d576f3ac1a7f"],[{"index":{"value":4178},"size":{"value":18}},"4014abad-d24a-4b62-9a55-db21a0d8fcd5"],[{"index":{"value":4178},"size":{"value":36}},"d2f14ef1-7e26-4925-9f8b-b000c1aa3ddc"],[{"index":{"value":4178},"size":{"value":42}},"aca9d061-3f89-443f-b89a-569401d96fd7"]]
+{"ide":{"node":{"432ef9fb-9929-4fb0-b01a-13589dc1ff25":{"position":{"vector":[-1583,1909]}},"2f6eaeae-360f-418b-ba8e-6f3d8e580076":{"position":{"vector":[-1583,1988]}},"79117835-de95-454f-aa7f-5c99efe82d75":{"position":{"vector":[-1285,1837]}},"94e5eb17-7503-4e08-89fb-95d093747b18":{"position":{"vector":[-1285,1765]}},"20bb37bd-461e-4c5f-a1cf-1cc8c7c81415":{"position":{"vector":[-804,836]}},"d2b1c17a-4123-4f25-972d-735249f1aa3c":{"position":{"vector":[-1285,1693]}},"cd458e69-ef26-47ca-9355-d6b2b50276dd":{"position":{"vector":[-804,764]}},"452a5e38-dbe0-4233-aa24-e47227b65244":{"position":{"vector":[-1583,1621]},"visualization":{"show":true,"width":953.7864583333334}},"7d13702f-6420-4ebc-80b1-323bfcf12ddd":{"position":{"vector":[-541,270]}},"0c3dcf06-583a-4218-98a2-8d52959e5f3b":{"position":{"vector":[-1353,1359]}},"37cd16f6-4625-488b-b801-16a4ad3c5dce":{"position":{"vector":[-580,376]},"visualization":{"show":true}},"8987b2e3-1a9b-4a71-9c5a-2da55e43294c":{"position":{"vector":[-578,363]}},"2db6a97f-faf0-4f57-97d8-0f51f05b59c8":{"position":{"vector":[-1353,1287]},"visualization":{"show":true,"width":338.1302083333333}},"361653ed-fa09-47fc-a8da-71a985ea9954":{"position":{"vector":[-1573,1025]}},"03520088-4c00-4f4d-9420-79a099138c1b":{"position":{"vector":[-638,-57]}},"30171d24-dac4-4489-8f02-ffd4c4838672":{"position":{"vector":[-638,-57]}},"87e236ff-463a-4add-948f-02995e9b693b":{"position":{"vector":[-628,-57]}},"968b11bc-2f46-47f0-988d-9914d0d995e2":{"position":{"vector":[-628,-57]}},"5cf3c502-811f-4dad-a012-febda7461eac":{"position":{"vector":[-564,921]},"visualization":{"show":true}},"de426f05-ff98-489c-a931-7da347eec2d4":{"position":{"vector":[519,360]}},"b3380d8e-917f-4ef5-8c1b-d5678fb3bc5c":{"position":{"vector":[522,361]}},"255ca0c6-2b44-4a8e-89a3-f5c555d6d790":{"position":{"vector":[522,361]}},"ee82ab6d-433e-4362-ac99-92ec9c662118":{"position":{"vector":[-1573,921]},"visualization":{"show":true}},"a5e4a2cc-c31c-4daa-b723-631eafef9b57":{"position":{"vector":[-669,376]}},"7c2003f1-5969-4788-93d4-463d581dc945":{"position":{"vector":[-669,376]}},"c2fef32c-263c-422b-8537-9cb63734b358":{"position":{"vector":[-669,376]}},"d1575af9-bfbe-4cbe-9129-5bdbed032a40":{"position":{"vector":[-639,659]}},"97a991e8-9851-4eac-af74-2d8386f0f896":{"position":{"vector":[-669,50]}},"405df2a4-6b0b-4af0-9e39-e566a9c2309f":{"position":{"vector":[-669,50]}},"d486c78f-3e54-4408-8ffb-5bf1ca2f07fb":{"position":{"vector":[-669,50]}},"b38a5db2-aa5d-4701-af6c-c050b7bbbe73":{"position":{"vector":[-1573,587]},"visualization":{"show":false,"width":1858.1822916666667}},"f94c62b0-effd-4b16-a01e-d5f7a8a7e0d5":{"position":{"vector":[-669,-22]}},"d90d277f-57fb-4b1a-92e6-7477453a62eb":{"position":{"vector":[-1573,497]},"visualization":{"show":true,"width":1536.6666666666667}},"3a75e903-4dab-4d5c-adb2-7e2431c22add":{"position":{"vector":[378,770]}},"269e768e-12a5-497a-964c-b6cc7d75e56c":{"position":{"vector":[655,766]}},"0cb2930d-4cea-447a-b5f7-a2390da0bc71":{"position":{"vector":[-1573,230]}},"8afc8a37-7c26-4f9a-9eb5-22937f40eb7f":{"position":{"vector":[-648,-957]}},"8c6fee92-fe40-459f-977a-40117a93e5e1":{"position":{"vector":[-669,-375]}},"84cfb09c-587f-45d7-b80f-7154f209729f":{"position":{"vector":[-1573,142]},"visualization":{"show":false,"width":1925.0625}},"d2c98322-84c8-4e18-abb1-075dbc2a538e":{"position":{"vector":[-1573,70]},"visualization":{"show":false,"width":276.078125}},"4338287c-b9c4-4b5d-af57-68dfde6bd4ed":{"position":{"vector":[-648,-1117]}},"b8ba30f4-0ad4-4839-a3ab-3a06fba178c3":{"position":{"vector":[-648,-1117]}},"014a8541-ad4e-4455-acaf-4847c3216af1":{"position":{"vector":[-430,-87]},"visualization":{"show":false,"width":276.078125}},"7482dd4e-f2e4-4f0f-bc51-81a4e7463fb3":{"position":{"vector":[-1573,-40]}},"fe6265f5-ec26-4121-ab9e-06ac0f09d32a":{"position":{"vector":[-593,-1136]}},"a86a890e-b56c-455b-9a0f-574b19e3f9b9":{"position":{"vector":[-593,-1136]}},"6b203451-862c-4ffe-8487-ed8c3181f82d":{"position":{"vector":[-593,-1136]}},"87fbd0eb-9505-44be-b433-8478678d34a9":{"position":{"vector":[-1573,-141]},"visualization":{"show":true,"width":2109.2771532012193}},"f78afa1c-543e-4b04-b101-3821f7cca58b":{"position":{"vector":[-648,-1328]}},"49326479-ebec-4602-a048-373ce8766bc3":{"position":{"vector":[-648,-1328]}},"125f4384-4522-4bce-b8f0-73eb65f0dd00":{"position":{"vector":[-628,-1343]}},"ca14d7a3-14f1-4b04-a230-6de6f8983d72":{"position":{"vector":[-1573,-403]},"visualization":{"show":false,"width":1982.609375,"height":148.66666666666666}},"706c0d23-9332-4ff2-8385-7cc26f2f1693":{"position":{"vector":[-648,-1388]}},"f6b45b63-76ac-4bf6-b920-e602163efdfc":{"position":{"vector":[-1573,-505]},"visualization":{"show":false,"width":2035.9583333333333}},"08ee887a-568c-4666-8844-833997543b9d":{"position":{"vector":[-413,-1216]}},"ae0a5a68-1f5d-4c99-bd57-a1df5c327d51":{"position":{"vector":[-413,-1216]}},"063bac03-6747-4b1d-bf8e-d576f3ac1a7f":{"position":{"vector":[-1573,-577]},"visualization":{"show":false,"width":2056.265625}},"94ccdfe4-9bd4-4bd7-8a2e-6a5a8893b5cb":{"position":{"vector":[-648,-1307]}},"ee367b81-5f01-47d2-aff8-e147e06db889":{"position":{"vector":[-648,-1307]}},"aca9d061-3f89-443f-b89a-569401d96fd7":{"position":{"vector":[-1573,-673]},"visualization":{"show":true,"width":2115.493598090278}},"d2f14ef1-7e26-4925-9f8b-b000c1aa3ddc":{"position":{"vector":[-1491,-871]}},"4014abad-d24a-4b62-9a55-db21a0d8fcd5":{"position":{"vector":[-1491,-871]}}},"import":{}}}
