@@ -1,0 +1,116 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+import Standard.Visualization
+
+## ![Image](eags.png)
+   
+   # Aggregations and Cross Tabs
+   
+   In this scenario, we want to look at calculating the number of accounts by type and by currency.
+   
+   ### 
+   
+   ## 🗝️ **Objective 1:**  Lets read a single sheet in from Excel (Review from previous example):
+   
+   1️⃣        The data has already been included in this workflow.
+   
+   2️⃣        Add a new component after the ***Data.read*** component by either dragging from the output port (the bottom edge) of the `Data.read` component, or clicking the ➕ button on the component.
+   
+   3️⃣        Add another new component after the ***Data.read*** component (See #2 above).
+   
+   - Choose the ***read*** component
+   - Click on **query** then choose Sheet1
+   
+   ### 
+   
+   ## 🗝️ **Objective 2:**  Aggregating by Account Type (Product Name):
+   
+   The first task is to add an aggregate component grouped by [product_name] and create a new column of data that summarizes the count of records for each Account Type.
+   
+   1️⃣        Add a new component after the ***read*** component by either dragging from the output port (the bottom edge) of the ***read*** component, or clicking the ➕ button on the component.
+   
+   2️⃣        Choose the ***aggregate*** component (Begin typing the term aggregate or sum) and hit enter or left-click on the ***aggregate*** component.
+   
+   - Click the group_by argument then choose [product_name]
+   - Click on the [➕] symbol (to the right of the columns  argument)
+   - This will add the default of “Count”.  *Note:  If you click on “Count”, you will see other options for aggregation.*
+   - You can open the visualization (<>) and see the count of 1,026 Savings Accounts, as we saw in the prior example, along with counts for the 3 other products:
+   ![Image](table1.png)
+   
+   .
+   
+   ## 🗝️ **Objective 3:**  Sort/Order the aggregated counts in descending order of [Count]
+   
+   1️⃣        Add an ***order_by*** component after the ***aggregate*** component.
+   
+   - Click on the [➕] symbol on the columns argument.
+   - Click on the [product_name] and change it to Count (dropdown or typing).
+   - Click on direction argument and choose Descending from the dropdown list. (Savings Account will now be at the bottom of the list as #3).
+   
+   .
+   
+   ## 🗝️ **Objective 4:**  Create table of currencies by product names
+   
+   For each product name create a distinct count of accounts within each of the currency codes (from previous exercise we examined 3-digit currency codes with one (1) exception accouant).
+   
+   1️⃣        Add a new ***cross_tab*** component after the ***read*** component.
+   
+   A cross tab allows us to create a column for each domain value for a given field (in this case [currency_code]).
+   
+   - Click on the group_by argument and choose [product_name].
+   - Click on the names argument and choose [currency_code].
+   - Click on the values argument and select “Count_Distinct”.
+   - Click on the [➕] symbol and add the [account_id] field.
+   
+   When we complete this objective, you’ll have 4 rows with 5 columns of data.
+   
+   .
+   
+   ## 🗝️ **Objective 5:**  Create table of account statuses by currency_code
+   
+   For each currency code create a distinct count of accounts within each of the account statuses.  In this data, you’ll find that there is at least one account status that has a ‘dirty’ value.  For extra credit, you can cleanse that status (See next Objective).
+   
+   1️⃣        Add a new ***cross_tab*** component after the ***read*** component.
+   
+   Create the configuration properly and you will see the four (4) currency values and the three (3) account statuses.  Let’s guide you through the extra credit assignment.
+   
+   🗝️ **Objective 5 Extra Credit:**  Create table of account statuses by a cleansed currency code field.  You’ll want to convert any “C” statuses to “Closed” prior to the ***cross_tab*** component.  You can accomplish this by:
+   
+   1️⃣       Add a new ***set*** component (set can be used to update values in an existing field or to add new fields to the incoming data) after the ***read*** component.
+   
+   2️⃣        Configure the ***set*** component to update “C” values to “Closed”
+   
+   ![Image](set.gif)
+   
+   - Click on the value argument and choose <Simple Expression>.
+   - Click on the input argument and choose the [account_status] column.
+   - Click on the operation argument and choose the “if” operation.
+   - Click on the input argument and choose the [account_status] column.
+   - Click on the condition argument and choose the “Equals” option.
+   - Click on the true_value argument and choose the <Text Value> option.
+   - Type the letter “C” between the quote marks.
+   - Click on the false_value argument and choose the <Text Value> option.
+   - Type the word “Closed” between the quote marks.
+   - Click on the double-quotes (following the word as) and type the column name “account_status” (default will be to add a ‘copy’ to the end of the data)
+   
+   3️⃣       Either reconnect the existing ***cross_tab*** component or create a new ***cross_tab*** component to this cleansed data.
+   
+   ## 
+   
+   # **Exercise 3: Create a cross tab grouped by currency code with counts by each account status.**
+   
+   - Additional challenge to normalise the C into Closed account (use set).
+   Your answer should look like the following:
+   ![image](answer_table.png)
+main =
+    operator1 = "Aggregration and Pivoting Data"
+    any1 = Data.read enso_project.data/'sample_bank_data.xlsx'
+
+
+
+#### METADATA ####
+[[{"index":{"value":5605},"size":{"value":32}},"74c61235-eefb-415c-a579-554292e963b5"],[{"index":{"value":5649},"size":{"value":9}},"ba17bd32-db36-4d49-8912-90a3e5023f4b"],[{"index":{"value":5649},"size":{"value":51}},"0a32a7f0-79d8-43b8-8b45-1944a375cceb"]]
+{"ide":{"node":{"74c61235-eefb-415c-a579-554292e963b5":{"position":{"vector":[-534,1116]}},"0a32a7f0-79d8-43b8-8b45-1944a375cceb":{"position":{"vector":[-645,1025]}},"ba17bd32-db36-4d49-8912-90a3e5023f4b":{"position":{"vector":[-645,1025]}}},"import":{}}}

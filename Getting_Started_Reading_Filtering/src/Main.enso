@@ -1,0 +1,80 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+import Standard.Visualization
+
+## ![Image](eags.png)
+   
+   **Download the sample data from [here](https://assets-v2.circle.so/1aissf6qz8d9kboi0j6qjv1vnmsa).**
+   
+   # Reading Data from an Excel Workbook
+   
+   ## 🗝️ **Objective 1:**  Let’s read a single sheet in from Excel
+   
+   1️⃣	Drag the **sample_bank_data.xlsx** workbook on the canvas. This adds a ***Data.read*** component to the workflow.
+   
+   ![image](loadfile.gif)
+   
+   2️⃣	Click on the eye **<>** to open the visualization. You will see a list of the sheets in this workbook (just Sheet1 in this case).  Double click **Sheet1**  to add a ***read*** component configured to read this sheet.
+   
+   ![image](sheets.gif)
+   
+   3️⃣	Click on the eye **<>** to open the visualization to see the data (1,000 of 4,126 rows).
+   
+   **An Overview of the Table visualization**
+   
+   ![Image](table_viz.png)
+   
+   4️⃣	Within visualization you can stretch the window maximize it using the 4-arrow (outward) button to the right of the visualization eye, or using the shortcut keys <Shift><Space>.  *Note:  once expanded, you can revert to the original size by using the 4-arrow (inward) button located in the upper left corner or hitting the shortcut* <Shift><Space> *.*
+   
+   The next button (after the 4-arrow) allows you to choose the type visualization - in this case table is the default.
+   
+   By default, the table visualization displays 1,000 rows.  To display more data, click on the dropdown (🔽) next to 1000 and increase this limit.  When all the rows are displayed (4,126 in this case), you can filter and sort within the table to examine the data. *Note:*  this does not change the data or the workflow.
+   
+   ![image](showdata.gif)
+   
+   .
+   
+   ## 🗝️ **Objective 2:**  Filter Data to find “exception” records.
+   
+   Next we want to find the records where the field [currency_code]is not valid. We want to find any records where the length of the code is NOT 3 characters. To do this we will first add a [currency_code_length]field and then filter on this.
+   
+   1️⃣	From From the ***read*** component add a new component.
+   
+   2️⃣	Type **set** and as you do this the available components will reveal a ***set*** component.  Either hit the carriage control/enter on your keyboard or use your mouse to add this component (equivalent to expression or formula which will also drive you to this same component if you typed one of these terms). This component allows us to create a derived column from other columns.
+   
+   - Click the value parameter and choose <Simple Expression> from the dropdown list.
+   - This will add 2 dots followed by “From”  (..From) entry, then click on input and choose [currency_code].
+   - Click on the operation argument and choose ***Text*** and then ***length*** from the dropdown list.
+   - If you now open visualization, a new column has been added at the end called text_length([currency_code]).
+   - To rename this field, update your configuration by setting a new fieldname value in the as “ “ argument.  Type the new name currency_code_length inside of the quotes and you will have updated the new field to become [currency_code_length].
+   
+   ![image](simpleexpression.gif)
+   
+   **3️⃣**	From the ***set*** component add a new component.
+   
+   4️⃣	Type **filter** to add the ***filter*** component.
+   
+   - Click on the “column” argument and select the [currency_code_length] column argument.
+   - Click on the “filter” argument and choose “Not Equals” (note: Not_Equal appears in the configuration).
+   - Click on the “to” argument and select <Number Value>.
+   - Click on the “0” (default number) in the configuration and type a value of  “3”.
+   
+   How many records appear in your visualization? The expected result is a single record.
+   
+   .
+   
+   ## 🗝️ **Objective 3:**  Filter Data to find “Savings Accounts” records.
+   
+   The [product_name] field will be used in this filtering exercise.  Using some of the skills that you’ve learned, you should be able to visualize this product type data and get an expected quantity of 1,026 rows.
+   ![Image](table_solution.png)
+main =
+    operator1 = "Welcome to Enso!"
+
+
+
+#### METADATA ####
+[[{"index":{"value":4289},"size":{"value":18}},"4b88666b-57f4-4e62-9f57-d7deb26fa722"]]
+{"ide":{"node":{"4b88666b-57f4-4e62-9f57-d7deb26fa722":{"position":{"vector":[-16,-72]}}},"import":{}}}

@@ -1,0 +1,184 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Google_Api import all
+import Standard.Visualization
+
+## ![image](eags.png)
+   
+   # Selecting and Joining Data
+   
+   In this exercise, you will read an Excel workbook containing three (3) worksheets of connected information about bank customers.  You need to create a summary of information about the Savings Accounts that includes:
+   
+   account_id | open_date | created_date | last_updated_date | active_passive | Base Rate
+   
+   Join the Customers, Accounts and ECBRates worksheets together to solve this exercise.  The exercise begins with the ***Data.read*** component.
+   .
+   
+   ## **Objective 1:**  Read the Accounts to only “Savings” products, limiting the columns of data to the required columns/elements:
+   
+   1️⃣        Add a new component after the ***Data.read*** component by either dragging from the output port (the bottom edge) of the ***Data.read*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***read*** component
+   - Click on the query argument
+   - Select the Accounts sheet
+   
+   2️⃣        Filter to the Savings products by adding a new component after the ***read*** component by either dragging from the output port (the bottom edge) of the ***read*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***filter*** component
+   - Click on the column argument
+   - Select the [product_name] column
+   - Click on the filter argument
+   - Select the Equals option
+   - Click on the “to” argument
+   - Select the <Text Value> option
+   - Click into the “ “ argument
+   - Type “Savings Account” (case sensitive)
+   
+   You should be able to see the first 1,000 of  1,026 rows in the visualization.
+   
+   3️⃣        Add a new component after the ***filter*** component by either dragging from the output port (the bottom edge) of the ***filter*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***select_columns*** component
+   - Click on the column argument
+   - Select the [account_id] and [open_date] columns
+   
+   ### .
+   
+   .
+   
+   ## **Objective 2:**  Read the Customers data
+   
+   1️⃣        Add a new component after the ***Data.read*** component by either dragging from the output port (the bottom edge) of the ***Data.read*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***read*** component
+   - Click on the query argument
+   - Select the [Customers] sheet
+   
+   ### .
+   
+   .
+   
+   ## **Objective 3:**  Join the Accounts (Left) and the Customers (Right) data together
+   
+   1️⃣        Add a new component after the ***select_columns*** component by either dragging from the output port (the bottom edge) of the ***select_columns*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***join*** component (*Note:  This will become the Left set of data*)
+   
+   2️⃣        Connect the outgoing data from the ***read*** component (Customers) by dragging from the output port (the bottom edge) of the ***read*** component to the, or clicking the ➕ button on the “right” argument on the ***join*** component.
+   
+   ·      Choose an appropriate “join_kind” argument option ([https://help.enso.org/docs/api/Standard.Table/Table/Table.join/](https://help.enso.org/docs/api/Standard.Table/Table/Table.join/))
+   
+   ·      Click on the on (➕) and accept the [account_id] (1st field) column
+   
+   ·      Click on the right argument and select the [acct_id] column
+   
+   ·      Check your results and choose again (if necessary)
+   
+   3️⃣        Remove the [acct_id] column
+   
+   ·      Add a ***remove_columns*** component following ***join*** component (*Note:  You can select_columns and choose all desired columns or use the remove_columns component and de-select the one unnecessary column*).
+   
+   ### You should now have 1026 rows with columns: account_id, open_date, created_date, last_updated_date, active_passive.
+   
+   ![Image](table1.png)
+   
+   .
+   
+   ## **Objective 4:**  Joining your data to the ECB Rates
+   
+   The ECB rates are provided as a table of Start Date, End Date, Rate. The final task is to join the result from above to these rates.  There is a challenge in using the ECB data.  The use of the table reads each row as follows:  Date greater than or equal to [StartDate] until [EndDate].  In this definition of the table, there is a redundancy where each [StartDate] is equal to the prior period’s [EndDate].
+   
+   1️⃣        Add a new component after the ***Data.read*** component by either dragging from the output port (the bottom edge) of the ***Data.read*** component, or clicking the ➕ button on the component.
+   
+   - Choose the ***read*** component
+   - Click on the query argument
+   - Select the [ECBRates] sheet
+   
+   2️⃣        Add a ***set*** component to the output of the ***read*** component (to subtract 1 day from the [EndDate]).
+   
+   ·      Click on the value argument and select the <Simple Expression> option
+   
+   ·      Click on the input argument and select the [EndDate] column
+   
+   ·      Click on the operation argument and select the “Date_Add” function
+   
+   ·      Click on the length argument and select the “Number Value” option
+   
+   ·      Type “-1” into the argument
+   
+   ·      Click on the period argument and select the “Day” option
+   
+   ·      Type “EndDate” in the ‘as’ argument
+   
+   ·      Check your results to see non-overlapping date ranges
+   
+   3️⃣        Add your new ***join*** component to bring the data from the ***remove_columns*** component into the ***join*** component and then connect the output anchor from the ***set*** component (ECBRates – Fixed).
+   
+   Based on the account’s [open_date], use the join tool to join to the date ranges in the ECB rate data easily
+   
+   ·      Connect the data from the ***set*** component into the right argument in the ***join*** component
+   
+   ·      Click on the join_kind argument and select the “Inner” option
+   
+   ·      Click on the ➕ button (on [+])
+   
+   ·      Click on the Equals (default) and select “Between”
+   
+   ·      Click on the left argument and select [open_date]
+   
+   ·      Click on the right_lower argument and select [StartDate]
+   
+   ·      Click on the right_upper argument and select [EndDate]
+   
+   ### .
+   
+   .
+   
+   ## **Objective 5:**  Final data preparation
+   
+   You’ll want to remove unnecessary columns, followed by renaming of Interest Rate and finally the filtering to only “Active” accounts.
+   
+   1️⃣        Remove the `StartDate` and `EndDate` columns.
+   
+   ·      Use the ***remove_columns*** component for the [StartDate] and [EndDate] columns
+   
+   You should still have 1026 rows with columns: account_id, open_date, created_date, last_updated_date, active_passive, StartDate, EndDate and InterestRate.
+   
+   2️⃣        Rename the [InterestRate] column to [Base Rate]
+   
+   ·      Add a new ***rename_columns*** component after the ***remove_columns*** component
+   
+   ·      Click on the ➕ button (on [+])
+   
+   ·      Click on the “account_id” (default 1st column) and select the [InterestRate] column
+   
+   ·      Click on the “New Name” (default) and type “Base Rate” as replacement text
+   
+   ·      Next, using a `rename_columns` component, rename the `InterestRate` to `base_rate`.
+   
+   3️⃣        Filter to the active accounts
+   
+   ·      Add a new ***filter*** component after the ***rename_columns*** component
+   
+   ·      Click on the column argument
+   
+   ·      Select the [active_passive] column
+   
+   ·      Check to see how many rows of data are present in your visualization
+   
+   ### .
+   
+   ### **You should now have 676 rows with columns: account_id, open_date, created_date, last_updated_date, active_passive, StartDate, EndDate and Base Rate.**
+   
+   ![Image](table2.png)
+main =
+    operator1 = "Selecting and Joining Data"
+    node1 = Data.read enso_project.data/"Customer Data.xlsx"
+
+
+
+#### METADATA ####
+[[{"index":{"value":7956},"size":{"value":28}},"96ab67a9-9096-4751-a2d2-e679f07870d7"],[{"index":{"value":7997},"size":{"value":48}},"9e0c0be9-a11e-4c16-8593-a18f1cbb94e3"]]
+{"ide":{"node":{"96ab67a9-9096-4751-a2d2-e679f07870d7":{"position":{"vector":[-45,17]}},"9e0c0be9-a11e-4c16-8593-a18f1cbb94e3":{"position":{"vector":[-145,-55]}}},"import":{}}}
