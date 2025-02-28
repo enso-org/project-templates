@@ -144,7 +144,7 @@ import Standard.Visualization
    ### 
 main =
     operator1 = "Cleaning and Parsing Data"
-    any2 = Data.read enso_project.data/"crm_data.csv"
+    any2 = Data.read "Data/crm_data.csv"
 
 
 

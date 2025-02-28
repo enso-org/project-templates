@@ -1,4 +1,4 @@
-name: Month Over Month Sales Analysis
+name: Month on Month Sales
 namespace: local
 version: 0.0.1
 prefer-local-libraries: 'true'

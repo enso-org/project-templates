@@ -5,67 +5,67 @@ from Standard.AWS import all
 import Standard.Visualization
 
 ## ![Image](eaep.png)
-   
+
    # Combining Spreadsheet Data in Enso
-   
+
    ## Overview
-   
+
    You have an Excel file that has 3 tabs (pictured below)
-   
+
    1️⃣ Customer data, with a Customer ID which is a unique key, and has data that contains the customer's name and phone number.
-   
+
    2️⃣ Item data, with an Item ID which is a unique key, and has each item's category and price.
-   
+
    3️⃣ Order data, which  has an Order ID which is a unique key, along with the Customer ID and Item ID for that order, along with their quanity ordered.
-   
+
    .
-   
+
    ### **Using this data, you are tasked with calculating the total order value for each customer, and put them in order of largest to smallest customer based on this total order value.**
-   
+
    **.**
-   
+
    ### Here are the steps we took to solve this problem
-   
+
    1️⃣ Open the Excel file. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    2️⃣ Read in the "Orders" sheet from the Excel file that we have chosen.
-   
+
    3️⃣ Read in the "Items" sheet from the Excel file that we have chosen.
-   
+
    4️⃣ Join the "Orders" and "Items" sheets together, using the [Item ID] as the key to tie the two sheets together. For Excel power-users, you may have used vlookup or xlookup functions to do this before.
-   
+
    5️⃣ Create a new column, called [Order Value], and fill it with [Unit Price] * [Quantity].
-   
+
    6️⃣ Aggregate the data, grouping by the [Customer ID] and adding up for each [Customer ID] their total amount spent. We create a new column called [Orders Value] with this value.
-   
+
    7️⃣ Read in the "Customers" sheet from the Excel file that we have chosen.
-   
+
    8️⃣ Join the "Customers" sheet with the aggregated [Orders Value] by [Customer ID] output data, to add the [Customer Name] and [Phone Number] to the aggregated [Orders Value].
-   
+
    9️⃣ Sort the joined data by the Orders Value, from largest to smallest.
-   
+
    🔟 Round the data to 2 decimal places. We now have our customers ranked from top to bottom for their overall order value.
-   
+
    .
-   
+
    ### **We have expanded the data visualization to show the table on each step You can close these visualizations by clicking on the eye at the top of each visualization.**
-   
+
    ![Image](eyeball_viz.png)
-   
+
    .
-   
+
    .
-   
+
    ## Data in Excel
-   
+
    ![Image](excel1.png)
-   
+
    ![Image](excel2.png)
-   
+
    ![Image](excel3.png)
 main =
     ## 1 - Typically you would drag this file onto the canvas. If you click on the word "path" here, you will also see how you can select a file from your computer.
-    any1 = Data.read enso_project.data/'store_data.xlsx'
+    any1 = Data.read 'Data/store_data.xlsx'
     ## 7 - Read the customers table.
     operator3 = any1.read 'Customers'
     ## 3 - Read the products table.
@@ -88,5 +88,5 @@ main =
 
 
 #### METADATA ####
-[[{"index":{"value":2925},"size":{"value":9}},"4d60f339-771b-4e59-9398-b0abae20d712"],[{"index":{"value":2925},"size":{"value":45}},"412eaee1-cc3d-44eb-af2e-ff75c98c566a"],[{"index":{"value":3024},"size":{"value":21}},"108a1561-cf9e-4ba3-b771-518a2e516ddd"],[{"index":{"value":3098},"size":{"value":17}},"cc532ccd-423c-4390-a861-0e757092bea8"],[{"index":{"value":3168},"size":{"value":18}},"df4ac6de-97d2-4ea5-9e46-ffce91498ed8"],[{"index":{"value":3310},"size":{"value":54}},"ab35b4ba-98c6-4ded-a3a2-40449300fb44"],[{"index":{"value":3459},"size":{"value":98}},"9df667e1-43e3-41a0-8d32-6659c884501c"],[{"index":{"value":3683},"size":{"value":73}},"8c744806-df4b-46fd-8339-da5827c376e3"],[{"index":{"value":3866},"size":{"value":60}},"50439399-6648-4d8a-a5d8-6e92cde1fbc1"],[{"index":{"value":4059},"size":{"value":54}},"1348f722-de08-441f-927d-69cbe91c65a2"],[{"index":{"value":4187},"size":{"value":81}},"14ef71f4-de02-48b5-bc4a-df23fe3b72fb"]]
-{"ide":{"node":{"412eaee1-cc3d-44eb-af2e-ff75c98c566a":{"position":{"vector":[-150,26]}},"4d60f339-771b-4e59-9398-b0abae20d712":{"position":{"vector":[-150,26]}},"108a1561-cf9e-4ba3-b771-518a2e516ddd":{"position":{"vector":[-615,-91]},"visualization":{"show":true,"width":563.9800415039062}},"cc532ccd-423c-4390-a861-0e757092bea8":{"position":{"vector":[724,-91]},"visualization":{"show":true,"width":469.988525390625}},"df4ac6de-97d2-4ea5-9e46-ffce91498ed8":{"position":{"vector":[-16,-46]},"visualization":{"show":true,"width":677.2506103515625}},"ab35b4ba-98c6-4ded-a3a2-40449300fb44":{"position":{"vector":[-16,-349]},"visualization":{"show":true,"width":1015.4761962890625}},"9df667e1-43e3-41a0-8d32-6659c884501c":{"position":{"vector":[-16,-607]},"visualization":{"show":true,"width":1024.193359375}},"8c744806-df4b-46fd-8339-da5827c376e3":{"position":{"vector":[-16,-888]},"visualization":{"show":true}},"50439399-6648-4d8a-a5d8-6e92cde1fbc1":{"position":{"vector":[-615,-1127]},"visualization":{"show":true,"width":768.4908447265625}},"1348f722-de08-441f-927d-69cbe91c65a2":{"position":{"vector":[-615,-1385]},"visualization":{"show":true,"width":756.4642333984375}},"14ef71f4-de02-48b5-bc4a-df23fe3b72fb":{"position":{"vector":[-585,-1666]},"visualization":{"show":true,"width":746.8021240234375}}},"import":{},"project":null}}
+[[{"index":{"value":2838},"size":{"value":9}},"4d60f339-771b-4e59-9398-b0abae20d712"],[{"index":{"value":2838},"size":{"value":32}},"412eaee1-cc3d-44eb-af2e-ff75c98c566a"],[{"index":{"value":2924},"size":{"value":21}},"108a1561-cf9e-4ba3-b771-518a2e516ddd"],[{"index":{"value":2998},"size":{"value":17}},"cc532ccd-423c-4390-a861-0e757092bea8"],[{"index":{"value":3068},"size":{"value":18}},"df4ac6de-97d2-4ea5-9e46-ffce91498ed8"],[{"index":{"value":3210},"size":{"value":54}},"ab35b4ba-98c6-4ded-a3a2-40449300fb44"],[{"index":{"value":3359},"size":{"value":98}},"9df667e1-43e3-41a0-8d32-6659c884501c"],[{"index":{"value":3583},"size":{"value":73}},"8c744806-df4b-46fd-8339-da5827c376e3"],[{"index":{"value":3766},"size":{"value":60}},"50439399-6648-4d8a-a5d8-6e92cde1fbc1"],[{"index":{"value":3959},"size":{"value":54}},"1348f722-de08-441f-927d-69cbe91c65a2"],[{"index":{"value":4087},"size":{"value":81}},"14ef71f4-de02-48b5-bc4a-df23fe3b72fb"]]
+{"ide":{"node":{"412eaee1-cc3d-44eb-af2e-ff75c98c566a":{"position":{"vector":[-150,26]}},"4d60f339-771b-4e59-9398-b0abae20d712":{"position":{"vector":[-150,26]}},"108a1561-cf9e-4ba3-b771-518a2e516ddd":{"position":{"vector":[-615,-91]},"visualization":{"show":true,"width":563.9800415039062}},"cc532ccd-423c-4390-a861-0e757092bea8":{"position":{"vector":[724,-91]},"visualization":{"show":true,"width":469.988525390625}},"df4ac6de-97d2-4ea5-9e46-ffce91498ed8":{"position":{"vector":[-16,-46]},"visualization":{"show":true,"width":677.2506103515625}},"ab35b4ba-98c6-4ded-a3a2-40449300fb44":{"position":{"vector":[-16,-349]},"visualization":{"show":true,"width":1015.4761962890625}},"9df667e1-43e3-41a0-8d32-6659c884501c":{"position":{"vector":[-16,-607]},"visualization":{"show":true,"width":1024.193359375}},"8c744806-df4b-46fd-8339-da5827c376e3":{"position":{"vector":[-16,-888]},"visualization":{"show":true}},"50439399-6648-4d8a-a5d8-6e92cde1fbc1":{"position":{"vector":[-615,-1127]},"visualization":{"show":true,"width":768.4908447265625}},"1348f722-de08-441f-927d-69cbe91c65a2":{"position":{"vector":[-615,-1385]},"visualization":{"show":true,"width":756.4642333984375}},"14ef71f4-de02-48b5-bc4a-df23fe3b72fb":{"position":{"vector":[-615,-1639]},"visualization":{"show":true,"width":746.8021240234375}}},"widget":{},"import":{},"snapshot":"eJydV81yHDUQvvspmviw9pY9ZO38HnIAEsBUQQCTpKitrVTvTO+OsEaaSJpdD1cegAt3DrwEz8MLwCNQrdb82U6o4jY7Gn39devrr7UbZyu4DGgKdEX2KXoCVdXWBUCtDzaT1R9wrT+w/BwDrj8I8Mmby/FieuyXXyvfoFY/Y1DWHBwcHsJHy4sKt7Q6IqQ6q832+OAAAA7hM1utlVFmC5e1Iyx8SRSAGYAy8MJ4Kx8ewssduZ2iffz9o22gxB0BGnhxnZOGjdIEocQAJXo4h4BrD0e1ykPjqIA1abuXoIu///z1r1/+gM8aH2xFDgoMeAJ7FUrA4e3Fc9iXKi9BeUBojHrXEFxRewJoihiE90nI3JqAyngIJUGeEGYeDFYUP69LawhMU63JZZHFWWJxEaiaMDDy6r/DE/JqoGrmIcdAW+taCeZUThLlPEV56Yoh0QgbIdCklQ9E09ZshRonNy4Px+q4bqyTUljGu7lNOXjXoFGhlXUqhF6WDvcQ5vNXnlUQSuUTz9Y2gI4goL+iQrBy1HmjMcinBMEG1IIJO9QNRSKxMt0xSMHqJvCGilUln9sNaHRb8gGCBV+h1vzcbQPugAKsEUq3AmXzeSQ/n3dPnMaX5EhIlwQ+UO1hzyztVQxi9Y4Er3Z2ramaCPJlTSZuHBSdRcST+DYqXHmgak1FQQUoE2yP9hPlIYMf2lrlqHUr5dvbRhdQONwOCFZ2EeRodujhiJ/XmF9tnW1McQyx1VvbOMhtVTeBHHPHohgwEkIKewLWQa5VfgX7kgvAoT1JEfbWFTCrMZQz8KXdGz4BXpjP59zmGXf9fD6PwawhE49j7fiEmxpQAq6d3fubrfM9YdGh3Ys69vdADCTmMC2lyHNP4ht5aT2ZaZNM8FjY/w/uQYL7yt7kxkKcALOuthRKVmnjO1EvU1OtAMVRrqiNJVdS0rC3N7dn8Ll1iV1t9+ROG0/OiwoqbIVlw4reaWuvmprP7Do9bhqTs1UzHhRJU2vaWJds5GFnmY4wECAY2kNudVOZE+5JTQUsxUlec3OspOk2SmtQQVp3+cqoAN+yN61gDsvvGjRBhXYlIR6lEJ9st462HIVTFSdgZdZcnXUrBRq50CpGwqJIgun7f/qRmJB0MVa2MQF8TSZk8IYgv53WNCuf0uoMTflkApH647v000X/fxp6cktDt/B6S8auYrfYrtsbVbBNYCOUqo6aevjqG6xISrr8Ns6sb+LMWnUt/95gwvtp4n3J9wH+/ierDBUyKtPpjbedSFnuMGLB++f3336H79mXejnwR2dQUK4q1FBrzMnHUzR2L4WM1tWVCxwaHh9SfltHd7Eh2CrNLNaF3ZFDPfX3WwPqTTonuq7RsP/2jHbj+05MorR7adV407JGJMkDIV5dcjSQa+ujyD1NATwXKtopS9rK+VNLgCHNvJqHV0ScbOwG0XDZammNWr/dqZ+HO9c0seGqxaq8sZ1fLYad04Wz9y2cy0KFysAzXuYwCzgdhtPt2aT8ncMpg4tN/FimS6pFHCn3eKTcgzKOx4jHZoPa2zh6+ADaVGlPmvLQjZLb4y2LJNG0C3gG/UyCGT9+7IN19JaPObvW/nrWJfQYTqXhx1c+LwcugLYmh8G6c3gWwRNq38g91PkYqna2aPJwJ9KDKVKcJD3K2RjFSo+Vium3U5SHUxRpxx7mAZwOrqO6y2nX/tIgCTZayJYCKLOxrhL1WyO74iXUd3aY+NyR0xN4NjDL2C5G6UKWXRhDDpZZ9uJdg9pL1nDxfLbqGD+E07sGUzSx7r5Ig/OI8QxzIlKbclrcH5F6knkKcJRll6qqNb19cV07/slOCbNhqM2O+e3XjQ6q1u3wRTfnZsfHx6naQqEv+SM4hS94xEHvQb4zy5F9x3InzY4uv3LttZtuY3TEgvfLNVgrHnPT/Baj/Bb3s97UYTkbBZytuO6XTTWl3Ukm/ezP4clYOfn4z5XcVMcaiLkok+umoPgvqVfKRhnU0bSV2d6g/WhE+3yqlcVi0MrRIJZxNsc906dwOkyooXel5MqBVhsKqiKp7ckwaivrQ3wZbX3YmZzZB3SBj6K3/hsJPB7X/VHmmcOyV8qkrJBlz8nnZPhiM1Bf3Oc27wfieMudg3Ea/2wc//EHhT0hE6UtUc96FXeLB/8CD2uSIg=="}}

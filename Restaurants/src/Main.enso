@@ -5,91 +5,91 @@ from Standard.AWS import all
 import Standard.Visualization
 
 ## ![Image](eaep.png)
-   
+
    # Geospatial Analysis
-   
+
    ## Project Overview
-   
+
    This workflow analyzes restaurants in Los Angeles.
-   
+
    There are three data files in this project.
-   
+
    1 - Restaurants in Los Angeles, in a csv format.
-   
+
    2 - Council District centroids (geographic center) for Los Angeles, in a csv format.
-   
+
    3 - A mapping table of year ranges to color to be displayed on the map, in a JSON format.
-   
+
    ![Image](table1.png)
-   
+
    ## Project Goals
-   
+
    **Goal 1** - Create a map that displays the total number of restaurants by City Council District. Larger dots indicating more restaurants in that district.
-   
+
    **Goal 2** - Create a map showing all restaurants in Los Angeles. Categorize the restaurants by longevity:
-   
+
    - **Restaurants opened prior to January 1, 2000 in Red**
    - **Restaurants opened from January 1, 2000 to December 31, 2009 in Green**
    - **Restaurants opened January 1, 2010 and later in Blue.**
-   
+
    .
-   
+
    ## Here are the steps we took to solve this problem
-   
+
    ### **Goal 1** - Create a map that displays the total number of restaurants by City Council District.
-   
+
    1️⃣ Open the restaurants.csv file containing the restaurants in Los Angeles. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    2️⃣ Create a count of restaurants by [COUNCIL DISTRICT] using the ***aggregate*** component. The Count of the number of restaurants is placed in a new column called [radius].
-   
+
    3️⃣ In order to make the dots on the map easier to see, we multiply the [radius] column by 5, simply to make the radius larger.
-   
+
    4️⃣ Open the la_districts.csv file containing the centroid (geographic middle) of each council district in Los Angeles. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    5️⃣ Create a new column called [label] using the ***set*** component. This will allow a user to hover their mouse over any point to better understand what they are seeing.
-   
+
    6️⃣ Join the aggregated count of restaurants in each council district with the table of council district centroids. The visualization automatically changes the visualization if there are columns called [latitude] and [longitude]. If those columns appear, there are three optional columns. [radius] which changes the default size of the dot on the map, [color] which changes the color of the dot, and [label] which adds a hover-over label for each dot on the map. In this case, we have a [label] and [radius], and no [color] column, so the color is the default blue.
-   
+
    ![image](map1.png)
-   
+
    .
-   
+
    ### **Goal 2** - Display a map showing all restaurants in Los Angeles. Categorize the restaurants by longevity.
-   
+
    1️⃣ Open the restaurants.csv file containing the restaurants in Los Angeles. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    2️⃣ Notice that the  [LOCATION] column in the ***Data.read*** component has latitude and longitude coordinates embedded into a single field. We need to extract each component and put the latitude in its own column, and the longitude in its own column. We show two methods to accomplish this.
-   
+
    2a uses the ***parse_to_column*** component. We chose the [LOCATION] column, and provided a Regular Expression to parse latitude and longitude to their own columns.  The regular expression looks for what are called Named Groups. If you are comfortable writing Regular Expressions, these are a powerful tool to find and extract all kinds of data.
-   
+
    2b is an alternate solution, that starts with the ***split_to_columns*** component, using the ',' as the delimiter.
-   
+
    We then need to rename the [latitude] and [longitude] columns using the ***rename_columns*** component.
-   
+
    When we view the data, we can see that the latitude and longitude columns are of the type TEXT and they need to be numeric, specifically FLOAT, in order to display on a map. They also have the parentheses (brackets) that need to be removed.
-   
+
    Using the ***text_replace*** component, we replace the parentheses with empty strings.
-   
+
    And finally we convert the text based [latitude] and [longitude] columns to the data type FLOAT.
-   
+
    3️⃣ We use a filter to find restaurants that are between latitude 32 and 35 to get rid of the rows with poor data quality. Either missing the latitude completely, or a latitude that is not near Los Angleles.
-   
+
    4️⃣ We use another filter to remove rows with poor data quality in the [longitude] column. All longitudes in the western hemisphere are defined as negative numbers. This filter also removes rows that have a zero as the longitude.
-   
+
    5️⃣ Convert the [LOCATION START DATE] and [LOCATION END DATE columns from a CHAR format to a DATE format. This will allow us to extract the year in the next step using a Date_Part function.
-   
+
    6️⃣ Create a new column called [year] that contains the 4 digit year.
-   
+
    7️⃣ Create a new field called [label] that contains the name of the restaurant. This will allow us to hover-over a point on the map and see what restaurant is displayed.
-   
+
    8️⃣ Open the mapcolors.json file containing the colors that will be used for the map. Each row has [StartYear], [EndYear] and [color]. The [color] field uses RGB notation. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    9️⃣ Join the data from the restaurants data with the color data. We are doing a special kind of join here, which joins not on an exact match, but rather between two values. For example, if the restaurant was opened in 2005, the join between will match to the second record in the table, which has a [StartYear] of 2000 and and [EndYear] of 2009. Therefore, the [color] will be Green (RGB 0,255,0,100)
    ![Image](map2.png)
   
 main =
     ## 1 - Restaurants in Los Angeles CA
-    any1 = Data.read enso_project.data/'restaurants.csv'
+    any1 = Data.read 'Data/restaurants.csv'
     ## 2a- Using Regex extract the latitude and longitude from the LOCATION.
     operator1 = any1.parse_to_columns 'LOCATION' "\((?<latitude>-?\d+(?:.\d*)?), (?<longitude>-?\d+(?:.\d*)?)\)"
     ## 3 - Select only the rows where the latitude in in the correct range for LA.
@@ -115,9 +115,9 @@ main =
     ## 2b - An alternative to RegEx Step 5
     table2 = column2.parse ['latitude', 'longitude'] ..Float
     ## 4 - CSV has the Latitude and Longitude for each of the council districts in Los Angeles
-    any3 = Data.read enso_project.data/'la_districts.csv'
+    any3 = Data.read 'Data/la_districts.csv'
     ## 8 - Json file describing the colors we want for each year range in RGB.
-    any4 = Data.read enso_project.data/'mapcolors.json'
+    any4 = Data.read 'Data/mapcolors.json'
     ## 7 - Add a label to the dots on the map. You can see this name when you hover over a point.
     any5 = operator7.set (..Simple_Expr (..Name 'DBA NAME') (..If ..Not_Empty (..Name 'DBA NAME') (..Name 'BUSINESS NAME'))) 'label'
     ## 5 - Create a label for each of the dots on the map. See this when you hover over them.
@@ -130,5 +130,5 @@ main =
 
 
 #### METADATA ####
-[[{"index":{"value":6807},"size":{"value":9}},"f42eeb17-f531-4ffe-8649-f3e5000dd8ab"],[{"index":{"value":6807},"size":{"value":45}},"3205c87c-0d53-46b0-bcb9-d5bfb444a737"],[{"index":{"value":6946},"size":{"value":96}},"9e8474ec-aa98-42c4-a523-2c69e8eb66ce"],[{"index":{"value":7142},"size":{"value":52}},"90fb2469-3b44-4897-8955-f44a4b306bb5"],[{"index":{"value":7259},"size":{"value":39}},"1ff6acf9-a1bf-4a9a-9a84-0bc4c0ac5003"],[{"index":{"value":7376},"size":{"value":54}},"b6c1b9a1-f98b-4550-bc53-3ca31f4b90dd"],[{"index":{"value":7533},"size":{"value":72}},"10da91bb-66fd-46e4-b7bf-91156f64f64c"],[{"index":{"value":7725},"size":{"value":80}},"68da2641-6b5c-43d0-a8a7-a996c57d1993"],[{"index":{"value":7871},"size":{"value":98}},"cc7178ef-471f-4b1e-872a-548661b25bd8"],[{"index":{"value":8026},"size":{"value":21}},"d136e808-c2d3-4c39-847b-891a8c38d929"],[{"index":{"value":8026},"size":{"value":32}},"3933e107-5ee4-47c5-9994-1ba9c66943d7"],[{"index":{"value":8113},"size":{"value":21}},"4e787eda-037f-4ce1-b54c-bc0e9381c576"],[{"index":{"value":8113},"size":{"value":99}},"76aded59-d6f2-485f-ad2b-48a847327577"],[{"index":{"value":8270},"size":{"value":17}},"8935f929-8fb4-4504-a9d3-d052d280b5b3"],[{"index":{"value":8270},"size":{"value":30}},"b19b6f56-4146-410f-9093-294b445634c3"],[{"index":{"value":8270},"size":{"value":34}},"73c8eb7c-2582-472f-8172-89606606286b"],[{"index":{"value":8270},"size":{"value":37}},"e295373d-b24d-4b86-baac-ccae89e1f52a"],[{"index":{"value":8365},"size":{"value":20}},"1248699c-1889-477a-88a8-443354600db6"],[{"index":{"value":8365},"size":{"value":34}},"9ed3926c-37bd-42c1-8320-d73946822691"],[{"index":{"value":8365},"size":{"value":38}},"639e417e-5ddd-42f5-a6b1-2e931cddb71c"],[{"index":{"value":8365},"size":{"value":41}},"370c69e4-ec2b-45e7-ac43-6df886dca115"],[{"index":{"value":8463},"size":{"value":13}},"c5f71358-8e0f-4d5d-9c7b-8994022f78b4"],[{"index":{"value":8463},"size":{"value":39}},"853df947-8305-48ae-96bd-3af9cf86ef6d"],[{"index":{"value":8463},"size":{"value":47}},"adc7de0c-d907-4ace-aef3-bdb347b0d837"],[{"index":{"value":8617},"size":{"value":9}},"ba36a1ec-683f-4af1-8e32-c19aa507324c"],[{"index":{"value":8617},"size":{"value":46}},"0d4f320a-8caf-4366-bd17-65e37883a4d2"],[{"index":{"value":8754},"size":{"value":9}},"58fee964-7256-4c1e-9f64-6b3605f875b4"],[{"index":{"value":8754},"size":{"value":44}},"70f7aaf7-a7f1-432b-adfe-a0435eed603e"],[{"index":{"value":8908},"size":{"value":13}},"26522658-5e59-4d2b-82ea-85e4c3f0e07d"],[{"index":{"value":8908},"size":{"value":113}},"7eb832a3-77d7-4a00-9a85-33f7dc07b78c"],[{"index":{"value":8908},"size":{"value":121}},"3f4bc9ca-1295-4126-9b0d-82cd96ed458b"],[{"index":{"value":9135},"size":{"value":8}},"3975d0ee-e5a5-4bd0-b3e0-e53fad5083ff"],[{"index":{"value":9135},"size":{"value":68}},"b7edd5f0-4518-49fe-9216-2f6a26a9a65b"],[{"index":{"value":9135},"size":{"value":76}},"d91e360e-26bf-48e2-a4c5-f6da1a8dd60c"],[{"index":{"value":9389},"size":{"value":67}},"6c227521-983b-49e8-9338-76ceff8686b6"],[{"index":{"value":9528},"size":{"value":9}},"2e596ba3-d1da-4186-9149-bbd3278d7373"],[{"index":{"value":9528},"size":{"value":14}},"700096a7-d141-4312-b936-b4b4f4defd12"],[{"index":{"value":9528},"size":{"value":22}},"4dd266ea-3647-44bb-9870-60dbef9de6fa"],[{"index":{"value":9528},"size":{"value":63}},"4067e54f-26ab-4de5-9e37-db2380006c91"]]
-{"ide":{"node":{"3205c87c-0d53-46b0-bcb9-d5bfb444a737":{"position":{"vector":[-2471,761]},"visualization":{"show":true,"width":2922.967821633464}},"f42eeb17-f531-4ffe-8649-f3e5000dd8ab":{"position":{"vector":[-2471,761]},"visualization":{"show":true,"width":3230.2480753080627}},"9e8474ec-aa98-42c4-a523-2c69e8eb66ce":{"position":{"vector":[-1214,476]},"visualization":{"show":true,"project":{"project":"Builtin"},"name":"Table"}},"90fb2469-3b44-4897-8955-f44a4b306bb5":{"position":{"vector":[-1214,197]},"visualization":{"show":false,"project":{"project":"Builtin"},"name":"Table"}},"1ff6acf9-a1bf-4a9a-9a84-0bc4c0ac5003":{"position":{"vector":[-1214,119]},"visualization":{"show":false,"width":545,"height":161.17431640625,"project":{"project":"Builtin"},"name":"Table"}},"b6c1b9a1-f98b-4550-bc53-3ca31f4b90dd":{"position":{"vector":[-2471,476]}},"10da91bb-66fd-46e4-b7bf-91156f64f64c":{"position":{"vector":[-2471,379]}},"68da2641-6b5c-43d0-a8a7-a996c57d1993":{"position":{"vector":[-1212,47]}},"cc7178ef-471f-4b1e-872a-548661b25bd8":{"position":{"vector":[-1214,-48]},"visualization":{"show":false,"project":{"project":"Builtin"},"name":"Table"}},"3933e107-5ee4-47c5-9994-1ba9c66943d7":{"position":{"vector":[-277,465]},"visualization":{"show":true}},"d136e808-c2d3-4c39-847b-891a8c38d929":{"position":{"vector":[-537,503]}},"76aded59-d6f2-485f-ad2b-48a847327577":{"position":{"vector":[-277,186]},"visualization":{"show":false,"project":{"project":"Builtin"},"name":"Table"}},"4e787eda-037f-4ce1-b54c-bc0e9381c576":{"position":{"vector":[174,399]}},"e295373d-b24d-4b86-baac-ccae89e1f52a":{"position":{"vector":[-277,108]}},"73c8eb7c-2582-472f-8172-89606606286b":{"position":{"vector":[172,264]}},"b19b6f56-4146-410f-9093-294b445634c3":{"position":{"vector":[172,264]}},"8935f929-8fb4-4504-a9d3-d052d280b5b3":{"position":{"vector":[172,264]}},"370c69e4-ec2b-45e7-ac43-6df886dca115":{"position":{"vector":[-277,36]},"visualization":{"show":false,"project":{"project":"Builtin"},"name":"Table"}},"639e417e-5ddd-42f5-a6b1-2e931cddb71c":{"position":{"vector":[172,192]}},"9ed3926c-37bd-42c1-8320-d73946822691":{"position":{"vector":[172,192]}},"1248699c-1889-477a-88a8-443354600db6":{"position":{"vector":[172,192]}},"adc7de0c-d907-4ace-aef3-bdb347b0d837":{"position":{"vector":[-277,-36]},"visualization":{"show":true,"width":734.328125,"project":{"project":"Builtin"},"name":"Table"}},"853df947-8305-48ae-96bd-3af9cf86ef6d":{"position":{"vector":[202,12]}},"c5f71358-8e0f-4d5d-9c7b-8994022f78b4":{"position":{"vector":[202,12]}},"0d4f320a-8caf-4366-bd17-65e37883a4d2":{"position":{"vector":[-1864,476]},"visualization":{"show":false,"width":544.6015625,"project":{"project":"Builtin"},"name":"Table"}},"ba36a1ec-683f-4af1-8e32-c19aa507324c":{"position":{"vector":[209,-1109]}},"70f7aaf7-a7f1-432b-adfe-a0435eed603e":{"position":{"vector":[-1140,-209]},"visualization":{"show":false,"width":544.6015625,"project":{"project":"Builtin"},"name":"Table"}},"58fee964-7256-4c1e-9f64-6b3605f875b4":{"position":{"vector":[-299,9]},"visualization":{"show":true,"width":544.6015625,"project":{"project":"Builtin"},"name":"Table"}},"3f4bc9ca-1295-4126-9b0d-82cd96ed458b":{"position":{"vector":[-1214,-137]}},"7eb832a3-77d7-4a00-9a85-33f7dc07b78c":{"position":{"vector":[-731,-1250]}},"26522658-5e59-4d2b-82ea-85e4c3f0e07d":{"position":{"vector":[-730,-1250]}},"d91e360e-26bf-48e2-a4c5-f6da1a8dd60c":{"position":{"vector":[-1864,366]},"visualization":{"show":true,"width":512.2348414179104,"project":{"project":"Builtin"},"name":"Table"}},"b7edd5f0-4518-49fe-9216-2f6a26a9a65b":{"position":{"vector":[215,-1402]},"visualization":{"show":true,"project":{"project":"Builtin"},"name":"Table"}},"3975d0ee-e5a5-4bd0-b3e0-e53fad5083ff":{"position":{"vector":[216,-1402]}},"6c227521-983b-49e8-9338-76ceff8686b6":{"position":{"vector":[-2471,87]},"visualization":{"show":true,"width":1154.5765112866618,"height":838.3221106752704}},"4067e54f-26ab-4de5-9e37-db2380006c91":{"position":{"vector":[-1214,-324]},"visualization":{"show":true,"width":1311.9848228116844,"height":744.4933200198699}},"4dd266ea-3647-44bb-9870-60dbef9de6fa":{"position":{"vector":[-763,-1390]}},"700096a7-d141-4312-b936-b4b4f4defd12":{"position":{"vector":[-759,-1371]}},"2e596ba3-d1da-4186-9149-bbd3278d7373":{"position":{"vector":[-759,-1371]}}},"import":{},"project":null}}
+[[{"index":{"value":6690},"size":{"value":32}},"4cac6339-0659-44c0-b52d-5c1cdf51861d"],[{"index":{"value":6816},"size":{"value":96}},"27d70097-b674-4d9f-9103-4d75fbda30ac"],[{"index":{"value":7012},"size":{"value":52}},"e61d4e9c-c85f-4af8-b120-e2d14c1312fc"],[{"index":{"value":7129},"size":{"value":39}},"2b5db764-3b5d-4cd3-93bc-b58215dc47f6"],[{"index":{"value":7246},"size":{"value":54}},"6b583a64-333c-4193-9f42-5d0574742ced"],[{"index":{"value":7403},"size":{"value":72}},"a5a27f06-73d9-40e8-854d-4335d3eb8bc0"],[{"index":{"value":7595},"size":{"value":80}},"cae14069-fe83-48e7-a10f-e82429320145"],[{"index":{"value":7741},"size":{"value":98}},"e510a063-e82d-49cd-b20e-e191f0efc911"],[{"index":{"value":7896},"size":{"value":32}},"f88a1c89-2720-43b2-bb2d-a4d52fbe8f56"],[{"index":{"value":7983},"size":{"value":99}},"aa0918af-96a4-4f1d-ab6a-d9ed0b6bd92d"],[{"index":{"value":8140},"size":{"value":37}},"6a8bf0b5-fae7-4976-883b-4c6906a9fde3"],[{"index":{"value":8235},"size":{"value":41}},"73b3cd93-d030-45bd-b312-9807b10c34ea"],[{"index":{"value":8333},"size":{"value":47}},"df4f5f74-9986-4ed9-8ff1-d80dbb024434"],[{"index":{"value":8487},"size":{"value":33}},"3be90ae9-30ab-4c63-bd3e-c00e6f391d5e"],[{"index":{"value":8611},"size":{"value":31}},"acacc097-1cf2-4419-9434-4eedfba0ea45"],[{"index":{"value":8752},"size":{"value":121}},"fac84f33-585f-475f-a850-df62fd9d1397"],[{"index":{"value":8979},"size":{"value":76}},"fcdcc5f0-7fb0-43d5-a80f-b709c4b2451e"],[{"index":{"value":9233},"size":{"value":67}},"36d7f628-6594-4286-bd7b-59dafcf83fc7"],[{"index":{"value":9372},"size":{"value":63}},"2e1d833a-4df0-4962-abcb-976260d33b1a"]]
+{"ide":{"node":{"4cac6339-0659-44c0-b52d-5c1cdf51861d":{"position":{"vector":[-16,66]}},"27d70097-b674-4d9f-9103-4d75fbda30ac":{"position":{"vector":[525,-33]}},"e61d4e9c-c85f-4af8-b120-e2d14c1312fc":{"position":{"vector":[525,-131]}},"2b5db764-3b5d-4cd3-93bc-b58215dc47f6":{"position":{"vector":[525,-224]}},"6b583a64-333c-4193-9f42-5d0574742ced":{"position":{"vector":[-79,-33]}},"a5a27f06-73d9-40e8-854d-4335d3eb8bc0":{"position":{"vector":[-79,-131]}},"cae14069-fe83-48e7-a10f-e82429320145":{"position":{"vector":[525,-323]}},"e510a063-e82d-49cd-b20e-e191f0efc911":{"position":{"vector":[525,-417]}},"f88a1c89-2720-43b2-bb2d-a4d52fbe8f56":{"position":{"vector":[1289,-33]}},"aa0918af-96a4-4f1d-ab6a-d9ed0b6bd92d":{"position":{"vector":[1289,-131]}},"6a8bf0b5-fae7-4976-883b-4c6906a9fde3":{"position":{"vector":[1289,-224]}},"73b3cd93-d030-45bd-b312-9807b10c34ea":{"position":{"vector":[1289,-323]}},"df4f5f74-9986-4ed9-8ff1-d80dbb024434":{"position":{"vector":[1289,-417]}},"3be90ae9-30ab-4c63-bd3e-c00e6f391d5e":{"position":{"vector":[-172,-224]}},"acacc097-1cf2-4419-9434-4eedfba0ea45":{"position":{"vector":[605,-583]}},"fac84f33-585f-475f-a850-df62fd9d1397":{"position":{"vector":[525,-511]}},"fcdcc5f0-7fb0-43d5-a80f-b709c4b2451e":{"position":{"vector":[-172,-323]}},"36d7f628-6594-4286-bd7b-59dafcf83fc7":{"position":{"vector":[-294,-417]},"visualization":{"show":true,"width":722.6403530092305,"height":334.82582915657486}},"2e1d833a-4df0-4962-abcb-976260d33b1a":{"position":{"vector":[525,-681]},"visualization":{"show":true,"width":849.3840638586481,"height":565.5266217578502,"project":{"project":"Builtin"},"name":"Geo Map"}}},"widget":{},"import":{},"snapshot":"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"}}

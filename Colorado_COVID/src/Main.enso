@@ -5,65 +5,65 @@ from Standard.AWS import all
 import Standard.Visualization
 
 ## ![Image](eaep.png)
-   
+
    # Colorado COVID Example
-   
+
    ## Project Overview
-   
+
    This workflow analyses the cases of COVID across all counties in the state of Colorado.
-   
+
    The data has been downloaded as a CSV from the public health site in Colorado. The dates are from March 15, 2020 to December 14, 2022.
-   
+
    ![Image](table1.png)
-   
+
    ## Project Goals
-   
+
    **Goal 1** - Summarize the data for each date to give us total cases across the State of Colorado, the maximum by county, and totals for each county.
-   
+
    **Goal 2** - Create a map that shows the cases for a specified date, where a larger circle represents a larger number of cases. Each circle should be in the center of each county.
-   
+
    ## Here are the steps we took to solve this problem
-   
+
    ### Goal 1 - summarize the data for each date to give us total cases across the State of Colorado, the maximum by county, and totals for each county.
-   
+
    1️⃣ Open the csv file with the CDPHE_COVID19_County_Status_Metrics. Here, the file is embedded into this project. Typically, you would drag the file onto the canvas (the background) from your computer to add the file to the project, or click where you see the word 'path' shown in the ***Data.read*** component to bring up a file browser.
-   
+
    2️⃣ Notice the **T** at the top of the [date] column in the ***Data.read*** component. This indicates that it is in a text format, rather than a date format. We need to convert the text-based [date] column to a date formatted [date] column. We use the ***parse*** component to do this, and we provide the format. The dates are in a US format so we use MM/dd/yyyy as our format. Notice the calendar icon now appearing at the top of the [date] column.
-   
+
    3️⃣ The input data has many columns. We only need a few for our analysis so we select just the columns that we want using the ***select*** component.
-   
+
    4️⃣ Change the column names to capitalize the first letter, and to simplify the last column name to [Cases].
-   
+
    5️⃣ Convert the [Cases] column from a floating point number to an integer. This will make the tables below much nicer to read.
-   
+
    6️⃣ For each day, summarize the total number of cases across the entire state, and calculate the  maximum number of cases for the most affected county on that day.
-   
+
    7️⃣ Calculate the number of cases for each county for each day.
-   
+
    8️⃣ Join the ***aggregate*** result for statewide results with the ***cross_tab*** result with cases for each of the counties for each day into a single table.
-   
+
    9️⃣ Sort the joined data by the [Date] from earliest to latest.
-   
+
    ![Image](table2.png)
-   
+
    ### **Goal 2** - Create a map that shows the cases for a specified date, where a larger circle represents a larger number of cases. Each circle should be in the center of each county.
-   
+
    1️⃣ Read the SQLite file that has the latitude & longitude of each county. Here, the file is embedded into this project.
-   
+
    2️⃣ Query the datababase to get the values for [COUNTY], [CENT_LAT], [CENT_LONG]
-   
+
    3️⃣ Rename the columns to give them friendlier names: [County], [Latitude], [Longitude].
-   
+
    4️⃣ The query and the rename_columns were operations that were pushed back into the database (or IN_DB). This read component pulls the data into Enso's in-memory engine for further processing.
-   
+
    5️⃣ Create an input date for the day we want displayed on the map. We have chosen February 2, 2022. Try changing the date to any date in the range of March 15, 2020 to December 14, 2022 to see the map update.
-   
+
    6️⃣ Filter the COVID Case Data to a specific date.
-   
+
    7️⃣ Set the radius of the circles at the center of each county to a radius of the  number of cases * 10. Try modifying this to see larger or smaller circles on the map.
-   
+
    8️⃣ Join the COVID case date for the specific date with the latitude and longitude of the center of each county. This allows us to represent the data on a map! You can see on February 13, 2022, the cases were highest in the southeast part of the state.
-   
+
    ![Image](map.png)
    
    
@@ -71,48 +71,42 @@ import Standard.Visualization
    
    
 main =
-    ## The data has contains COVID case data for Colorado Countires. It has been downloaded as a CSV from the public health site in Colorado.
-    operator8 = enso_project.data/"CDPHE_COVID19_County_Status_Metrics.csv"
-    ## Geospatial dataset giving the center of the counies stored in a database (for this demo it is inside a SQLite file).
-    quotient1 = enso_project.data / "ColoradoGeoData.db"
-    ## 1 - Read the SQLite file that has the latitude & longitude of each county.
-    operator12 = quotient1.read
-    ## 2 - Query the datababase to get the values for [COUNTY], [CENT_LAT], [CENT_LONG]
-    operator29 = operator12.query "ColoradoLatLong"
-    ## 3 - Rename the columns to give them friendlier names: [County], [Latitude], [Longitude]
-    operator31 = operator29.rename_columns ["County", "Latitude", "Longitude"]
-    ## 4 - This read component pulls the data into Enso's in-memory engine for further processing
-    operator32 = operator31.read
-    ## 1 - Typically you would drag this file onto the canvas. If you click on the word "path" here, you will also see how you can select a file from your computer.
-    any2 = Data.read operator8
-    ## 2 - Parse (convert) the date from  a text format to a date format. This will be important for comparing dates or calculating date parts like the month or year.
+    ## 1 - Read COVID case data for Colorado. Typically you drag a file onto the canvas, if you click on the word "path", you can select a file from your computer.
+    any2 = Data.read 'Data\\CDPHE_COVID19_County_Status_Metrics.csv'
+    ## 2 - Convert the date from US format to a Date. This allows comparing or calculating date parts like month.
     operator26 = any2.parse ['date'] ..Date "MM/dd/yyyy"
     ## 3 - Select just the columns that we need.
     operator14 = operator26.select_columns ["date", "county", "One_Week_Cumulative_Incidence"] Boolean.True
     ## 4 - Rename to friendly names.
     operator16 = operator14.rename_columns [(Pair.Value 'date' 'Date'), (Pair.Value 'county' 'County'), (Pair.Value 'One_Week_Cumulative_Incidence' 'Cases')]
-    ## 5 - Change the data type of cases from a floating point number to an integer
+    ## 5 - Change the data type of cases from a floating point number to an integer.
     operator13 = operator16.cast ['Cases'] ..Integer
-    ## 7 - Calculate the number of cases for each county for each day
+    ## 7 - Calculate the number of cases for each county for each day.
     operator19 = operator13.cross_tab ["Date"] "County" (..Sum 'Cases')
-    ## 6 - For each day, summarize the total number of cases across all counites, and calculate the  maximum number of cases across all counties 
+    ## 6 - For each day, summarize the total number of cases, and the maximum number of cases by county.
     operator17 = operator13.aggregate ['Date'] [(..Sum 'Cases' 'Cases'), (..Maximum 'Cases' 'MaxByCounty')]
-    ## 8 - Join the aggregate result for statewide results with the cross_tab result with cases for each of the counties for each day 
+    ## 8 - Join the aggregated values with the cases for each of the counties for each day .
     operator21 = operator17.join operator19 ..Inner [(..Equals 'Date')]
     ## 9 - Sort the joined data by the [Date] from earliest to latest.
     operator18 = operator21.sort [(..Name 'Date')]
-    ## 5 - Change this date to see the map update
-    date1 = Date.new 2022 2 2
-    ## 6 - Filter the COVID case date to a specific date
-    any6 = operator13.filter 'Date' (..Equal date1)
-    ## 7 - set the radius of the circles at the center of each county to a radius of the  number of cases * 10. Try modifying this to see larger or smaller circles on the map.
+    ## 5 - Filter the COVID case date to a specific date (you can change the date to see the map upadte).
+    any6 = operator13.filter 'Date' (..Equal (Date.new 2022 2 2))
+    ## 6 - Set the radius of the circles of each county to the number of cases * 10. Modify this to see circles resize.
     operator6 = any6.set (..Simple_Expr (..Name 'Cases') (..Multiply 10)) "Radius"
-    ## 8 - Join the COVID case date for the specific date with the latitude and longitude of the center of each county. This allows us to represent the data on a map!
+    ## 1. Read geospatial dataset giving the counties' center stored in a SQLite database.
+    any1 = Data.read 'Data\\ColoradoGeoData.db'
+    ## 2 - Query the datababase to get the values for [COUNTY], [CENT_LAT], [CENT_LONG].
+    operator29 = any1.query "ColoradoLatLong"
+    ## 3 - Rename the columns to give them friendlier names: [County], [Latitude], [Longitude].
+    operator31 = operator29.rename_columns ["County", "Latitude", "Longitude"]
+    ## 4 - Bring the data into Enso's in-memory engine from SQLite for further processing.
+    operator32 = operator31.read
+    ## 7 - Join the COVID case data for the specific date with the latitude and longitude of each county's center.
     operator33 = operator6.join operator32 Join_Kind.Inner [(Join_Condition.Equals 'County')] 
 
 
 
 
 #### METADATA ####
-[[{"index":{"value":4426},"size":{"value":59}},"306b9931-c7cf-4b8f-ac97-04b418c2f878"],[{"index":{"value":4626},"size":{"value":40}},"ccc40fae-9b04-472a-b49f-5bebd8b7089c"],[{"index":{"value":4766},"size":{"value":14}},"62fdd815-a8a8-460d-bf97-0f93245ce336"],[{"index":{"value":4886},"size":{"value":34}},"a1b8d756-3532-45f2-ad39-2f1fa7b039a8"],[{"index":{"value":5033},"size":{"value":61}},"db9152b8-f7b1-47eb-9024-800af8b72706"],[{"index":{"value":5210},"size":{"value":15}},"33a1a367-7fd0-442f-8e7c-5f450e89d7f8"],[{"index":{"value":5402},"size":{"value":19}},"25681472-802d-44ca-8f80-b6e90863e2c2"],[{"index":{"value":5606},"size":{"value":39}},"eeb99498-5293-4e70-a71b-9fd9b5755a74"],[{"index":{"value":5712},"size":{"value":90}},"4127ea1d-d74d-4e35-b390-b1b706193ea0"],[{"index":{"value":5857},"size":{"value":140}},"acddbefa-631b-472c-b7dd-4ae0621580f6"],[{"index":{"value":6099},"size":{"value":35}},"b01bf8fd-892d-4d9a-9577-fe1ae14255fa"],[{"index":{"value":6222},"size":{"value":54}},"43523522-2707-4155-9cfb-daa37f043c1c"],[{"index":{"value":6440},"size":{"value":90}},"5a4d839b-62c9-46d8-8f15-37acbf0198a3"],[{"index":{"value":6683},"size":{"value":54}},"77355e47-3f8a-4255-85c7-6ebb4d7f75af"],[{"index":{"value":6826},"size":{"value":33}},"445cf7f7-d933-4d32-a472-5f9a1431770e"],[{"index":{"value":6922},"size":{"value":17}},"5d487374-1a54-4dda-8f68-82eaa0c5be1b"],[{"index":{"value":7008},"size":{"value":40}},"0f1c5b66-4f1d-4d54-a99f-c37f1537026c"],[{"index":{"value":7241},"size":{"value":66}},"03bf13ef-6940-41f0-825a-e0ccb49e89f4"],[{"index":{"value":7492},"size":{"value":76}},"a6d1a1be-96b4-4e2b-87c6-f396735449aa"]]
-{"ide":{"node":{"306b9931-c7cf-4b8f-ac97-04b418c2f878":{"position":{"vector":[-58,120]}},"ccc40fae-9b04-472a-b49f-5bebd8b7089c":{"position":{"vector":[1111,120]}},"62fdd815-a8a8-460d-bf97-0f93245ce336":{"position":{"vector":[1115,48]},"visualization":{"show":true,"height":0,"project":{"project":"Builtin"},"name":"JSON"}},"a1b8d756-3532-45f2-ad39-2f1fa7b039a8":{"position":{"vector":[1115,-96]},"visualization":{"show":true,"width":723.4802537604944}},"db9152b8-f7b1-47eb-9024-800af8b72706":{"position":{"vector":[1115,-380]}},"33a1a367-7fd0-442f-8e7c-5f450e89d7f8":{"position":{"vector":[1115,-452]}},"25681472-802d-44ca-8f80-b6e90863e2c2":{"position":{"vector":[-58,12]},"visualization":{"show":true,"width":854.8652343749999}},"eeb99498-5293-4e70-a71b-9fd9b5755a74":{"position":{"vector":[-58,-295]},"visualization":{"show":true,"width":855.4264772329758}},"4127ea1d-d74d-4e35-b390-b1b706193ea0":{"position":{"vector":[-58,-557]},"visualization":{"show":true}},"acddbefa-631b-472c-b7dd-4ae0621580f6":{"position":{"vector":[-58,-839]},"visualization":{"show":true}},"b01bf8fd-892d-4d9a-9577-fe1ae14255fa":{"position":{"vector":[-58,-1120]},"visualization":{"show":true,"width":1017.1461567618942}},"43523522-2707-4155-9cfb-daa37f043c1c":{"position":{"vector":[704,-1676]},"visualization":{"show":true,"width":969.1570917385728}},"5a4d839b-62c9-46d8-8f15-37acbf0198a3":{"position":{"vector":[-54,-1428]},"visualization":{"show":true}},"77355e47-3f8a-4255-85c7-6ebb4d7f75af":{"position":{"vector":[-54,-1909]}},"445cf7f7-d933-4d32-a472-5f9a1431770e":{"position":{"vector":[-53,-2000]},"visualization":{"show":true,"width":850.1484211024953}},"5d487374-1a54-4dda-8f68-82eaa0c5be1b":{"position":{"vector":[1115,-524]}},"0f1c5b66-4f1d-4d54-a99f-c37f1537026c":{"position":{"vector":[1119,-596]},"visualization":{"show":true,"width":600.4438549440298}},"03bf13ef-6940-41f0-825a-e0ccb49e89f4":{"position":{"vector":[1115,-901]},"visualization":{"show":true,"width":655.509525128265}},"a6d1a1be-96b4-4e2b-87c6-f396735449aa":{"position":{"vector":[1119,-1159]},"visualization":{"show":true,"width":976.0901717000933,"height":444.06091298712835,"project":{"project":"Builtin"},"name":"Geo Map"}}},"import":{"14843884512460083621":{}},"project":{"call_stack":[]}}}
+[[{"index":{"value":4353},"size":{"value":57}},"e1c0b0bd-8e6f-4e3d-9530-9bbcf7763225"],[{"index":{"value":4542},"size":{"value":39}},"0bdceef1-6b4f-496b-818d-63f16306f802"],[{"index":{"value":4648},"size":{"value":90}},"8eddcce9-400b-4eef-9d9c-3f13b2a71128"],[{"index":{"value":4793},"size":{"value":140}},"29d1f240-9540-4781-93cb-b4b0f0c4c461"],[{"index":{"value":5036},"size":{"value":35}},"92cf26f9-b787-4068-90c8-356a1e39857e"],[{"index":{"value":5160},"size":{"value":54}},"9d88e0cf-e486-4be1-a257-bbbf8c944270"],[{"index":{"value":5337},"size":{"value":90}},"2417a236-919e-46a3-8eba-c246d937776b"],[{"index":{"value":5538},"size":{"value":54}},"0f09d1ee-5919-4fa3-9aac-08347b39933b"],[{"index":{"value":5681},"size":{"value":33}},"5799b9ed-bd00-42ec-9f12-91b67ca8eb13"],[{"index":{"value":5832},"size":{"value":54}},"e3c07782-cf07-4e35-981f-f33022af4e90"],[{"index":{"value":6023},"size":{"value":66}},"5a03ce56-c542-4a2f-a8dd-661984af9934"],[{"index":{"value":6192},"size":{"value":9}},"05ef4fbf-5755-46c6-96a8-e29f71903fae"],[{"index":{"value":6192},"size":{"value":36}},"e57d730b-ca1b-4868-8f7c-62a99d50c6ec"],[{"index":{"value":6335},"size":{"value":28}},"ebc8af7f-cd85-43c3-a50b-af0e1786c228"],[{"index":{"value":6477},"size":{"value":61}},"6654b66d-63b5-4f6c-89f9-c64d43ed95f7"],[{"index":{"value":6647},"size":{"value":15}},"096b6351-2e05-441e-8e0c-e98d8a9690f8"],[{"index":{"value":6795},"size":{"value":76}},"ef58bde8-8ce6-471d-9123-b018035777c0"]]
+{"ide":{"node":{"e1c0b0bd-8e6f-4e3d-9530-9bbcf7763225":{"position":{"vector":[-1018,341]}},"0bdceef1-6b4f-496b-818d-63f16306f802":{"position":{"vector":[-1018,250]}},"8eddcce9-400b-4eef-9d9c-3f13b2a71128":{"position":{"vector":[-1018,154]}},"29d1f240-9540-4781-93cb-b4b0f0c4c461":{"position":{"vector":[-1018,59]}},"92cf26f9-b787-4068-90c8-356a1e39857e":{"position":{"vector":[-1018,-30]}},"9d88e0cf-e486-4be1-a257-bbbf8c944270":{"position":{"vector":[-617,-360]}},"2417a236-919e-46a3-8eba-c246d937776b":{"position":{"vector":[-1377,-131]},"visualization":{"show":true,"height":262.492052630085,"project":{"project":"Builtin"},"name":"Table"}},"0f09d1ee-5919-4fa3-9aac-08347b39933b":{"position":{"vector":[-732,-466]}},"5799b9ed-bd00-42ec-9f12-91b67ca8eb13":{"position":{"vector":[-732,-573]},"visualization":{"show":true,"width":713.0774842157257,"height":193.01789247141897}},"e3c07782-cf07-4e35-981f-f33022af4e90":{"position":{"vector":[-1,-131]}},"5a03ce56-c542-4a2f-a8dd-661984af9934":{"position":{"vector":[2,-225]}},"e57d730b-ca1b-4868-8f7c-62a99d50c6ec":{"position":{"vector":[2,341]}},"05ef4fbf-5755-46c6-96a8-e29f71903fae":{"position":{"vector":[254,298]}},"ebc8af7f-cd85-43c3-a50b-af0e1786c228":{"position":{"vector":[2,247]}},"6654b66d-63b5-4f6c-89f9-c64d43ed95f7":{"position":{"vector":[5,154]}},"096b6351-2e05-441e-8e0c-e98d8a9690f8":{"position":{"vector":[2,59]}},"ef58bde8-8ce6-471d-9123-b018035777c0":{"position":{"vector":[-4,-327]},"visualization":{"show":true,"height":466.23964195205303,"project":{"project":"Builtin"},"name":"Geo Map"}}},"widget":{},"import":{},"snapshot":"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"}}
