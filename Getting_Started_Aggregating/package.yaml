@@ -1,4 +1,3 @@
-name: Getting Started - Aggregating, Pivoting
-namespace: local
+name: Enso Getting Started - Exercise 2 - Aggregating and Pivoting Data
 version: 0.0.1
-prefer-local-libraries: true
+prefer-local-libraries: 'true'
