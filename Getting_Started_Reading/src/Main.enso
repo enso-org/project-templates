@@ -13,6 +13,15 @@ import Standard.Visualization
 
    1️⃣	Drag the **sample_bank_data.xlsx** workbook on the canvas. This adds a ***Data.read*** component to the workflow.
 
+   ### THE FILE CAN BE FOUND HERE:
+
+   **Windows - C:\Users\<username>\Documents\enso-projects\Samples\Data\sample_bank_data.xlsx**
+
+
+   **Mac & Linux - ~/Documents/enso-projects/Samples/Data/sample_bank_data.xlsx**
+
+
+
 
    ![Image](/images/1a%20drag%20file.gif)
 
@@ -56,7 +65,6 @@ import Standard.Visualization
    - Click on the operation argument and choose ***Text*** and then ***length*** from the dropdown list.
    - If you now open visualization, a new column has been added at the end called text_length([currency_code]).
    - To rename this field, update your configuration by setting a new fieldname value in the as “ “ argument.  Type the new name currency_code_length inside of the quotes and you will have updated the new field to become [currency_code_length].
-
    **3️⃣**	From the ***set*** component add a new component.
 
    4️⃣	Type **filter** to add the ***filter*** component.
@@ -81,5 +89,5 @@ main =
 
 
 #### METADATA ####
-[[{"index":{"value":3829},"size":{"value":18}},"4b88666b-57f4-4e62-9f57-d7deb26fa722"]]
-{"ide":{"node":{"4b88666b-57f4-4e62-9f57-d7deb26fa722":{"position":{"vector":[60,15]}}},"widget":{},"snapshot":"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","import":{}}}
+[[{"index":{"value":4047},"size":{"value":18}},"4b88666b-57f4-4e62-9f57-d7deb26fa722"]]
+{"ide":{"node":{"4b88666b-57f4-4e62-9f57-d7deb26fa722":{"position":{"vector":[60,15]}}},"widget":{},"snapshot":"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","import":{}}}
