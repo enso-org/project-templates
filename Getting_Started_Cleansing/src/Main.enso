@@ -9,154 +9,258 @@ import Standard.Visualization
 
    # Cleansing and Parsing Data
 
-   In this example, we are going to work through tidying up a CSV data file.  The data has already been read into the workflow through use of the ***Data.read*** component. We embedded the CSV file into this project and reference the file using (enso_project.data/”crm_customer_data.csv”).  Our objective of this exercise is to achieve the following:
+   **This exercise is available on the Enso Community at <<https://community.ensoanalytics.com/c/enso-analytics-101/>>. Working through the exercises on Community lets you to keep track of your progress, and allows you to open the exercise on a second screen. You will need to create a free account on the Enso Community to access the lessons.**
+
+   ### IT IS HIGHLY RECOMMENDED THAT YOU EXPERIENCE THIS EXERCISE BY USING THE LEARNING PATH ON ENSO COMMUNITY!
+
+   This is the third in a series of four (4)  Exercises designed to help you quickly master Enso Analytics. Each Exercise is broken up in to a number of learning objectives.
+
+
+   Start with Excel basics and visual components, then advance through aggregations, data cleaning, and multi-sheet integration. Each exercise tackles common business scenarios—from messy data cleanup to customer analysis across multiple datasets.
+
+
+   By completion, you'll have the confidence to handle your organization's data challenges. 
+
+
+   Users who complete these four exercises before jumping into their first real use case are over **10 times more likely to be successful**.
+
+
+   The [Enso Community](<https://community.ensoanalytics.com>) provides advanced workflows for continued growth beyond these foundational skills.
+
+
+   > **Note:** This example assumes you have completed Exercises 1 and 2 which have very detailed instructions on how to add and configure new components, how to open each components visualization panel, how to move and reconnect components and more.If you haven't completed these exercises, and the instructions are not sufficient here, we highly recommend you start with these two exercises.
+
+
+   > 
+
+   ## Overview
+   Data types are fundamental to performing analysis in Enso Analytics, as they determine what operations and calculations can be applied to your data. For instance, dates must be stored as date data types rather than text to enable proper date arithmetic, sorting, and time-based filtering, while numeric values need to be in number formats to support mathematical operations and statistical functions.
+
+
+   In this example, we are going to work through tidying up a CSV data file.   Our objective of this exercise is to achieve the following:
 
    1.     Ensure that all Date columns are stored as DATE data types
    2.     Convert all applicable fields to BOOLEAN (T/F) data types
    3.     Convert all “N/A” text values to Nothing (aka Null) values
-   .
-
-   ## **Objective 1:**  Examine the Data Types for the columns of data:
-
-   1️⃣        Add a new component after the ***read*** component by either dragging from the output port (the bottom edge) of the ***read*** component, or clicking the ➕ button on the component.
-
-   - Choose the ***column_info*** component
-   - Open the data visualization (<>) to see the number of “not nothing” columns and the quantity of data for each field with the associated value type (e.g. Integer, char, or Date).
-
-   ![Image](/images/image.png)
 
 
-   Observations: What we notice about the data includes:
-
-   ·      The data contains various (5) True/False columns stored as text (Char).
-
-   ·      The [`report_date`] is stored as an integer (`20240601` in this case).
-
-   .
-
-   ## **Objective 2:**  Convert the Report_Date from an Integer into a Date column:
-
-   In order to accomplish this data type transformation, we’ll use a ***parse*** component to apply the date structure to the [report_date] data.  The ***parse*** component however expects a “Char” data type as input.  We will first convert the Integer into a Character, then parse the Date  to complete this transition.
-
-   1️⃣        Add a new component after the ***read*** component by either dragging from the output port (the bottom edge) of the ***read*** component, or clicking the ➕ button on the component.
-
-   - Choose the ***format*** component
-   - Click on the columns argument and select the [report_date] column
-   - You now have changed the report_date to a Character string.
-   2️⃣        Add a new component after the ***format*** component.
-
-   - Choose the ***parse*** component
-   - Click on the “columns” argument and select the [report_date] column
-   - Click on the “type” argument and select the Date option (a warning will appear)
-   - Click on the “format” argument and either select the desired output format from the dropdown list or type your format.  If your input format isn’t present, simply select another similar format and EDIT/Update the provided mask (e.g. yyyyMMdd) - Learn more about Enso custom format strings [here](https://help.enso.org/docs/using-enso/custom-formats).
-
-   ![Image](/images/image_1.png)
 
 
-   .
+   ## **Objective 1:**  Open a CSV file and examine Data Types for each column
 
-   ## **Objective 3:**  Normalize the Active_Passive data values into a Boolean (T/F) type:
+   ## Step 1 of 2 - Read a CSV file
 
-   You may first want to prove that the values are either Active or Passive and that there are no Unknown or Nothing values.  A normalized version of the field would have a name like, “active_CRM”.
+   - In the toolbar at the top of the canvas, click on the **+ Input** button to add a new Input Component. This will open the Input Component Browser.
+   - In the component browser, Choose the ***Data.read*** component by clicking on its name.
+   - Click on the word *path* that is highlighted in royal blue on the ***Data.read*** component.
+   - Click on *Choose file...*
+   - Navigate to your Documents/enso-projects/Samples/Data folder.
+   - Choose the file named **crm_data.csv.**
+   - Open the component’s data visualization to see the records by clicking on the **eye** icon in its quarter circle menu.
 
-   1️⃣        Add a new component after the ***parse*** component by either dragging from the output port (the bottom edge) of the ***parsed*** component, or clicking the ➕ button on the component.
+   ## Step 2 of 2 - Examine the Data Types for each column
 
-   - Choose the ***aggregate*** component
-   - Click on the ➕ sign (to the right of the columns argument group_by argument and select the [active_passive] column
-   - You can now see 1,347 Active and 653 Passive counts.
-   2️⃣        Add a new component after the ***parse*** component by either dragging from the output port (the bottom edge) of the ***parsed*** component, or clicking the ➕ button on the component.
-
-   3️⃣        Choose the ***set*** component and configure it to create a new [active_CRM] column with a “True” value when the incoming [active_passive] data is “Passive”.
-
-   - Click on the value argument and choose <Simple Expression>.
-   - Click on the input argument and choose the [active_passive] column.
-   - Click on the operation argument and choose the “if” operation.
-   - Click on the condition argument and choose the “Equals” option.
-   - Click on the to argument and choose the <Text Value> option.
-   - Type the value “Active” between the quote marks.
-   There is no need to choose values for `true_value` and `false_value` as they will default to `True` and `False`.
-
-   Type the value “active_CRM” in the single quote marks which follow the term: “as” located to the right after the ‘true & false’ arguments
+   - Add a ***column_info*** component after the ***Data.read*** component
+   - - From the "Hamburger" menu on the ***Data.read*** component, select **+ Add New Component** to open the **Component Browser**
+     - - Choose ***column_info*** by clicking on its name in the Metadata list in the Component Browser or by typing "column_info" which will narrow the list of all available components.
+   - Open the data visualization to see the column information
+   - - Move your mouse over the ***column_info*** component. This will enable the quarter circle menu on the left edge of the component.
+     - - In the quarter circle menu, click on the **eye** icon to open the visualization see the column names, the count of of “not nothing” values in each column, and the data type for each column (e.g. Integer, Char, or Date). And starting with version 2025.2, a number of statistics to better understand your dataset, including:
+     - - The number of distinct (non-duplicate) values in each column.
+       - The minimum and maximum values in each column
+       - For char (string) columns, the number of empty, untrimmed, and non-trivial whitespace in each column. Non-trivial whitespace would include embedded tabs, line feeds, and other non-printable characters).
+   ![Image](/images/image_7.png)
 
 
+   ### **Observations:** 
+
+   - The data has values in each row in each column. The Items Count counts only non-nothing (non-null) values. Since we have a value of 2,000 for each column, we know that we have a complete data set.
+   - The data contains various (5) True/False columns stored as a Char type (active_passive, deleted_flag, is_preferred, is_employee and special).
+   - The **report_date** column is stored as an integer (`20,240,601` in this case).
+
+   ### **🎉🥳🎈CONGRATULATIONS! You learned how to identify challenges in a dataset using column_info!**
+
+   - You also learned about different data types, such as Char, Date and Integer. Enso also supports Float, Decimal, and Mixed data types.
+
+
+
+   ## **Objective 2:**  Convert the report_date from an Integer into a Date column:
+
+   As you saw in the observations from Exercise 1, our **report_date** column was stored as an integer, and not as a date.
+
+   In order to accomplish this data type transformation, we’ll use a ***parse*** component to apply the date structure to the **report_date** column.  The ***parse*** component however expects a “Char” data type as input.  We will first convert from Integer to a Character, then parse the Date to complete this transition.
+
+   ## **Step 1 of 2 - convert the report_date column to a char type**
+
+   - Add a new component after the ***Data.read*** component
+   - - From the "Hamburger" menu on the ***Data.read*** component, select **+ Add New Component** to open the **Component Browser**.
+   - Choose ***format*** by clicking on its name in the Conversions list in the Component Browser or by typing "format" which will narrow the list of all available components.
+   - Click on the columns argument and select the **report_date** column
+   - You now have changed the **report_date** to a Char data type (also known as a string).
+   - Check your work by opening the visualization on the ***format*** component. You should notice the T next to the filter icon in the **report_date** header in the visualization, and the commas are now removed.
+   - 
+   ![Image](/images/text_heading.png)
+
+
+
+   ## **Step 2 of 2 - convert the report_date column to a date type**
+   Add a new component after the ***format*** component.
+   -  From the "Hamburger" menu on the ***format*** component, select **+ Add New Component** to open the **Component Browser**.
+   - Choose ***parse*** by clicking on its name in the Conversions list in the Component Browser or by typing "parse" which will narrow the list of all available components.
+   - Click on the “columns” argument and select the **report_date** column
+   - Click on the “type” argument and select the Date option (a warning will appear and will disappear after you properly configure the "format" argument in the next step)
+   - - Click on the “format” argument and either select the desired output format from the dropdown list or type your format.  If your input format isn’t present (as in this example), simply select any similar format and EDIT/Update the provided mask (e.g. yyyyMMdd) by clicking into the format and typing over the provided choice. - Learn more about Enso custom format strings [here](https://help.enso.org/docs/using-enso/custom-formats).
+   - Check your work by opening the visualization as described above. You should see a calendar icon in the header row, and the date should be in an ISO standard format (e.g. 2024-06-01).
+   See how the data type changes from Integer (in the ***Data.read*** component) to Char (in the ***format*** component) to Date (in the ***parse*** component).
+
+   ![Image](/images/image_9.png)
+
+   > **Note:** Using a ***format*** component with no other configuration (as we did above) does a simple conversion from numbers, dates and boolean types to a Char type. By adding a format, as we did in the parse component, you can format the output how you wish. For example, with a format string of “yyyy-MM-dd”, we could have formatted the text to appear as 2024-06-01. This still would be a text representation of the date, and we still would need to use a ***parse*** component to convert to a date type.
+
+
+   ### **🎉🥳🎈CONGRATULATIONS! You have converted the report_date column from an Integer type, to a Char type to a Date type.**
+
+   - You learned how to use the ***format*** component to convert from a number (Integer) to text (Char).
+   - You learned how to convert text-based dates to a date type using the ***parse*** component.
+
+
+   ## **Objective 3:**  Normalize the Active_Passive data values into a Boolean (T/F) type
+
+   ## Step 1: Ensure there are only two values in the column
+
+   When there are only two possible values (plus optionally *Nothing),* converting data to a boolean type is recommended.
+
+   - Boolean values use less memory (1 bit vs multiple characters for text)
+   - Smaller output file sizes
+   - Simplifies filter conditions (activeCRM=True vs active_passive = “Active”)
+   Before we do any conversion of the data, we need to validate that the only values in the Active_Passive column are in fact "Active" or "Passive" and that there are no Unknown or *Nothing* values. 
+
+   - Add a new component after the ***parse*** component (see Objective 2 for step by step instructions).
+   - - Choose the ***aggregate*** component (this is in Enso's list of suggestions in the Component Browser)
+   - - Click on the ➕ sign to the right of the **group_by** argument and select the **active_passive** column.
+   - - Click on the ➕ sign to the right of the **columns** argument which will default to Count.
+   - - Open the visualization on the ***aggregate*** component to view the results (see Objective 1 if you have forgotten how to open a component’s visualization).
+   - You can now see 1,347 Active and 653 Passive counts. We now are confident that there are only two values, Active and Passive, and there are no *Nothing* values.
+
+   ## Step 2: Create a new column called activeCRM that has true/false values for Active/Passive values**
+
+   - Move the ***aggregate*** component to the right by clicking and dragging it with the mouse to create space to add a second component.
+   - Add a new component after the ***parse*** component. (see Objective 2 Step 1 if you need help).
+   - Choose the ***set*** component and configure it to create a new **activeCRM** column with a “True” value when the incoming **active_passive** data is “Active”.
+   - - Click on the value argument and choose <Simple Expression>.
+   - - Click on the input argument and choose the **active_passive** column.
+   - - Click on the operation argument and choose the “if” operation.
+   - - Click on the condition argument and choose the “..Equal” option.
+   - - Click on the to argument and choose the <Text Value> option.
+   - - Type the value “Active” between the quote marks.
+   - - There is no need to choose values for **true_value** and **false_value** as they will default to **True** and **False**.
+   - - Type the value “activeCRM” in between the quotation marks which follow the term: “as” located to the right after the ‘true & false’ arguments
+   - Open the visualization on the ***set*** component and scroll to the right to get to the last column, which is the new activeCRM column. Data values that are True have a check mark, and False are blank.
    ![Image](/images/image_2.png)
 
 
-   ## **Objective 4:**  Normalize the Deleted Flag data values into a Boolean (T/F) type:
+   ### **🎉🥳🎈CONGRATULATIONS! You have converted text data to a new boolean column called activeCRM!**
 
-   Repeat your learnings from Objective 3 and prove the data domain values are “Deleted” and “Not Deleted”.  Then you can UPDATE the [deleted_flag] column by setting the as “ “ argument to the originating fieldname.
+   - Learned that it is best to validate that there are just two values using an ***aggregate*** component.
+   - Used a ***set*** component to build an if statement to make “Active” true and “Passive” false.
 
-   Spoiler:  set (..From (..Name 'deleted_flag') (..If (..Equal 'Deleted') true_value=True)) 'deleted_flag'.
+
+
+
+   ## **Objective 4:**  Convert the deleted_flag data values into a Boolean (T/F) type
+
+   ## Mastering what you have learned
+
+   Repeat your learnings from Objective 3 and prove the data domain values in the **deleted_flag** column are “Deleted” and “Not Deleted”.  (If you get stuck, go back and look at the instructions for Objective 3)
+
+
+   Then you can UPDATE the ***deleted_flag*** column by setting the as “ “ argument to the originating column name. You will do this by typing “deleted_flag” in the as “ “ argument.
+
+
+   The new ***aggregate*** and ***set*** components will originate from the ***set*** component that you just created.
 
 
    ![Image](/images/image_3.png)
 
+   > **Note:** When you set the as argument to the originating column for the expression, you overwrite (in the new table) the column with the updated value. It will also automatically convert the column to the correct data type, in this case boolean.
+
+   ### **🎉🥳🎈CONGRATULATIONS! You have MASTERED converting text data to boolean!**
+   - You also learned how to update an existing column, instead of creating a new column, using the ***set*** component!
+   > 
+
+
 
    ## **Objective 5:**  Parse the “Yes/No” Char fields into a Boolean (T/F) type
 
-   There are three (3) fields, [is_preferred] , [is_employee] and [special] can be parsed within a single component.
+   There are three (3) fields, **is_preferred** , **is_employee** and **special** that can be parsed (converted) in a single step.
 
-   1️⃣        Add a new component after the ***set*** component by either dragging from the output port (the bottom edge) of the ***set*** component, or clicking the ➕ button on the component.
+   Add a new component after the last ***set*** component added in Objective 4.
 
    - Choose the ***parse*** component
-   ·       Click on the columns argument and choose the [is_preferred] field.
+   - - Click on the columns argument and choose the **is_preferred, is_employee** and **special** columns.
+   - - Click on the type argument and choose the Boolean option.
+   - - Click on the format argument and choose the ‘Yes|No (Boolean)’ option
 
-   ·       Click (again) on the columns argument and choose the [is_employee] field.
-
-   ·       Click on the type argument and choose the Boolean option.
-
-   ·       Click on the format argument and choose the ‘Yes/No (Boolean)’ option
-
-   You can visualize the data and see that you have now converted the data types for both of these fields.
-
-   **Objective 5:**  Parse the “Yes/No” Char fields into a Boolean (T/F) type
-
-   Repeat the same method as above will work but you will need a different format string.
-
-   Spoiler:  parse ['has_cd', 'has_investment_account'] ..Boolean 'Yes|No'
-
+   Open the visualization on the ***parse*** component to see that you have now converted the data types for all three fields.
 
    ![Image](/images/image_4.png)
 
+   >**Note**: The format option of ‘Yes|No’ looks for the exact words Yes and No. If the data had been upper case, you would type over the format option with YES|NO to properly handle the conversion.
+   >
 
-   ## **Objective 6:**  Within the [crm_code] column, replace the “N/A” value with ‘Nothing’.
+   ### **🎉🥳🎈CONGRATULATIONS! You have converted multiple columns from Yes No values to boolean type**
+   - The ***parse*** component, and other components such as ***format*** can convert multiple columns at once. They need to be identical conversions however. If one of the columns had “YES” and “NO” values, we would have handled the first two columns in one ***parse*** component, and the “YES” and “NO” column in a second ***parse*** component.
+   - 
 
-   1️⃣        Add a new component after the ***parse*** component by either dragging from the output port (the bottom edge) of the ***parse*** component, or clicking the ➕ button on the component.
 
+
+
+   ## **Objective 6:**  Within the crm_code column, replace the “N/A” value with ‘Nothing’.
+
+   This is the last bit of normalization that we are going to perform on this dataset. In the **crm_code** column there are many instances of “N/A”. We want to replace these with *Nothing (null).*
+
+   - Add a new component after the **parse** component that we added in Objective 5.
    - Choose the ***replace*** component
-   ·       Click on the [➕] following the “lookup_table” operator to see “Pair Value” appear
-
-   ·       Type “N/A” over the default of ‘Current’ text
-
-   ·       Click on the “New” text argument and scroll down to select the <Nothing> option
-
-   ·       Click on the [➕] following the “columns” operator
-
-   ·       Select the [crm_code] column
-
-
+       - Click on the ➕ following the “lookup_table” operator to see “Pair Value” appear
+       - Type “N/A” (without the quotes) over the default of ‘Current’ text
+       - Click on the “New” text argument and scroll down to select the <Nothing> option
+       - Click on the ➕ following the “columns” operator
+       - Select the **crm_code** column
+       - Open the visualization on the ***replace*** component to see that you have replaced the N/A values in the **crm_code**** column with ‘Nothing’.
    ![Image](/images/image_5.png)
+   > **Note:** The ***replace*** component can replace more than one value at a time. Just add additional pairs of Current and New values. The ***replace*** component requires that a full value gets replaced. So if the value in one of the fields was “N/A “ (where there is a space at the end of the text, that instance would not be replaced. A lookup table can be read in and passed into the lookup table parameter as well, and this is particularly useful if there are a large number of replacements that are being done. You can learn more in this [community post](<https://community.ensoanalytics.com/c/tips-and-tricks/every-parameter-can-be-dynamic>).
 
 
-   ## **Objective 7:**  Write the new output to a new “CSV” data file.
+   ### **🎉🥳🎈CONGRATULATIONS! You have replaced N/A values with Nothing**
+   - The ***replace*** component can quickly replace one or more values with new values, which is critical in data normalization projects.
+
+
+
+
+   ## **Objective 7:**  Output the results to a CSV file
 
    Having now tidied the data, the last step is to write it out to a new file.
-
-   1️⃣        Add a new component after the ***replace*** component by either dragging from the output port (the bottom edge) of the ***replace*** component, or clicking the ➕ button on the component.
-
-   - Add a ***write*** component
-   - Select the output path (where to create a new CSV file) by configuring the path argument
-   - The file will not be written at this point. Click the ▶︎ button at the top of the canvas to run the workflow once with writing enabled.
-   The output file should now be created.
+   - Add a new component after the ***replace*** component 
+   - Chose the ***write*** component from the suggestions list
+   - Select the output path (where to create a new CSV file) by configuring the path argument. You must give the file the extension csv, but you are not required to set any other parameters.
+   - The file will not be written at this point. You will notice a yellow triangle indicating a warning to the left of the ***write*** component.
+   - Click the ▶︎ button at the top of the canvas to refresh the workflow and write the output(s). 
+   The output file should now be created at the location you specified.
 
 
    ![Image](/images/image_6.png)
+
+   > **Note:** Enso Analytics is constantly processing your data with each new component and each configuration change. This feature gives instant feedback to a user.The one exception is when Enso is writing to a file, a database, or a web api. For these operations, a user must click the ▶︎ button to write all outputs, or if you have multiple outputs and only want to write to one, you can choose the write button in its hamburger menu.
+
+
+   ### **🎉🥳🎈CONGRATULATIONS! You have written your results to a csv file!**
+
+   - The ***write*** component can output to a variety of formats such as delimited (e.g. CSV), Excel, and JSON.
 main =
     operator1 = "Cleaning and Parsing Data"
-    any2 = Data.read 'Data/crm_data.csv'
 
 
 
 #### METADATA ####
-[[{"index":{"value":7815},"size":{"value":27}},"7c75350c-beb9-4bf8-a28b-8da265e60aa6"],[{"index":{"value":7854},"size":{"value":9}},"1ad1f10a-b6dc-478b-b0b7-06a285a81240"],[{"index":{"value":7854},"size":{"value":29}},"0896b45c-7a27-4426-8dcd-bc1596516a07"]]
-{"ide":{"node":{"7c75350c-beb9-4bf8-a28b-8da265e60aa6":{"position":{"vector":[-1816,827]},"visualization":{"show":false,"width":414.83538651790013,"height":166.2797622020428}},"0896b45c-7a27-4426-8dcd-bc1596516a07":{"position":{"vector":[-2159,773]},"visualization":{"show":true,"width":921.0871654909049,"height":218}},"1ad1f10a-b6dc-478b-b0b7-06a285a81240":{"position":{"vector":[-2165,683]},"visualization":{"show":true,"width":921.0871654909049}}},"widget":{},"import":{},"snapshot":"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"}}
+[[{"index":{"value":18268},"size":{"value":27}},"7c75350c-beb9-4bf8-a28b-8da265e60aa6"]]
+{"ide":{"node":{"7c75350c-beb9-4bf8-a28b-8da265e60aa6":{"position":{"vector":[-2497,1126]},"visualization":{"show":false,"width":414.83538651790013,"height":166.2797622020428}}},"widget":{},"snapshot":"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","import":{}}}

@@ -9,85 +9,212 @@ import Standard.Visualization
 
    # Reading Data from an Excel Workbook
 
-   ## 🗝️ **Objective 1:**  Let’s read a single sheet in from Excel
-
-   1️⃣	Drag the **sample_bank_data.xlsx** workbook on the canvas. This adds a ***Data.read*** component to the workflow.
-
-   ### THE FILE CAN BE FOUND HERE:
-
-   **Windows - C:\Users\<username>\Documents\enso-projects\Samples\Data\sample_bank_data.xlsx**
 
 
-   **Mac & Linux - ~/Documents/enso-projects/Samples/Data/sample_bank_data.xlsx**
+   **This exercise is available on the Enso Community at <https://community.ensoanalytics.com/c/enso-analytics-101/>. Working through the exercises on Community lets you to keep track of your progress, and allows you to open the exercise on a second screen. You will need to create a free account to access the lesson on Enso Community.**
+
+   ### IT IS HIGHLY RECOMMENDED THAT YOU EXPERIENCE THIS EXERCISE BY USING THE LEARNING PATH ON ENSO COMMUNITY!
+
+   This is the first in a series of four (4)  Exercises designed to help you quickly master Enso Analytics. Each Exercise is broken up in to a number of learning objectives.
+
+
+   Start with Excel basics and visual components, then advance through aggregations, data cleaning, and multi-sheet integration. Each exercise tackles common business scenarios—from messy data cleanup to customer analysis across multiple datasets.
+
+
+   By completion, you'll have the confidence to handle your organization's data challenges. 
+
+
+   Users who complete these four exercises before jumping into their first real use case are over **10 times more likely to be successful**.
+
+
+   The [Enso Community](https://community.ensoanalytics.com) provides advanced workflows for continued growth beyond these foundational skills.
+
+
+   ## **Objective 1 - Let’s read a single sheet in from Excel**
+
+   Excel Workbooks are containers for Worksheets (and Named Ranges for more advanced Excel users).
+
+   Here we will open an Excel Workbook, and then a single Excel Worksheet.
+
+   ### **Step 1 of 3 - Read the Excel Workbook**
+   - In the toolbar at the top of the canvas, click on the ＋ Input button to add a new Input Component. This will open the Input Component Browser. ![Image](/images/image_4.png)
+   
+   - In the component browser, Choose the ***Data.read*** component by clicking on its name. ![Image](/images/image_5.png)
+   - Click on the word *path* that is highlighted in royal blue on the ***Data.read*** component. ![Image](/images/image_6.png)
+   - Click on *Choose file...* ![Image](/images/image_7.png)
+   - Navigate to your Documents/enso-projects/Samples/Data folder.
+   - Choose the file called **sample_bank_data.xlsx**.
+   You should now have a fully configured ***Data.read*** component on your canvas that looks like the one below. If something had gone wrong, you would see a yellow warning message  or a red error message below the component with a hint as to what went wrong. ![Image](/images/image_1.png) 
+
+   > **Note:**  Components are the building blocks of Enso Workflows, and you can add an unlimited amount of components to solve virtually any data challenge.
+
+   ### **🎉🥳🎈CONGRATULATIONS!** You have added and configured your first Enso Component (***Data.read***) to the Workflow!!!   You are now ready to move on to Step 2 of 3 in this Exercise.
 
 
 
 
-   ![Image](/images/1a%20drag%20file.gif)
+   ### **Step 2 of 3 - Read the Excel Worksheet**
+      - Move your mouse over the ***Data.read*** component.  This will enable the **Quarter Circle Menu** on the left edge of the component.
+      - - The Quarter Circle Menu has three icons:
+      - - - The 'Hamburger' icon (the three horizontal lines) has a menu with lots of options, such as adding a new component, creating a comment above the component, copying the component, and deleting the component.
+      - - - The ? icon will open Help on the component.
+      - - - The **eye** icon shows the current component's ***Visualization***
+      - In the Quarter Circle Menu, click on the **eye** icon to open the Visualization to show the list of Worksheets in the Workbook.![Image](/images/Quarter%20Circle.png) 
+     - Double-click **Sheet 1** to read this worksheet. This adds a **read** component connected to the output of the ***Data.read*** component, configured with the query parameter set to **Sheet1**
+   ![Image](/images/read_closeup.gif)
 
 
-   2️⃣	Click on the eye **<o>** to open the visualization. You will see a list of the sheets in this workbook (just Sheet1 in this case).  Double click **Sheet1**  to add a ***read*** component configured to read this sheet.
+   **Note:** You will notice several additional configuration options on the ***read*** component such as *headers,* *limit*, and *skip_rows*. These parameters are optional, but you will find them valuable if your Excel Worksheet has its column headers starting on row 5 for example!
 
-   ![Image](/images/1b%20read.gif)
-
-
-   3️⃣	Click on the eye **<o>** of the new ***read*** component to open the visualization to see the data.
-
-   **An Overview of the Table visualization**
-
-   ![Image](/images/image.png)
+   ### **Step 3 of 3 - View the Data in the Worksheet**
+   - Hover your mouse over the newly added ***read*** component to show the quarter circle menu
+   - Click the **eye** icon to view the data in the Worksheet. This opens the ***read*** component's **Visualization**.![Image](/images/image.png)
 
 
-   4️⃣	Within visualization you can stretch the window or maximize it using the 4-arrow (outward) button to the right of the visualization eye, or using the shortcut keys <Shift><Space>.  
-
-   *Note:  once expanded, you can revert to the original size by using the 4-arrow (inward) button located in the upper left corner or hitting the shortcut* <Shift><Space>  or <esc>*.*
-
-   The next button (after the 4-arrow) allows you to choose the type visualization - in this case table is the default.
-
-
-   ![Image](/images/1c%20-%20viewing%20data.gif)
+   ### **🎉🥳🎈CONGRATULATIONS!** You have added and configured a ***read*** component to your **Workflow**. 
+      - You also learned how to open a component's Visualization to view the data in the Worksheet.
+      - You have discovered the Quarter Circle Menu that appears on every component when your mouse is moved over that component.
+   This component has read the Excel Worksheet called **Sheet1** and is now ready for the next step in the tutorial.
 
 
 
-   ## 🗝️ **Objective 2:**  Filter Data to find “exception” records.
-
-   Next we want to find the records where the field [currency_code]is not valid. We want to find any records where the length of the code is NOT 3 characters. To do this we will first add a [currency_code_length]field and then filter on this.
-
-   1️⃣	From From the ***read*** component add a new component.
-
-   2️⃣	Type **set** and as you do this the available components will reveal a ***set*** component.  Either hit the carriage return/enter on your keyboard or use your mouse to add this component (equivalent to expression or formula which will also drive you to this same component if you typed one of these terms). This component allows us to create a derived column from other columns.
 
 
-   ![Image](/images/1d%20-%20set.gif)
 
-   - Click the value parameter and choose <Simple Expression> from the dropdown list.
-   - Click on input and choose [currency_code].
-   - Click on the operation argument and choose ***Text*** and then ***length*** from the dropdown list.
-   - If you now open visualization, a new column has been added at the end called text_length([currency_code]).
-   - To rename this field, update your configuration by setting a new fieldname value in the as “ “ argument.  Type the new name currency_code_length inside of the quotes and you will have updated the new field to become [currency_code_length].
-   **3️⃣**	From the ***set*** component add a new component.
+   ## **Objective 2:**  Filter Data to find “exception” records.
 
-   4️⃣	Type **filter** to add the ***filter*** component.
-
-   - Click on the “column” argument and select the [currency_code_length] column argument.
-   - Click on the “filter” argument and choose “Not Equals” (note: Not_Equal appears in the configuration).
-   - Click on the “to” argument and select <Number Value>.
-   - Click on the “0” (default number) in the configuration and type a value of  “3”.
-   How many records appear in your visualization? The expected result is a single record.
-
-   ![image](onerecord.png)
-
-   ## 🗝️ **Objective 3:**  Filter Data to find “Savings Account” records.
-
-   The [product_name] field will be used in this filtering exercise.  Using some of the skills that you’ve learned, you should be able to visualize this product type data and get an expected quantity of 1,026 rows. 
+   Next we want to find the records where the **currency_code** column is not valid. Currency Codes must be **three characters long**, such as USD, GBP, and EUR. 
 
 
-   ![Image](/images/image_1.png)
+   To accomplish this we will first create a  **currency_code_length** column and then filter on values in this new column where the currency_code_length is not equal to 3.
+
+
+   ### **Step 1 of 3 - From the *read* component add a new component.**
+      - From the "Hamburger" menu on the ***read*** component, select **+ Add New Component** to open the **Component Browser**. ![Image](/images/image_9.png)
+   > **Note:** The Component Browser has a categorized list of all Enso Components that are related to the data that you are working on.
+      - Choose ***set*** by clicking on it in the  suggestions list. The ***set*** component allows us to create a new column using an expression (formula).
+   ![Image](/images/image_10.png)
+
+      - Click the value **argument** by clicking on the word **value** just to the right of the word **set** on the component, and choose <Simple Expression> from the dropdown list. 
+   ![Image](/images/image_11.png)
+
+   > **Note: Arguments**, also called **parameters** are configuration options required by the component to make them work. 
+      - Click on **input** and choose **currency_code** from the list of columns.
+      - Click on the **operation** argument and choose **Text**
+      - A new operation parameter will appear to the right of **Text** as we need to configure which Text function to use. Select **length** from the dropdown list.
+      - If you now open visualization, a new column has been added at the end called **text_length(currency_code)**.
+   ![Image](/images/image_12.png)
+      - To rename this field, update the ***set*** component configuration by setting a new column name value in the **as** “ “ argument to the right of the word  **Length**. You may need to reselect the ***set*** component to get this argument to appear.
+   ![Image](/images/image_13.png)
+
+      - Type the new name currency_code_length inside of the quotes and you will have updated the new field to become **currency_code_length**.
+   ![Image](/images/image_15.png)
+
+
+      -
+      -
+
+
+
+
+
+
+
+   ### **Step 2 of 3- From From the *set* component add a new component.**
+      - From the "Hamburger" menu on the ***set*** component, select **+ Add New Component** to open the **Component Browser**.
+      - Choose ***filter*** by clicking on its name in the suggestions list in the Component Browser or by typing "filter" which will narrow the list of all available components.
+      - Click on the “column” argument and select the **currency_code_length**.
+      - Click on the “filter” argument and choose “..Not Equal” 
+      - Click on the “to” argument and select <Number Value>.
+      - Click on the “0” (default number) in the configuration and type a value of  “3”.
+
+
+   ### **Step 3 - View the Data in the Worksheet**
+      - Hover your mouse over the newly added ***filter*** component to show the quarter circle menu
+      - Click the **eye** icon to view the data in the Worksheet. This opens the ***filter*** component's **Visualization**.
+   How many records appear in your visualization? **The expected result is a single record.**
+
+   ### **Expected Result**![Image](/images/image_2.png)
+
+   ### **🎉🥳🎈CONGRATULATIONS!** You have added and configured two additional components to your **Workflow**.  
+      - The ***set*** component enabled you to create a new calculated column using a Simple Expression.
+      - The ***filter*** component was able to identify the one record that has an invalid **currency_code**. You will learn in Exercise 2 in this four part series how you can fix this exception record.
+
+
+
+
+
+
+   ## **Objective 3:**  Filter Data to find “Savings Account” records.
+
+   In Enso, you can add as many components originating from a single component as you wish. In this case, we want to create a table that has all of the records where **product_name** equals "Savings Account".
+
+
+   Since our last step had just a single row, and it has a **product_name** equal to Certificate of Deposit, we will move that component out of the way, and add a new component to the ***set*** component above as it has all records.
+
+   ### Step 1 of 3 - Move the ***filter*** component that you just created to make space.
+      - Click on any part of the **filter** component that you just created and, while holding the mouse button, drag the component to the right. ![Image](/images/move_component.gif)
+
+   ### Step 2 - Add a second filter component to the set component above
+      - From the "Hamburger" menu on the ***set*** component, select **+ Add New Component** to open the **Component Browser**.
+      - Choose **filter** from the suggestions, or type "filter" and hit return.
+      - Click on the “column” argument and select the **product_name** .
+      - Click on the “filter” argument and choose “..Equal” 
+      - Click on the “to” argument and select <Text Value>.
+      - Type  the text **Savings Account** between the " " to the right of ..Equal in the configuration.
+      - Move the newly created ***filter*** component to the left, to line it up with the ***set*** component above by clicking and dragging as in Step 1 above. Keeping your workflow aligned will help you better understand how the data flows from top to bottom. 
+
+   ### **Step 3 - View the Data in the Worksheet**
+
+      - Hover your mouse over the newly added ***filter*** component to show its quarter circle menu
+      - Click the **eye** icon to view the data in the Worksheet. This opens the ***filter*** component's **Visualization**.
+
+
+   ### How many records appear in your visualization? **The expected result is 1,026.**
+
+   ### Expected Result![Image](/images/image_3.png)
+
+   > **Note**: When you work in Enso Analytics, your original data is never overwritten (unless you explicitly choose to do so by writing back to the same file that you read from. You will see a warning, and you will explicitly need to click on the write all outputs button at the top of the canvas to do so. Therefore, you should feel confident in experimenting as you are not going to corrupt your original data.
+
+
+   ### **🎉🥳🎈CONGRATULATIONS!** You have added a second component to the ***set*** component, and have created your first **Workflow**.  
+      - The workflow created two tables. One with a single record. The second with 1,026 records. You will learn in Exercise 3 how to write this data to a file.
+      - You learned how to move components.
+      - You learned that your original data is not overwritten (unless you explicitly choose to do so).
+      - You are on your way to mastering Enso Analytics.
+
+
+   ## **Objective 4:**  Using the Zoom controls to show more or less of the workflow
+
+   Depending on the size of your monitor, you likely can't see your entire workflow. Let's zoom out to see the entire workflow all at once. (There is an animation at the bottom of this document that shows you the steps, in addition to the text below)
+
+      - In the **Toolbar** at the top of the **Canvas** You will see a magnifying glass icon with **－** and **＋** buttons.
+      - Click the **－** button one or more times until you can see the entire workflow.
+      - Click the icon that looks like a box just to the right of the **＋** icon. This will set the zoom to **show all components** if no components are selected, or will zoom to one or more selected components if you have them selected.
+
+
+   ### **🎉🥳🎈CONGRATULATIONS!** You have learned how to zoom in and out in Enso, and Exercise 1 is now complete!
+      - Pro tip - if you ever mistakenly scroll to a point where no components are visible, click the box icon to **show all components** to find your way back!
+      - You learned to add and configure the arguments on several components.
+      - You added a new Input component (***Data.read***) to open the Excel Workbook.
+      - You added a ***read*** component to read *Sheet1* from the Workbook.
+      - You learned about the Quarter Circle Menu that is found at the upper left of every component when your mouse hovers over the component.
+      - You learned how to show the Visualization that is found on every component by clickling on the **eye** icon in the Quarter Circle Menu.
+      - You created a new calculated column using the ***set*** component.
+      - You created two different tables using ***filter*** components.
+      - You learned how to move components.
+
+   ## Video Walkthrough
+
+   ![Image](/images/zoom.gif)
+
+
+   ## You are now ready to progress to Enso Analytics 101 - Exercise 2 - Aggregating and Pivoting Data!
 main =
     operator1 = "Welcome to Enso!"
 
 
 
 #### METADATA ####
-[[{"index":{"value":4047},"size":{"value":18}},"4b88666b-57f4-4e62-9f57-d7deb26fa722"]]
-{"ide":{"node":{"4b88666b-57f4-4e62-9f57-d7deb26fa722":{"position":{"vector":[60,15]}}},"widget":{},"snapshot":"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","import":{}}}
+[[{"index":{"value":13888},"size":{"value":18}},"92b59475-443c-4380-83f9-54930a813e29"]]
+{"ide":{"node":{"92b59475-443c-4380-83f9-54930a813e29":{"position":{"vector":[21,351]}}},"widget":{},"snapshot":"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","import":{}}}

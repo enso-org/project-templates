@@ -1,3 +1,4 @@
 name: Enso Getting Started - Exercise 3 - Cleaning and Parsing Data
+namespace: local
 version: 0.0.1
-prefer-local-libraries: true
+prefer-local-libraries: 'true'

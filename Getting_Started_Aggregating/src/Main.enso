@@ -9,122 +9,185 @@ import Standard.Visualization
 
    # Aggregating and Pivoting Data
 
-   In this scenario, we want to look at calculating the number of accounts by type and by currency.
+   **This exercise is available on the Enso Community at <<https://community.ensoanalytics.com/c/enso-analytics-101/>>. Working through the exercises on Community lets you to keep track of your progress, and allows you to open the exercise on a second screen. You will need to create a free account on the Enso Community in order to access the lessons.**
+
+   ### IT IS HIGHLY RECOMMENDED THAT YOU EXPERIENCE THIS EXERCISE BY USING THE LEARNING PATH ON ENSO COMMUNITY!
+
+   This is the second in a series of four (4)  Exercises designed to help you quickly master Enso Analytics. Each Exercise is broken up in to a number of learning objectives.
+
+
+   Start with Excel basics and visual components, then advance through aggregations, data cleaning, and multi-sheet integration. Each exercise tackles common business scenarios—from messy data cleanup to customer analysis across multiple datasets.
+
+
+   By completion, you'll have the confidence to handle your organization's data challenges. 
+
+
+   Users who complete these four exercises before jumping into their first real use case are over **10 times more likely to be successful**.
+
+
+   The [Enso Community](<https://community.ensoanalytics.com>) provides advanced workflows for continued growth beyond these foundational skills.
+
 
    ### 
 
-   ## 🗝️ **Objective 1:**  Lets read a single sheet in from Excel (Review from previous example):
+   ## **Objective 1:**  Lets read a single sheet in from Excel (Review from previous example):
 
-   1️⃣        Drag the **sample_bank_data.xlsx** workbook on to the canvas. This adds a ***Data.read*** component to the workflow.
+   ### **Step 1 of 2 - Read the Excel Workbook**
+   - In the toolbar at the top of the canvas, click on the **+ Input** button to add a new Input Component. This will open the  Input Component Browser.![Image](/images/image_9.png)
+   - In the Component Browser Choose the ***Data.read*** component by clicking on its name. ![Image](/images/image_10.png)
+   - Click on the word *path* that is highlighted in royal blue on the ***Data.read*** component. ![Image](/images/image_11.png)
+   - Click on *Choose file…* ![Image](/images/image_12.png)
+   - Navigate to your Documents/enso-projects/Samples/Data folder.
+   - Choose the file called **sample_bank_data.xlsx** You should now have a fully configured ***Data.read*** component on your canvas that looks like the one below. If something had gone wrong, you would see a yellow warning message or a red error message below the component with a hint as to what went wrong. 
+   ![Image](/images/image_13.png)
 
-   ### THE FILE CAN BE FOUND HERE:
-   **Windows - C:\Users\<username>\Documents\enso-projects\Samples\Data\sample_bank_data.xlsx**
 
 
-   **Mac & Linux - ~/Documents/enso-projects/Samples/Data/sample_bank_data.xlsx**
+   ### **Step 2 of 2 - Read the Excel Worksheet**
+   - Move your mouse over the ***Data.read*** component. This will enable the quarter circle menu on the left edge of the component.
+   - In the quarter circle menu, click on the **eye** icon open its visualization to show the list of Worksheets. ![Image](/images/Quarter%20Circle.png)
+   - 
+   - Double-click **Sheet 1** to read this worksheet ![Image](/images/read_closeup.gif)
+   
+   - Hover your mouse over the newly added ***read*** component to show the quarter circle menu
+   - Click the **eye** to view the data in the Worksheet.
+   - 
 
-
-
-   2️⃣        Add a new component after the ***Data.read*** component by either dragging from the output port (the bottom edge) of the `Data.read` component, or clicking the ➕ button on the Data.readcomponent.
-
-   - Choose the ***read*** component
-   - Click on **query** then choose Sheet1
+   ### **🎉🥳🎈CONGRATULATIONS! You have mastered reading Excel Worksheets in Enso Analytics!**
 
    ### 
 
-   ## 🗝️ **Objective 2:**  Aggregating by Account Type (Product Name):
+   ## **Objective 2:**  Aggregating by Account Type (Product Name):
 
-   The first task is to add an aggregate component grouped by [product_name] and create a new column of data that summarizes the count of records for each Account Type.
+   Next we want to analyze how many Savings Accounts, Checking Accounts, Investment Accounts and Certificate of Deposit accounts our customers have, and rank them from most to least.
 
-   1️⃣        Add a new component after the ***read*** component by either dragging from the output port (the bottom edge) of the ***read*** component, or clicking the ➕ button on the component.
+   To accomplish this task we will summarize the data using an ***aggregate*** component and then we will add a ***sort*** component to do the ranking.
 
-   2️⃣        Choose the ***aggregate*** component (Begin typing the term aggregate or sum) and hit enter or left-click on the ***aggregate*** component.
-
-   - Click the group_by argument then choose [product_name]
-   - Click on the [➕] symbol (to the right of the columns  argument)
+   ### **Step 1 of 2 -Add an aggregate component grouped by product_name and create a new column of data that summarizes the count of records for each Account Type.**
+   - From the "Hamburger" menu on the ***read*** component that read the **Sheet 1** worksheet, select **+ Add New Component** to open the **Component Browser**.
+   - Choose ***aggregate*** by clicking on it in the  suggestions list in the Component Browser, or by typing aggregate which will narrow the list of all available components.
+   - Click the **group_by** argument (the word group_by just to the right of the word aggregate on the component) then choose **product_name**
+   - Click on the ➕ symbol (to the right of the columns  argument).
    - This will add the default of “Count”.  *Note:  If you click on “Count”, you will see other options for aggregation.*
-   - You can open the visualization (<>) and see the count of 1,026 Savings Accounts, as we saw in the prior example, along with counts for the 3 other products:
-   ![Image](/images/image_2.png)
+   - Open the visualization on the ***aggregate*** component to see the results.
+   - - Move your mouse over the ***aggregate*** component. This will enable the quarter circle menu on the left edge of the component.
+   - - In the quarter circle menu, click on the eye icon to show the results.
+   - You should now see and see the count of 1,026 Savings Accounts, as we saw in the prior example, along with counts for the 3 other products: ![Image](/images/image_2.png)
 
 
 
-   ## 🗝️ **Objective 3:**  Sort/Order the aggregated counts in descending order of [Count]
 
-   1️⃣        Add a ***sort*** component after the ***aggregate*** component.
+   ### **Step 2 of 2 -  Sort/Order the aggregated counts in descending order of (Count)**
 
-   - Click on the [➕] symbol on the columns argument.
-   - Click on the [product_name] and change it to Count (dropdown or typing).
-   - Click on direction argument and choose Descending from the dropdown list. (Savings Account will now be at the bottom of the list as #3).
+   Next we want to sort our results so we can see which product has the highest number of accounts. We will accomplish this task using a ***sort*** component.
+
+   ### Add a ***sort*** component after the ***aggregate*** component.
+   - From the "Hamburger" menu on the ***aggregate*** component, select **+ Add New Component** to open the **Component Browser**.
+   - Choose ***sort*** by clicking on it in the  suggestions list, or by typing sort which will narrow the list of all available components.
+   - Click on the ➕ symbol on the columns argument.
+   - Click on the **product_name** and change it to Count (dropdown or typing).
+   - Click on direction argument and choose Descending from the dropdown list. (Savings Account will now be at the bottom of the list).
+   - Open the visualization on the ***sort*** component to see the results.
+   - - Move your mouse over the ***sort*** component. This will enable the quarter circle menu on the left edge of the component.
+   - - In the quarter circle menu, click on the eye icon to show the results.
+   ### **Expected Result**
    ![Image](/images/image_3.png)
 
+   ### 🎉🥳🎈CONGRATULATIONS! You have summarized your first dataset using the ***aggregate*** component and ranked the results using a ***sort*** component!
 
-   ## 🗝️ **Objective 4:**  Create table of currencies by product names
+   You also learned about the ➕ icon found on many Enso components. This ➕ icon allows you to add one or more items for a single parameter.
 
-   For each product name create a distinct count of accounts within each of the currency codes (from previous exercise we examined 3-digit currency codes with one (1) exception accouant).
+   - In the ***aggregate*** component you chose one group_by column (**product_name**) and one column (Count), but if you clicked ➕ again after the Count, you could have summarized additional columns, such as a Sum of the **current_balance** column.
+   - In the ***sort*** component, you chose a single column to sort on (Count). But you can add more columns by clicking again on the ➕ to the right of an item you have already added. Here you could have sorted by Count and then by Product Name by clicking on the ➕ to the right of the Count Descending argument you have configured.
 
-   1️⃣        Add a new ***cross_tab*** component after the ***read*** component.
 
-   A cross tab allows us to create a column for each domain value for a given field (in this case [currency_code]).
 
-   - Click on the group_by argument and choose [product_name].
-   - Click on the names argument and choose [currency_code].
+   ## **Objective 3:**  Create table of currencies by product names
+
+   **Our goal** in Objective 3 is to create a table that contains a list of product names with a distinct count of accounts within each of the currency codes.
+
+
+   ***aggregate*** and ***cross_tab*** are two key components that can be used to summarize data. As you saw in Objective 2, ***aggregate*** grouped data and created one (or more) summaries for each of columns we chose.
+
+
+   ***cross_tab*** reorganize data horizontally for comparison across categories. This will become much more clear as we tackle this objective (*see the Expected Result below*).
+
+   > **Note:** *count* will give the number of rows in each group. A *distinct count* requires a column name to be given and it eliminates any duplicates that might exist in that column.
+
+   ## 
+
+   ## Step 1 - Add a new ***cross_tab*** component after the ***read*** component.
+   - Move the ***aggregate*** and ***sort*** components to the right by selecting them and dragging them. ![Image](/images/move%20components.gif)
+   
+   - From the ***read*** component, add a ***cross_tab*** component from From the "Hamburger" menu on the read component, select + Add New Component to open the Component Browser, or by dragging down from the bottom of the ***read*** component. ![Image](/images/drag_to_add.gif)
+   
+   - Click on the group_by argument and choose **product_name**.
+   - Click on the names argument and choose **currency_code**.
    - Click on the values argument and select “Count_Distinct”.
-   - Click on the [➕] symbol and add the [account_id] field.
-   When we complete this objective, you’ll have 4 rows with 5 columns of data.
+   - Click on the ➕ symbol and add the **account_id** field.
+   - Open the visualization on the ***cross_tab*** component to see the result by clicking on the **eye** icon in the components quarter circle menu. When we complete this step, you’ll have 4 rows with 5 columns of data.
+
+   ### **Expected Result**
+   ![Image](/images/image_8.png)
+
+   ### **🎉🥳🎈CONGRATULATIONS! You have summarized your first dataset using the *cross_tab* component in Enso Analytics!**
+
+   - You also learned a new way to add components - by dragging down from the bottom of an existing component. (*Note - the entire bottom of a component is called its **output port**. You will see it appear as your mouse gets near the bottom of the component, or the bottom of the components visualization if it is open*).
+   - You practiced moving components to a new location.
 
 
-   ![Image](/images/image_5.png)
 
 
-   ## 🗝️ **Objective 5:**  Create table of account statuses by currency_code
+   ## **Objective 4:**  Fixing Dirty Data
 
-   For each currency code create a distinct count of accounts within each of the account statuses.  In this data, you’ll find that there is at least one account status that has a ‘dirty’ value.  For extra credit, you can cleanse that status (See next Objective).
-
-   1️⃣        Add a new ***cross_tab*** component after the ***read*** component.
-
-   Create the configuration properly and you will see the four (4) currency values and the three (3) account statuses.  Let’s guide you through the extra credit assignment. ![image](4by3.png)
-
-   🗝️ **Objective 5 Extra Credit:**  Create table of account statuses by a cleansed currency code field.  You’ll want to convert any “C” statuses to “Closed” prior to the ***cross_tab*** component.  You can accomplish this by:
-
-   1️⃣       Add a new ***set*** component (set can be used to update values in an existing field or to add new fields to the incoming data) after the ***read*** component.
-
-   2️⃣        Configure the ***set*** component to update “C” values to “Closed”
+   The goal for Objective 4 is to update the cross_tab that you just created by fixing the currency_code column. Notice that we have a column in the visualization of the ***cross_tab*** that we just created that has a name of "G". This was a data entry error where one record in our Certificate of Deposits had this erroneous value , and it should have been GBP.
 
 
-   ![Image](/images/2a.gif)
+   ### **Step 1 of 2:**
+
+   - Make some space by moving the ***cross_tab*** component down an inch (2.5 cm) or so on your screen.
+   - Add a new ***set*** component after the ***read*** component. You can use the ***read*** component's hamburger menu, or you can drag down from the bottom of the visualization on the ***read*** component as shown in the Video Walkthrough below.
+   - Configure the ***set*** component to update “G” values to “GBP”
+   - - Click on the value argument and choose <Simple Expression> .
+   - - Click on the input argument and choose the **currency code** column.
+   - - Click on the operation argument and choose the “if” operation.
+   - - Click on the condition argument and choose the "..Equal" option.
+   - - On the **to** argument click **<Text Value>** and choose the option and type the letter G between the quote marks.
+   - - Click on the **true_value** argument and choose the option **<Text Value>**.
+   - - Type the word “GBP” between the quote marks.
+   - - Click on the false_value argument and select the **currency_code** column.
+   - - Click on the double-quotes (following the word as) and type the column name currency_code.
+
+   ### **Expected Configration** ![Image](/images/image_14.png)
 
 
-   - Click on the value argument and choose <Simple Expression>.
-   - Click on the input argument and choose the [account_status] column.
-   - Click on the operation argument and choose the “if” operation.
-   - Click on the condition argument and choose the "Equals" option.
-   - On the to argument click and choose the  <Text Value> option and type the letter C between the quote marks.
-   - Click on the true_value argument and choose the <Text Value> option.
-   - Type the word “Closed” between the quote marks.
-   - Click on the false_value argument and select the [account_status] column.
-   - Click on the double-quotes (following the word as) and type the column name “account_status”
-   3️⃣       Change the input connection on the ***cross_tab*** from the first step of this objective with the output from the ***set*** component.
+   ### **Video Walkthrough**![Image](/images/crosstab2.gif)
 
 
-   ![Image](/images/2b%20-reconnect.gif)
 
 
-   Your result should look like the following: 
+   ### **Step 2 of 2: Replacing a connection** 
+
+   Change the input connection on the ***cross_tab*** from the first step of this objective with the output from the last ***set*** component that you added.
+
+   - Drag down from the bottom of the ***set*** component, and while holding your mouse, drag your cursor on top of the icon at the far left of the ***cross_tab*** component and release your mouse button. You will know this was successful if you see a line connecting ***set*** to ***cross_tab*** instead of ***read*** to ***cross_tab***. ![Image](/images/reconnect.gif)
 
 
-   ![Image](/images/image.png)
 
+   ### **Expected Result**
+   ![Image](/images/image_7.png)
 
-   # **Bonus**
+   ### **🎉🥳🎈CONGRATULATIONS! You have fixed dirty data, enabling you to have an accurate table of counts of distinct accounts by product name and currency code!!**
 
-   **Fix the currency_code that is G, which needs to be updated to GBP by adding a new** *set* **component as below:**
-
-   ![Image](/images/image_1.png)
+   - You used a ***set*** component to look for the letter "G" in the currency_code column and replace it with "GBP".
+   - You also learned how to replace an existing connection with a new connection by dragging from the ***set*** component to the already configured ***cross_tab*** component.
+   - You are now ready to move on to Enso Analytics 101 Exercise 3 - Cleaning and Parsing Data!
+   - 
 main =
     text1 = "Aggregating and Pivoting Data"
 
 
 
 #### METADATA ####
-[[{"index":{"value":5752},"size":{"value":31}},"97d15141-d528-48a5-99c8-2b959863d6ac"]]
-{"ide":{"node":{"97d15141-d528-48a5-99c8-2b959863d6ac":{"position":{"vector":[-88,418]}}},"widget":{},"import":{},"snapshot":"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"}}
+[[{"index":{"value":12430},"size":{"value":31}},"97d15141-d528-48a5-99c8-2b959863d6ac"]]
+{"ide":{"node":{"97d15141-d528-48a5-99c8-2b959863d6ac":{"position":{"vector":[277,727]}}},"widget":{},"import":{},"snapshot":"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"}}

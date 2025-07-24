@@ -1,0 +1,43 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google_Api import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+import Standard.Visualization.Scatter_Plot
+from Standard.Base.Meta import Enso_Project
+
+## # Welcome to Enso Analytics!![Testing](https://www.youtube.com/embed/4y_oCSBzctE) 
+   # Instructions
+   ## Step 1
+   ### Connect the Color Map worksheet as the lookup_table on the merge component
+   ![Image](/images/connect_merge.gif)
+
+
+   ## Step 2
+   ### Change the filter condition from Is_True to Is_False
+   ![Image](/images/change_filter.gif)
+
+
+   # Next Steps
+   1. Check out [Getting Started](<https://community.ensoanalytics.com/c/start-here/>) on the Enso Community!
+   2. There you will find a self-paced course [Enso Analytics 101](<https://community.ensoanalytics.com/c/enso-analytics-101/>) which will quickly get you **prepping, blending, analyzing** and **automating** in Enso Analytics.
+main =
+    file1 = Data.read enso_project.data/'Getting Started.xlsx'
+    node1 = file1.read 'Points'
+    node2 = file1.read 'Mask'
+    node3 = file1.read 'Colors'
+    table6 = node1.merge node2 key_columns=['ID']
+    table3 = table6.filter (expr '[ID]=0') (..Equal True)
+    table1 = table3.select_columns ['X', 'Y', 'color'] True
+
+
+
+#### METADATA ####
+[[{"index":{"value":1161},"size":{"value":50}},"fcf199e6-d2b1-44b7-be92-a47545d6a593"],[{"index":{"value":1224},"size":{"value":19}},"3de01645-421f-437a-92de-0059bb62a22b"],[{"index":{"value":1256},"size":{"value":17}},"01f10de1-4929-4332-8c8f-778806e09bfe"],[{"index":{"value":1286},"size":{"value":19}},"25d6f464-06a3-487c-a470-0e4e0f98a321"],[{"index":{"value":1319},"size":{"value":11}},"8b85f90a-a7a4-42f3-b13f-95263861eb2f"],[{"index":{"value":1319},"size":{"value":17}},"91deea4e-c1f4-452c-b10e-6a1291297401"],[{"index":{"value":1319},"size":{"value":36}},"5c7c47ba-2f93-4972-a1f8-b08d9e6a1609"],[{"index":{"value":1369},"size":{"value":13}},"23bd2b53-6903-4cb6-8e91-94b9bf448452"],[{"index":{"value":1369},"size":{"value":29}},"42a13da6-02ff-4b95-9623-5f83105c7017"],[{"index":{"value":1369},"size":{"value":44}},"583e2098-7cc1-4d3d-a531-2f6db2da1182"],[{"index":{"value":1427},"size":{"value":21}},"c77aedac-ca91-4ca0-82d6-9f181b05b808"],[{"index":{"value":1427},"size":{"value":41}},"b18096a1-326e-49a4-95be-73b4ae34b3cc"],[{"index":{"value":1427},"size":{"value":46}},"5ceac25b-2a71-40e2-b6d1-3f37205ece18"]]
+{"ide":{"node":{"fcf199e6-d2b1-44b7-be92-a47545d6a593":{"position":{"vector":[-404,535]},"visualization":{"show":false,"width":370.671875,"height":165}},"3de01645-421f-437a-92de-0059bb62a22b":{"position":{"vector":[-404,463]},"visualization":{"show":false,"width":964.06640625,"height":360.83203125,"project":{"project":"Builtin"},"name":"Scatter Plot"}},"01f10de1-4929-4332-8c8f-778806e09bfe":{"position":{"vector":[-224,424]},"visualization":{"show":false,"width":785.317138671875}},"25d6f464-06a3-487c-a470-0e4e0f98a321":{"position":{"vector":[-50,391]}},"5c7c47ba-2f93-4972-a1f8-b08d9e6a1609":{"position":{"vector":[-404,293]}},"91deea4e-c1f4-452c-b10e-6a1291297401":{"position":{"vector":[-491,348]}},"8b85f90a-a7a4-42f3-b13f-95263861eb2f":{"position":{"vector":[-491,348]}},"583e2098-7cc1-4d3d-a531-2f6db2da1182":{"position":{"vector":[-404,221]},"visualization":{"show":false,"width":737.6194458007812,"height":150.52593994140625,"project":{"project":"Builtin"},"name":"Table"}},"42a13da6-02ff-4b95-9623-5f83105c7017":{"position":{"vector":[-332,-260]}},"23bd2b53-6903-4cb6-8e91-94b9bf448452":{"position":{"vector":[-332,-260]}},"5ceac25b-2a71-40e2-b6d1-3f37205ece18":{"position":{"vector":[-404,149]},"visualization":{"show":true,"width":696,"height":578,"project":{"project":"Builtin"},"name":"Scatter Plot"}},"b18096a1-326e-49a4-95be-73b4ae34b3cc":{"position":{"vector":[-404,121]}},"c77aedac-ca91-4ca0-82d6-9f181b05b808":{"position":{"vector":[-404,121]}}},"widget":{},"import":{},"snapshot":"eJyNVE1v2kAQvfMrJuJgQMk6JFUPVamUkDTikCoSUdMKIWtZD2bLesfZHQvIr692HUJCG9qLP+bNe/N2Zuy5oxLGLG0uXS4upUfQZUWOQRrTmr9B7+XMHICvJMvZQYGLh/H74A3SAZCoMJhdVPr9nFutHHma8/spY0uruZHLfx1S1q8Tnh9fUq7XsqwM+j+A79rX0ugnyZrsYVSMlWRGl90Z4j0LYQriFlluTVxbT9mdo1+ouNVqt6END2gUlQhMEYULK82GtfJHR5N79KxtMe0smCv/KU1Xq5XYUM31DIWiMsVyhnn6YZPRcHz5pPi6Cy0AaMPIena1CgZ9jLRhzFhBv3lpw5CsRcXAC4QhGXJwKytYkVv6BSKD9BEyRMu6yjguDNkYK9EVCIrKiixaDopHk1EpC5x2Uh3uPlWNfBZzRaHn3VbrtY+zFx8LaQuMunNtGB0osrkOxiE2c+Sze1fH/ox89lUaj3+vGIWyRuR1RfiGa45VYyf6AoYLVEugmmFygxw6HEbmGPNp5/O21YrKsraaNwKtJ7mdSmy7Sn3IP1mgw/RLd9uYOL/hlncUqp0JuA9ZsKEaVtoYmGubgwSPZn5SSYU5KKqdR5i8HT/0T/v/bSfETl6CJ/3TfrC1Wmi1aKo+1lotzQYK5Gil16scVpW2xTHMDNo8PkWFJ22LXg+kzaHXkzVTKbkJabu3oqJVSm1hEE4axod9GED4ewiHMofgKquabRe5ZJkme/0Wa+PXSaRbyiM9yjT85I60Zb/Dz/bwW+mXO/R8D41r/cyOC/wRBk0Z0axwI7nETabI1KX1g0kyukqmO0aQbKjieTs7uK4cJJPR1XRwmnShI8T1Yy0NhCXt7pj9LfNceDThU3iuAZPkR3IMyc9wUcFiMo3k1m+eNPL1"}}
