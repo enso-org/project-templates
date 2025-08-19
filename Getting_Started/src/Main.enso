@@ -1,43 +1,39 @@
 from Standard.Base import all
 from Standard.Table import all
-from Standard.Database import all
-from Standard.AWS import all
-from Standard.Geo import all
-from Standard.Google_Api import all
-from Standard.Microsoft import all
-from Standard.Snowflake import all
-from Standard.Tableau import all
-import Standard.Examples
 import Standard.Visualization
-import Standard.Visualization.Scatter_Plot
-from Standard.Base.Meta import Enso_Project
 
 ## # Welcome to Enso Analytics!![Testing](https://www.youtube.com/embed/4y_oCSBzctE) 
+   # Overview
+   In 2024, your organization achieved its sales target only in Q2. You have been asked to update the analysis for 2025.
+
    # Instructions
-   ## Step 1
-   ### Connect the Color Map worksheet as the lookup_table on the merge component
-   ![Image](/images/connect_merge.gif)
+
+   ### Connect the 2025 worksheet to the **right** argument on the join component, as shown below.
+   ![reconnect_2025](/images/reconnect_2025.gif)
 
 
-   ## Step 2
-   ### Change the filter condition from Is_True to Is_False
-   ![Image](/images/change_filter.gif)
+   # Observations
+   - Your organization achieved all of its targets in 2025!
+   - No changes were required to the workflow, just a change in input data!
+   - No need to hit a run button. Enso recalculated the results automatically!
+
+   ## 
 
 
    # Next Steps
    1. Check out [Getting Started](<https://community.ensoanalytics.com/c/start-here/>) on the Enso Community!
    2. There you will find a self-paced course [Enso Analytics 101](<https://community.ensoanalytics.com/c/enso-analytics-101/>) which will quickly get you **prepping, blending, analyzing** and **automating** in Enso Analytics.
 main =
-    file1 = Data.read enso_project.data/'Getting Started.xlsx'
-    node1 = file1.read 'Points'
-    node2 = file1.read 'Mask'
-    node3 = file1.read 'Colors'
-    table6 = node1.merge node2 key_columns=['ID']
-    table3 = table6.filter (expr '[ID]=0') (..Equal True)
-    table1 = table3.select_columns ['X', 'Y', 'color'] True
+    file1 = Data.read 'Data/Sales Targets and Results.xlsx'
+    targets = file1.read 'Targets'
+    results_2024 = file1.read '2024 Results'
+    results_2025 = file1.read '2025 Results'
+    table1 = targets.join results_2024 ..Inner [(..Equals 'Quarter' 'Quarter')]
+    table3 = table1.filter (expr '[Sales]<[Target]') ..Is_False
+    table4 = table3.select_columns ['Year', 'Quarter', 'Target', 'Sales'] True
 
 
 
 #### METADATA ####
-[[{"index":{"value":1161},"size":{"value":50}},"fcf199e6-d2b1-44b7-be92-a47545d6a593"],[{"index":{"value":1224},"size":{"value":19}},"3de01645-421f-437a-92de-0059bb62a22b"],[{"index":{"value":1256},"size":{"value":17}},"01f10de1-4929-4332-8c8f-778806e09bfe"],[{"index":{"value":1286},"size":{"value":19}},"25d6f464-06a3-487c-a470-0e4e0f98a321"],[{"index":{"value":1319},"size":{"value":11}},"8b85f90a-a7a4-42f3-b13f-95263861eb2f"],[{"index":{"value":1319},"size":{"value":17}},"91deea4e-c1f4-452c-b10e-6a1291297401"],[{"index":{"value":1319},"size":{"value":36}},"5c7c47ba-2f93-4972-a1f8-b08d9e6a1609"],[{"index":{"value":1369},"size":{"value":13}},"23bd2b53-6903-4cb6-8e91-94b9bf448452"],[{"index":{"value":1369},"size":{"value":29}},"42a13da6-02ff-4b95-9623-5f83105c7017"],[{"index":{"value":1369},"size":{"value":44}},"583e2098-7cc1-4d3d-a531-2f6db2da1182"],[{"index":{"value":1427},"size":{"value":21}},"c77aedac-ca91-4ca0-82d6-9f181b05b808"],[{"index":{"value":1427},"size":{"value":41}},"b18096a1-326e-49a4-95be-73b4ae34b3cc"],[{"index":{"value":1427},"size":{"value":46}},"5ceac25b-2a71-40e2-b6d1-3f37205ece18"]]
-{"ide":{"node":{"fcf199e6-d2b1-44b7-be92-a47545d6a593":{"position":{"vector":[-404,535]},"visualization":{"show":false,"width":370.671875,"height":165}},"3de01645-421f-437a-92de-0059bb62a22b":{"position":{"vector":[-404,463]},"visualization":{"show":false,"width":964.06640625,"height":360.83203125,"project":{"project":"Builtin"},"name":"Scatter Plot"}},"01f10de1-4929-4332-8c8f-778806e09bfe":{"position":{"vector":[-224,424]},"visualization":{"show":false,"width":785.317138671875}},"25d6f464-06a3-487c-a470-0e4e0f98a321":{"position":{"vector":[-50,391]}},"5c7c47ba-2f93-4972-a1f8-b08d9e6a1609":{"position":{"vector":[-404,293]}},"91deea4e-c1f4-452c-b10e-6a1291297401":{"position":{"vector":[-491,348]}},"8b85f90a-a7a4-42f3-b13f-95263861eb2f":{"position":{"vector":[-491,348]}},"583e2098-7cc1-4d3d-a531-2f6db2da1182":{"position":{"vector":[-404,221]},"visualization":{"show":false,"width":737.6194458007812,"height":150.52593994140625,"project":{"project":"Builtin"},"name":"Table"}},"42a13da6-02ff-4b95-9623-5f83105c7017":{"position":{"vector":[-332,-260]}},"23bd2b53-6903-4cb6-8e91-94b9bf448452":{"position":{"vector":[-332,-260]}},"5ceac25b-2a71-40e2-b6d1-3f37205ece18":{"position":{"vector":[-404,149]},"visualization":{"show":true,"width":696,"height":578,"project":{"project":"Builtin"},"name":"Scatter Plot"}},"b18096a1-326e-49a4-95be-73b4ae34b3cc":{"position":{"vector":[-404,121]}},"c77aedac-ca91-4ca0-82d6-9f181b05b808":{"position":{"vector":[-404,121]}}},"widget":{},"import":{},"snapshot":"eJyNVE1v2kAQvfMrJuJgQMk6JFUPVamUkDTikCoSUdMKIWtZD2bLesfZHQvIr692HUJCG9qLP+bNe/N2Zuy5oxLGLG0uXS4upUfQZUWOQRrTmr9B7+XMHICvJMvZQYGLh/H74A3SAZCoMJhdVPr9nFutHHma8/spY0uruZHLfx1S1q8Tnh9fUq7XsqwM+j+A79rX0ugnyZrsYVSMlWRGl90Z4j0LYQriFlluTVxbT9mdo1+ouNVqt6END2gUlQhMEYULK82GtfJHR5N79KxtMe0smCv/KU1Xq5XYUM31DIWiMsVyhnn6YZPRcHz5pPi6Cy0AaMPIena1CgZ9jLRhzFhBv3lpw5CsRcXAC4QhGXJwKytYkVv6BSKD9BEyRMu6yjguDNkYK9EVCIrKiixaDopHk1EpC5x2Uh3uPlWNfBZzRaHn3VbrtY+zFx8LaQuMunNtGB0osrkOxiE2c+Sze1fH/ox89lUaj3+vGIWyRuR1RfiGa45VYyf6AoYLVEugmmFygxw6HEbmGPNp5/O21YrKsraaNwKtJ7mdSmy7Sn3IP1mgw/RLd9uYOL/hlncUqp0JuA9ZsKEaVtoYmGubgwSPZn5SSYU5KKqdR5i8HT/0T/v/bSfETl6CJ/3TfrC1Wmi1aKo+1lotzQYK5Gil16scVpW2xTHMDNo8PkWFJ22LXg+kzaHXkzVTKbkJabu3oqJVSm1hEE4axod9GED4ewiHMofgKquabRe5ZJkme/0Wa+PXSaRbyiM9yjT85I60Zb/Dz/bwW+mXO/R8D41r/cyOC/wRBk0Z0axwI7nETabI1KX1g0kyukqmO0aQbKjieTs7uK4cJJPR1XRwmnShI8T1Yy0NhCXt7pj9LfNceDThU3iuAZPkR3IMyc9wUcFiMo3k1m+eNPL1"}}
+[[{"index":{"value":1098},"size":{"value":47}},"fcf199e6-d2b1-44b7-be92-a47545d6a593"],[{"index":{"value":1160},"size":{"value":20}},"3de01645-421f-437a-92de-0059bb62a22b"],[{"index":{"value":1200},"size":{"value":25}},"01f10de1-4929-4332-8c8f-778806e09bfe"],[{"index":{"value":1245},"size":{"value":10}},"1572bfae-0da2-4bdf-90a9-a9a262e1ffdb"],[{"index":{"value":1245},"size":{"value":25}},"7ee2878c-5a99-4329-8b5d-dcce30c3dbda"],[{"index":{"value":1284},"size":{"value":12}},"56f450ad-fa57-40c5-bd42-32eba125f97a"],[{"index":{"value":1284},"size":{"value":33}},"337e6cde-a406-4294-b3b3-43cc97165865"],[{"index":{"value":1284},"size":{"value":66}},"cc7954e1-67c6-4cc5-87fc-9b5d035a0c5a"],[{"index":{"value":1364},"size":{"value":13}},"0a018f7a-b272-4559-b7a9-a7b65b4600da"],[{"index":{"value":1364},"size":{"value":39}},"70822f96-9bb3-4deb-875a-d5cb64c39876"],[{"index":{"value":1364},"size":{"value":50}},"9d587939-a0eb-46ea-9108-8e4916865bd3"],[{"index":{"value":1428},"size":{"value":21}},"21e7d2c8-c826-456e-ae1f-ff11c488606f"],[{"index":{"value":1428},"size":{"value":60}},"651e37c0-2c4d-445a-b3f6-4860fa7d4eda"],[{"index":{"value":1428},"size":{"value":65}},"a80772a0-b804-4230-a880-de9644b7f649"]]
+{"ide":{"node":{"fcf199e6-d2b1-44b7-be92-a47545d6a593":{"position":{"vector":[-404,560]},"visualization":{"show":false,"width":370.671875,"height":165}},"3de01645-421f-437a-92de-0059bb62a22b":{"position":{"vector":[-404,463]},"visualization":{"show":false,"width":964.06640625,"height":360.83203125,"project":{"project":"Builtin"},"name":"Table"}},"01f10de1-4929-4332-8c8f-778806e09bfe":{"position":{"vector":[-202,425]},"visualization":{"show":false,"width":785.317138671875}},"7ee2878c-5a99-4329-8b5d-dcce30c3dbda":{"position":{"vector":[7,371]}},"1572bfae-0da2-4bdf-90a9-a9a262e1ffdb":{"position":{"vector":[-46,391]}},"cc7954e1-67c6-4cc5-87fc-9b5d035a0c5a":{"position":{"vector":[-404,268]}},"337e6cde-a406-4294-b3b3-43cc97165865":{"position":{"vector":[-404,271]}},"56f450ad-fa57-40c5-bd42-32eba125f97a":{"position":{"vector":[-404,219]}},"9d587939-a0eb-46ea-9108-8e4916865bd3":{"position":{"vector":[-404,196]},"visualization":{"show":false,"width":630.8953960526102,"height":210.9901213422185}},"70822f96-9bb3-4deb-875a-d5cb64c39876":{"position":{"vector":[-404,170]},"visualization":{"show":true,"width":519.105128633342,"height":198.39614374918537}},"0a018f7a-b272-4559-b7a9-a7b65b4600da":{"position":{"vector":[-404,170]}},"a80772a0-b804-4230-a880-de9644b7f649":{"position":{"vector":[-404,124]},"visualization":{"show":true,"width":687.6189269064862,"height":182.6328758900059}},"651e37c0-2c4d-445a-b3f6-4860fa7d4eda":{"position":{"vector":[-404,196]}},"21e7d2c8-c826-456e-ae1f-ff11c488606f":{"position":{"vector":[-404,196]}}},"widget":{},"snapshot":"eJyNVE1v2zgQvftXjOGDP2DTcZpcimaBNs0ucmnRxthFYRjBmBpJbChSIYdWnF9fjCTXcIsCexsN37x5M3xUHnwFD4wuw5CpDxgJTFX7wIDWDvKz0zXu7NlxH/4E/GtiQmtekY13g8FoBCP4j6z2FQF7uHPRw3uH9sBGx+Fws6bIxhXbSclcx7fLZdM06uATpx0p7aslVTvKlleHR3/78OFV890UBgAwgs97CntDjXzdO7i8uLyaw8GnAD4U6HoJgLo0tKcMDEeIaCkCYyiIwTt7AOPgy6WCbz5BiXuCHZEDjE+UidxUZ8gEXBKgiI4mQu6DNLtWg07HvYsckpZmsUuNRnDrnSPNbaWAofHhKZZELLSSnc2CKUqezQBDkSpyIqg9+e6NA+2r2jtyPAeMEEvfONiR9Y2SFsNNIN21eBT67WRpKiwoLs/zqjD5dNAL/byLFPbYCQWAhUz9p22hteDzdmnduqKsSjiHXe0nD7pEV1CEhgJBoOdkQrc2mUIGzq1v5vA9RQbs0cJiXJ0YMmQ8cTnqSksj2JAc7BKzd6qzTCCNVieLLLBS2sVkOQIm9hWy0WjtYdjvH44jf6IX8SbV7cArBbcl6SfwiWHzD7E4T6wbmLLt5N3RgtpXVXKGD4pc9Hh0a2tHvYyCX5QUaPnX9HhnrcjbY1071qWCtaDEk9AYayE3LgOESDZf1KgpA+1TiASb82cBq4vV/5YjucXP5GJ1sRJZTWl02XV9TkY/2QOI5UXKbFYHqmvjijnsLLmsjVqGV+MKMaTLYDY7brZNGffL01WDCo2DG5kUcmNpBTfwERlVIMxgLOHyoX1u694/Qvu1uzb1YuPLuK09uuumY+nL+5oO0t+1OPrqF1yb6kl/A1//Dr4+B7P8zkR5r0K1b++sn1L3zlGAzUSpu+eENsL4SxLLhPEpmm5PfG9aPiFWubFMASb0UgcYb9p9bN9tuum246mwx8e/0UY61V8d69+oSFaesvY2VS7CZvyNMIznp77z46okaunHW1iHRIMfctntbg==","import":{}}}
