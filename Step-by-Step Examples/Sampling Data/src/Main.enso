@@ -1,0 +1,130 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+## ![image](/images/step-by-step-example.png)
+
+   # Sampling Data in Enso Analytics
+
+   The Data Sampling components in Enso Analytics provide powerful tools for extracting subsets of rows from a table, enabling users to create representative samples or focus on specific portions of a dataset for analysis, reporting, or visualization. These components, primarily centered around the `take` component and its variations, support flexible sampling methods such as selecting the first N rows, systematic sampling, random sampling, or custom filtering and sampling based on group criteria. Integrated with other Enso tools, these components streamline data exploration and preparation, making this project a practical example of sampling techniques.
+
+   ## Key Components
+
+   ### take
+
+   The `take` component is used to extract a specified subset of rows from a table based on user-defined criteria, such as selecting the first N rows, a random sample, or a percentage-based subset.
+
+   - **Functionality**: Supports multiple sampling methods, including:
+     - **First N Rows**: Selects the first N rows of a table using the `..First` option, ideal for quick previews or working with the top records.
+     - **Every Nth Row**: Selects every Nth row using the `..Every` option, useful for systematic sampling across a dataset.
+     - **Random Sample**: Selects a random subset of rows using the `..Sample` option, based on a specified number or proportion of rows, ensuring unbiased sampling.
+   - **Use Case**: Extract the first 3 rows of a dataset for a quick preview, select every 10th row for systematic sampling, or take a random sample of 10% of rows for statistical analysis.
+   - **Benefit**: Provides flexible and efficient ways to reduce dataset size while maintaining representativeness, speeding up exploratory analysis or testing.
+
+   ### add_row_number
+
+   The `add_row_number` component adds a sequential index column to a table, optionally grouped by a column and ordered by another.
+
+   - **Functionality**: Assigns a unique row number to each row, with options to group by a column (e.g., `BillingState`) and order by another (e.g., a random number), useful for custom sampling.
+   - **Use Case**: Add a row number grouped by `BillingState` and ordered by a random value to identify the first N rows per group.
+   - **Benefit**: Enables precise control over row ordering and grouping, facilitating targeted sampling within categories.
+
+   ### filter_and_take_first_n_rows
+
+   The `filter_and_take_first_n_rows` function is a custom component that combines filtering and sampling to extract the first N rows for each group defined by a specified column.
+
+   - **Functionality**: Filters a table based on a condition (e.g., matching a specific value in a column) and then takes the first N rows from each filtered group. This is often used in conjunction with the `map` component to apply the function across multiple groups dynamically.
+   - **Use Case**: Select the first 3 rows for each `BillingState` in a customer dataset to analyze recent activity per state.
+   - **Benefit**: Enables targeted sampling within groups, making it ideal for scenarios requiring focused subsets of data based on categorical groupings.
+
+   ### set
+
+   The `set` component adds or updates columns in a table based on expressions or external vectors.
+
+   - **Functionality**: Creates a new column (e.g., `_Rand_`) by applying an expression or merging data, such as adding random numbers or calculated values like 10% of row counts.
+   - **Use Case**: Add a random number column to enable random sampling or calculate the number of rows representing 10% of each group.
+   - **Benefit**: Enhances sampling flexibility by introducing dynamic data for filtering or ordering.
+
+   ### merge
+
+   The `merge` component performs a find-and-replace operation to combine tables based on matching keys.
+
+   - **Functionality**: Matches rows between tables (e.g., by `BillingState`) and adds or updates columns from the secondary table (e.g., `_Count_`).
+   - **Use Case**: Merge a table with group counts to filter rows based on a calculated percentage per group.
+   - **Benefit**: Facilitates advanced sampling by integrating summary statistics into the dataset.
+
+   ## Example Workflow
+
+   In this example workflow, a dataset like `salesforce_customers_2024.csv` is processed using the Sample components to demonstrate various sampling techniques:
+
+   - **Reading Data**: Use `Data.read` with `..Delimited skip_rows=3` to load the CSV file, skipping initial rows for relevant data.
+   - **Systematic Sampling**: Use `take` with `..Every 10` to select every 10th row for a systematic sample.
+   - **First N Rows**: Use `take` with `..First 3` to extract the first 3 rows for a quick dataset preview.
+   - **Random Sampling**: Calculate 10% of the row count with `div` and use `take` with `..Sample` to select a random subset, noting that results vary unless a seed is added.
+   - **Percentage-Based Sampling**: Calculate 10% of the row count with `div` and use `take` with `..First` to select the first 10% of rows, equivalent to a fixed count approach.
+   - **Group-Based Sampling**: Add a row number with `add_row_number` grouped by `BillingState`, filter to the first 3 rows per group with `filter`, and remove the index with `remove_columns`.
+   - **Random Group Sampling**: Generate a random float, add it as `_Rand_` with `set`, add a row number grouped by `BillingState` and ordered by `_Rand_` with `add_row_number`, merge with a 10% count per `BillingState`using `merge`, filter rows less than this count with `filter`, and remove temporary columns with `remove_columns`.
+
+   ## Use Cases
+
+   - **Dataset Preview**: Use `take` with `..First` to extract the first few rows of a large dataset for quick inspection or quality checks.
+   - **Systematic Sampling**: Select every Nth row with `take` and `..Every` to create a representative subset for analysis, such as sampling every 10th customer record.
+   - **Random Sampling**: Use `take` with `..Sample` to select a random subset of rows for statistical modeling or testing, ensuring unbiased representation.
+   - **Group-Based Analysis**: Apply `add_row_number` and `filter` to extract the first N records for each category (e.g., top 3 transactions per state) for targeted insights.
+   - **Percentage-Based Sampling**: Use `set` and `merge` with calculated percentages to sample a proportional number of rows per group, enhancing representativeness.
+   - **Dynamic Sampling Exploration**: Leverage random ordering with `set` and `add_row_number` to explore variable subsets, useful for iterative analysis.
+
+   ## Benefits
+
+   The Sample components in Enso Analytics provide a flexible and efficient approach to extracting meaningful subsets of data, supporting both simple and advanced sampling techniques. The `take` component offers versatile options for selecting rows, from quick previews to random samples, while `add_row_number` and `filter_and_take_first_n_rows` enable group-based sampling for targeted analysis. The `set` and `merge` components enhance dynamic sampling strategies by introducing random or calculated data. Integrated with Enso's visualization tools (accessible via the eyeball icon), these components allow users to inspect sampled data instantly. By simplifying data sampling and preparation, the Sample components empower users to focus on key data subsets, enhancing efficiency and precision in Enso Analytics workflows.
+main =
+    any1 = Data.read 'data/salesforce_customers_2024.csv' (..Delimited skip_rows=3)
+    ## 1 of every N recurds are returned
+    table1 = any1.take (..Every 10)
+    ## The first 3 rows are returned
+    table2 = any1.take (..First 3)
+    ## Random 1 in 10 chance for each row
+    integer1 = any1.row_count
+    ## First 10% of rows
+    integer3 = any1.row_count
+    ## First 3 in a group: Create an index column with specified grouping
+    any2 = any1.add_row_number "_Row_" group_by=['BillingState']
+    ## First 3 in a group:  Filter to the first 3 rows
+    any4 = any2.filter '_Row_' (..Less 3)
+    ## First 3 in a group:  Remove index column
+    any5 = any4.remove_columns ['_Row_']
+    ## Use integer division to compute number of rows to sample.
+    node3 = integer1.div 10
+    ## Random 1 in N chance for Each Row. Note - this produces different results every run,  add a seed to stabilise this.
+    node1 = any1.take (..Sample node3)
+    integer2 = integer3.div 10
+    ## This is identical to the top example where we returned the first 3 rows. In this case, we are calculating the number of rows based on the row_count.
+    node2 = any1.take (..First integer2)
+    ## Get the list of Billing States with the count of rows in each state
+    any3 = any1.aggregate ['BillingState'] [..Count "_Count_"]
+    ## Calculate how many rows will be 10% of records in each state. Floor rounds down.
+    any6 = any3.set (expr 'floor([_Count_]*0.1)') "_Count_"
+    ## Add a random number to a new column called _Rand_
+    table3 = any1.set (expr 'rand()') "_Rand_"
+    ## Add a row number, grouping by Billing State and ordering by the Random number we created. Note, every time the workflow is run, the order will change.
+    any8 = table3.add_row_number "_Row_" group_by=['BillingState'] order_by=[(..Name '_Rand_')]
+    ## Merge is a find and replace component in Enso. This example matches on Billing State and adds thke _Rand_ column to the table
+    any9 = any8.merge any6 ['BillingState']
+    ## First 10% in a group:  Filter to the  _Count_ above, which is the number of rows that represents 10% of the rows in each BillingState
+    any10 = any9.filter '_Row_' (..Less (..Name '_Count_'))
+    ## First 10% in a group:  :  Remove temporary columns
+    any11 = any10.remove_columns ['_Row_', '_Rand_', '_Count_']
+
+
+
+#### METADATA ####
+[[{"index":{"value":7859},"size":{"value":9}},"a0adc9c2-6ca9-45f9-a68e-b570d6cea972"],[{"index":{"value":7859},"size":{"value":46}},"1824d69e-4d0e-4ab2-9149-02f1e13354e8"],[{"index":{"value":7859},"size":{"value":72}},"6b67ee85-a071-4917-b95b-68286886459f"],[{"index":{"value":7986},"size":{"value":9}},"83b52a28-953f-45e0-b19b-56184927cb26"],[{"index":{"value":7986},"size":{"value":22}},"470cd6d3-b4b9-4674-aa6c-fb75194aa4ff"],[{"index":{"value":8059},"size":{"value":9}},"04e8876a-4586-4504-9e60-3bdada686f71"],[{"index":{"value":8059},"size":{"value":21}},"1c09065f-4883-4d76-9c8d-45f2505ad062"],[{"index":{"value":8138},"size":{"value":14}},"7e066880-c523-44e0-8f2c-7e68cfb073d6"],[{"index":{"value":8193},"size":{"value":14}},"16c6c0ec-1c27-4be2-99c0-5922d90c8210"],[{"index":{"value":8293},"size":{"value":19}},"40dd53ee-f54d-4e07-a7c9-e08087756915"],[{"index":{"value":8293},"size":{"value":27}},"0b1322fb-cf38-4ac1-a90c-4c25873b0c10"],[{"index":{"value":8293},"size":{"value":53}},"fe1c5a8c-b317-4b13-ad8d-9426b46f861d"],[{"index":{"value":8413},"size":{"value":11}},"ab537e26-ee74-49b0-8152-03aef9363066"],[{"index":{"value":8413},"size":{"value":19}},"30ccf075-c76c-4d55-804c-fbc245cb1f3e"],[{"index":{"value":8413},"size":{"value":30}},"ae7f12d8-cd84-4945-b079-f31f0e911438"],[{"index":{"value":8503},"size":{"value":19}},"692bbfdf-384a-4762-bc44-2f3abd7ebba0"],[{"index":{"value":8503},"size":{"value":29}},"f267d9c1-4896-4391-9fb9-f0ec811c6b72"],[{"index":{"value":8610},"size":{"value":15}},"ccf69538-304e-435c-9c69-fbc16763863d"],[{"index":{"value":8761},"size":{"value":9}},"4d25245f-f4bf-4a32-aa55-2d56d1718488"],[{"index":{"value":8761},"size":{"value":26}},"6e64fdc0-09e7-46ff-80e1-678b27c343cb"],[{"index":{"value":8803},"size":{"value":12}},"360d8879-9630-43f4-b38b-43d8828b9ca5"],[{"index":{"value":8803},"size":{"value":15}},"2366f3b4-fd25-41de-b03d-4758fc3afc25"],[{"index":{"value":8987},"size":{"value":28}},"e7a71443-261b-41b0-9d68-bf0c7517a194"],[{"index":{"value":9102},"size":{"value":14}},"fa546f01-3ef0-4165-965d-20492acef66e"],[{"index":{"value":9102},"size":{"value":31}},"a00f24c7-095b-4ee9-a5d4-1ee113368554"],[{"index":{"value":9102},"size":{"value":51}},"dc6dcc27-a52f-4e87-a1da-7660333297d0"],[{"index":{"value":9253},"size":{"value":8}},"6316aa3b-cd77-4ff2-a76b-5be07cc42c92"],[{"index":{"value":9253},"size":{"value":38}},"fcc09252-b15b-4f57-bc52-8f786a6d2967"],[{"index":{"value":9253},"size":{"value":48}},"87c305f6-ffac-41a0-8ddf-386f1e8d4234"],[{"index":{"value":9372},"size":{"value":8}},"1222069a-fb88-41ce-8e25-811511374cde"],[{"index":{"value":9372},"size":{"value":24}},"a7288961-b888-4663-8de1-e43d6c519e53"],[{"index":{"value":9372},"size":{"value":33}},"c10fc326-f76b-4d67-b315-ec200a6dcad6"],[{"index":{"value":9575},"size":{"value":21}},"4ce6c402-9fa6-4450-8fff-373ba0145013"],[{"index":{"value":9575},"size":{"value":29}},"318b1c42-0749-4f5b-990a-aa0b1a525d68"],[{"index":{"value":9575},"size":{"value":55}},"c8714147-362b-444d-ad53-8db54bffcddf"],[{"index":{"value":9575},"size":{"value":84}},"e72a991c-5429-4817-8d91-51c2251444dd"],[{"index":{"value":9804},"size":{"value":10}},"b3fd2be9-633e-4355-9276-d89a175a8ca3"],[{"index":{"value":9804},"size":{"value":15}},"75ad4d50-efaf-421e-b75a-b0eb2905982f"],[{"index":{"value":9804},"size":{"value":32}},"02d062b6-e0ce-457e-b9e0-5163d23d8603"],[{"index":{"value":9990},"size":{"value":47}},"06e16800-ca0d-45ca-a0bf-23dc477f05e8"],[{"index":{"value":10108},"size":{"value":51}},"69e7929a-0629-4a62-a09d-5723fb47279f"]]
+{"ide":{"node":{"6b67ee85-a071-4917-b95b-68286886459f":{"position":{"vector":[-1004,-74]}},"1824d69e-4d0e-4ab2-9149-02f1e13354e8":{"position":{"vector":[-1004,-74]}},"a0adc9c2-6ca9-45f9-a68e-b570d6cea972":{"position":{"vector":[-1004,-74]}},"470cd6d3-b4b9-4674-aa6c-fb75194aa4ff":{"position":{"vector":[-807,-340]}},"83b52a28-953f-45e0-b19b-56184927cb26":{"position":{"vector":[-54,-197]}},"1c09065f-4883-4d76-9c8d-45f2505ad062":{"position":{"vector":[-807,-233]}},"04e8876a-4586-4504-9e60-3bdada686f71":{"position":{"vector":[-23,-219]}},"7e066880-c523-44e0-8f2c-7e68cfb073d6":{"position":{"vector":[-413,-673]}},"16c6c0ec-1c27-4be2-99c0-5922d90c8210":{"position":{"vector":[-411,-948]}},"fe1c5a8c-b317-4b13-ad8d-9426b46f861d":{"position":{"vector":[-666,-435]}},"0b1322fb-cf38-4ac1-a90c-4c25873b0c10":{"position":{"vector":[-1644,-433]}},"40dd53ee-f54d-4e07-a7c9-e08087756915":{"position":{"vector":[-1644,-433]}},"ae7f12d8-cd84-4945-b079-f31f0e911438":{"position":{"vector":[-666,-516]}},"30ccf075-c76c-4d55-804c-fbc245cb1f3e":{"position":{"vector":[-1644,-514]}},"ab537e26-ee74-49b0-8152-03aef9363066":{"position":{"vector":[-1644,-514]}},"f267d9c1-4896-4391-9fb9-f0ec811c6b72":{"position":{"vector":[-666,-601]}},"692bbfdf-384a-4762-bc44-2f3abd7ebba0":{"position":{"vector":[-1644,-599]}},"ccf69538-304e-435c-9c69-fbc16763863d":{"position":{"vector":[-413,-745]}},"6e64fdc0-09e7-46ff-80e1-678b27c343cb":{"position":{"vector":[-567,-839]},"visualization":{"show":false,"height":276.0631314367848}},"4d25245f-f4bf-4a32-aa55-2d56d1718488":{"position":{"vector":[-54,-821]}},"2366f3b4-fd25-41de-b03d-4758fc3afc25":{"position":{"vector":[-411,-1020]}},"360d8879-9630-43f4-b38b-43d8828b9ca5":{"position":{"vector":[-1039,-1070]}},"e7a71443-261b-41b0-9d68-bf0c7517a194":{"position":{"vector":[-468,-1118]},"visualization":{"show":false,"height":276.0631314367848}},"dc6dcc27-a52f-4e87-a1da-7660333297d0":{"position":{"vector":[525,-232]}},"a00f24c7-095b-4ee9-a5d4-1ee113368554":{"position":{"vector":[263,-435]}},"fa546f01-3ef0-4165-965d-20492acef66e":{"position":{"vector":[261,-435]}},"87c305f6-ffac-41a0-8ddf-386f1e8d4234":{"position":{"vector":[525,-313]}},"fcc09252-b15b-4f57-bc52-8f786a6d2967":{"position":{"vector":[263,-516]}},"6316aa3b-cd77-4ff2-a76b-5be07cc42c92":{"position":{"vector":[263,-516]}},"c10fc326-f76b-4d67-b315-ec200a6dcad6":{"position":{"vector":[176,-233]}},"a7288961-b888-4663-8de1-e43d6c519e53":{"position":{"vector":[-15,-290]}},"1222069a-fb88-41ce-8e25-811511374cde":{"position":{"vector":[-15,-290]}},"e72a991c-5429-4817-8d91-51c2251444dd":{"position":{"vector":[176,-412]}},"c8714147-362b-444d-ad53-8db54bffcddf":{"position":{"vector":[337,-683]}},"318b1c42-0749-4f5b-990a-aa0b1a525d68":{"position":{"vector":[337,-683]}},"4ce6c402-9fa6-4450-8fff-373ba0145013":{"position":{"vector":[337,-683]}},"02d062b6-e0ce-457e-b9e0-5163d23d8603":{"position":{"vector":[176,-494]}},"75ad4d50-efaf-421e-b75a-b0eb2905982f":{"position":{"vector":[337,-764]}},"b3fd2be9-633e-4355-9276-d89a175a8ca3":{"position":{"vector":[337,-764]}},"06e16800-ca0d-45ca-a0bf-23dc477f05e8":{"position":{"vector":[176,-592]}},"69e7929a-0629-4a62-a09d-5723fb47279f":{"position":{"vector":[176,-677]},"visualization":{"show":true,"width":987.1653645833334,"height":237.84952799479166}}},"widget":{},"import":{},"snapshot":"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"}}

@@ -1,0 +1,41 @@
+ItemName,Category_and_Search_Tags
+Big Mac,"Burger[beef|cheeseburger|""special sauce""|""signature burger""|entree|sandwich]"
+Quarter Pounder with Cheese,"Burger[beef|""quarter pound""|cheese|""classic burger""|entree|sandwich]"
+McDouble,"Burger[beef|double|value|cheese|""value menu""|sandwich]"
+Cheeseburger,"Burger[beef|cheese|classic|""value menu""|sandwich]"
+Hamburger,"Burger[beef|classic|""value menu""|sandwich]"
+Chicken McNuggets,"Chicken[nuggets|fried|""kids meal""|snack|shareable]"
+McChicken,"Chicken[sandwich|crispy|lettuce|mayo|""value menu""]"
+Filet-O-Fish,Fish[sandwich|cod|tartar|seafood|entree]
+McCrispy,"Chicken[sandwich|crispy|""premium chicken""|entree]"
+Spicy McCrispy,"Chicken[sandwich|crispy|spicy|""premium chicken""|entree]"
+Deluxe Crispy Chicken Sandwich,"Chicken[sandwich|lettuce|tomato|mayo|""premium chicken""|entree]"
+French Fries,"Sides[fries|potatoes|salt|""world famous fries""|snack]"
+Apple Slices,Sides[fruit|apple|healthy|kids|snack]
+Side Salad,"Sides[salad|lettuce|greens|healthy|""light option""]"
+Hot Apple Pie,Dessert[pie|apple|baked|sweet|snack]
+McFlurry Oreo,"Dessert[""ice cream""|oreo|sweet|""frozen treat""]"
+Soft Serve Cone,"Dessert[""ice cream""|cone|sweet|""frozen treat""]"
+Hot Fudge Sundae,"Dessert[""ice cream""|""hot fudge""|sweet|""frozen treat""]"
+Hot Caramel Sundae,"Dessert[""ice cream""|caramel|sweet|""frozen treat""]"
+Egg McMuffin,"Breakfast[egg|""english muffin""|cheese|ham|morning|""classic breakfast""]"
+Sausage McMuffin,"Breakfast[egg|""english muffin""|sausage|cheese|morning|""classic breakfast""]"
+Bacon Egg & Cheese Biscuit,Breakfast[bacon|egg|biscuit|cheese|morning]
+Sausage Biscuit,"Breakfast[sausage|biscuit|morning|""value breakfast""]"
+Hotcakes,"Breakfast[pancakes|""maple syrup""|butter|sweet|morning]"
+Hash Browns,"Breakfast[potatoes|crispy|fried|morning|""classic breakfast side""]"
+Coffee,Drinks[hot|coffee|caffeine|morning|beverage]
+Iced Coffee,Drinks[cold|coffee|caffeine|iced|beverage]
+McCafé Latte,Drinks[hot|espresso|latte|milk|caffeine|beverage]
+McCafé Cappuccino,"Drinks[hot|espresso|cappuccino|""milk foam""|caffeine|beverage]"
+Coca-Cola,"Drinks[soda|cola|""soft drink""|beverage]"
+Sprite,"Drinks[soda|lemon-lime|""soft drink""|beverage]"
+Dr Pepper,"Drinks[soda|spicy|""soft drink""|beverage]"
+Chocolate Shake,"Drinks[shake|chocolate|""ice cream""|sweet|""frozen treat""]"
+Strawberry Shake,"Drinks[shake|strawberry|""ice cream""|sweet|""frozen treat""]"
+Vanilla Shake,"Drinks[shake|vanilla|""ice cream""|sweet|""frozen treat""]"
+Sweet Tea,Drinks[tea|sweet|iced|beverage]
+Unsweet Tea,Drinks[tea|iced|beverage]
+Minute Maid Orange Juice,Drinks[juice|orange|morning|beverage]
+Milk,Drinks[dairy|kids|beverage]
+Bottled Water,Drinks[water|still|hydration|beverage]

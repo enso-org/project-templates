@@ -1,0 +1,124 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+## ---
+   icon: group
+   ---
+   Add 2 date columns that have values close to today
+add_date_columns node1 =
+    date4 = Date.today
+    date6 = date4.date_add 8 ..Day
+    node2 = date4.up_to date6
+    table12 = node2.to_table
+    column1 = table12.get 'Date'
+    vector1 = Random.items column1 count=8
+    table13 = table12.zip vector1
+    table14 = table13.rename_columns [(Pair.Value 'Date' 'JoinDate'), (Pair.Value 'Value' 'PurchaseDate')]
+    table15 = node1.zip table14
+    table15
+
+## ![One Component Example](/images/step-by-step-example.png)
+   # Converting Data Types in Enso Analytics
+
+   The Converting Data Types components in Enso Analytics provide a robust set of tools for transforming column data types within tables, enabling users to prepare data for analysis, reporting, or visualization by converting text to numeric, date, or other formats, and vice versa. These components, centered around parse, cast, and format, support automatic type inference when reading text files, manual conversions with flexible options, and customizable formatting, making them essential for ensuring data compatibility and accuracy in workflows. Note that column selection, reordering, and renaming will be covered in a separate example.
+
+   ## Key Components
+
+   ### parse
+
+   The parse component converts text-based columns into other data types, such as integer, float, date, or boolean, while automatically handling extraneous characters.
+
+   - **Functionality**: Transforms text data into the specified type, stripping non-essential characters (e.g., currency symbols, leading zeros) during numeric or date conversions. Non-convertible values are set to Nothing (null).
+   - **Use Case**: Convert a Visits text column to an integer or a PurchaseDate text column (e.g., "M/d/yyyy" format) to a date for time-based analysis.
+   - **Benefit**: Offers flexible and robust data type conversion, simplifying preparation for mathematical operations or standardized date handling.
+
+   ### cast
+
+   The cast component converts columns between non-text data types or from numeric, date, or boolean to text (char) formats, complementing parse and format when other methods are insufficient.
+
+   - **Functionality**: Changes the data type of specified columns, such as converting numeric ZIP or Plus4 to text for string-based operations, particularly useful for mixed data types.
+   - **Use Case**: Convert numeric ZIP and Plus4 to text when dealing with inconsistent numeric data to enable concatenation or formatting.
+   - **Benefit**: Provides precise control over data type transformations, ensuring compatibility with specific analytical needs when automatic methods fail.
+
+   ### format
+
+   The format component converts numeric, date, datetime, or boolean columns to text, offering optional formatting strings for customized output.
+
+   - **Functionality**: Transforms specified columns into text with an optional format string (e.g., "d-MMM-yy" for dates), providing a controlled conversion approach.
+   - **Use Case**: Convert ZIP and Plus4 to text for consistent reporting, or format PurchaseDate as "25-Sep-25" for readable output.
+   - **Benefit**: Allows fine-tuned text conversion with customizable formatting, enhancing data presentation and compatibility.
+   For more information on using custom formats, see <https://help.enso.org/docs/using-enso/custom-formats>
+
+
+   ## Supported Features
+
+   - **Automatic Type Inference**: When reading text files (e.g., CSV) with Data.read, Enso automatically converts text to integer, float, or date types (e.g., ISO yyyy-MM-dd) where possible, preserving leading zeros in numeric columns unless explicitly converted. Enso respects the data types from Excel and databases without inference.
+   - **Text to Numeric Conversion**: Use parse to convert text to integer or float, handling extraneous characters automatically.
+   - **Text to Date Conversion**: Use parse with a date format (e.g., "M/d/yyyy") to convert text dates.
+   - **Numeric/Date to Text Conversion**: Use cast for mixed data types or format with optional strings for formatted text output.
+   - **Metadata Inspection**: Use column_info to verify data types and statistics post-conversion.
+   - **Integration with Enso Ecosystem**: Transformed tables integrate seamlessly with components like filter, join, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect type changes immediately.
+
+   ## Example Workflow
+
+   In this example workflow, a table from data/customers.csv is processed using Converting Data Types components:
+
+   - **Data Import with Automatic Conversion**: Use Data.read to load customers.csv, where Enso automatically converts text to integer, float, or date types (e.g., ZIP, Plus4, StoreNumber, Latitude, Longitude to integer/float, and ISO-formatted dates) for text files, preserving leading zeros unless converted, while respecting types from Excel or databases if used.
+   - **Text to Integer Conversion**: Use parse with ..Integer to convert the Visits text column to an integer, handling non-numeric values as Nothing.
+   - **Text to Float Conversion**: Use parse with ..Float to convert the Spend text column (with leading dollar signs) to a float, stripping symbols automatically.
+   - **Text to Date Conversion**: Use parse with ..Date 'M/d/yyyy' to convert the PurchaseDate text column to a date format.
+   - **Numeric to Text Conversion with cast**: Use cast with ..Char to convert ZIP and Plus4 to text for string operations, addressing mixed data types.
+   - **Numeric/Date to Text Conversion with format**: Use format to convert ZIP and Plus4 to text for consistent reporting, then use format with "d-MMM-yy" to format PurchaseDate as "25-Sep-25".
+   - **Metadata Verification**: Use column_info to inspect updated data types and verify conversion results.
+   - **Renaming with Prefix**: Use rename_columns with a regex ^(.*)$ to add a "Customer " prefix to all column names, or a targeted regex ^(FirstName|LastName|Address|City|State|ZIP|Plus4|Latitude|Longitude)$ to apply it selectively, as a preparatory step before type conversion in this context.
+   - **Adding Date Columns**: Use a sub-flow (add_date_columns) to generate a date range close to today (e.g., 8 days from September 25, 2025), convert it to a table, sample 8 dates, rename columns to JoinDate and PurchaseDate, and zip with the input dataset to add these columns for temporal context.
+
+   ## Use Cases
+
+   - **Automatic Data Import**: Rely on Data.read to convert text to numeric or date types during import of text files for immediate usability, while preserving Excel or database types.
+   - **Numeric Data Preparation**: Use parse to convert text columns like Visits or Spend to integers or floats for calculations.
+   - **Date Standardization**: Use parse to transform text dates (e.g., "M/d/yyyy") into a consistent date format for time-series analysis.
+   - **Text Conversion for Mixed Data**: Use cast to convert numeric ZIP and Plus4 to text when dealing with inconsistent data types.
+   - **Formatted Text Output**: Use format to convert numeric or date columns to text with specific formats (e.g., "25-Sep-25") for reporting.
+   - **Metadata Review**: Use column_info to validate data types after conversions.
+   - **Temporal Data Enrichment**: Add contextual date columns (e.g., JoinDate, PurchaseDate) using a separate zipoperation to support time-based analysis.
+
+   ## Benefits
+
+   The Converting Data Types components in Enso Analytics provide a flexible and efficient approach to transforming column data types, supporting automatic inference for text files, manual conversions, and formatted outputs. The parsecomponent handles text-to-numeric and text-to-date conversions with ease, cast addresses mixed data type challenges, and format offers customizable text formatting, enhancing data compatibility. These components integrate seamlessly with Enso’s ecosystem, supporting further processing with components like filter, join, or visualization tools (accessible via the eyeball icon) for immediate inspection. The addition of temporal context via add_date_columns further enriches analytical capabilities. By streamlining data type conversion, these components empower users to prepare accurate, analysis-ready datasets in Enso Analytics.
+main =
+    ## When reading delimted files, Enso will automatically convert text to other data types where possible. Notice the ZIP, Plus4, StoreNumber Latitude and Longitude were converted to Integer and Float. Dates that are ISO formatted yyyy-MM-dd are also automatically converted.  Leading zeros on numeric columns will not be automatically converted. 
+    any1 = Data.read 'data/customers.csv'
+    ## Convert Text to Integer The example below converts the Visits column from text to numeric.
+    table10 = any1.parse ['Visits'] ..Integer
+    ## Modify Data Types: Use cast when parse and format are unable to be used, such as converting Mixed data types to Char (text)
+    table12 = any1.cast ['ZIP', 'Plus4'] ..Char
+    table11 = any1.column_info
+    ## Convert Text to Float. Spend has leading dollar signs. No need to remove those prior to conversion as parse will strip this off automatically.
+    table1 = table10.parse ['Spend'] ..Float
+    ## Convert Text to Date. PurchaseDate was text. The date was in the format M/d/yyyy.
+    table2 = table1.parse ['PurchaseDate'] ..Date 'M/d/yyyy'
+    ## ZIP Codes and Plus4 should be treated as text (char). Format converts numeric, date, datetime and boolean columns to text.
+    table3 = table2.format ['ZIP', 'Plus4']
+    ## Format can optionally format the data when you use a format string. In this case d-MMM-yy outputs dates as text but formats the dates (e.g. 25-Sep-25)
+    table4 = table3.format ['PurchaseDate'] 'd-MMM-yy'
+    ## Notice the updated data types
+    table8 = table3.column_info
+
+
+
+#### METADATA ####
+[[{"index":{"value":446},"size":{"value":5}},"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5"],[{"index":{"value":466},"size":{"value":10}},"646985dc-ac5f-4821-8d5a-8861bf904ff8"],[{"index":{"value":489},"size":{"value":22}},"8f6cef0d-c331-4557-8ba9-adb612b4329c"],[{"index":{"value":524},"size":{"value":17}},"3350d1b6-464f-450d-8871-909cdfbc7c26"],[{"index":{"value":556},"size":{"value":14}},"3addd758-8a24-4e7f-aced-70da03f75997"],[{"index":{"value":585},"size":{"value":18}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1"],[{"index":{"value":618},"size":{"value":28}},"01af9746-4b49-4aaf-99a6-4a065f7f1974"],[{"index":{"value":661},"size":{"value":19}},"88cd9951-89f4-47fb-b178-eaca2120da87"],[{"index":{"value":695},"size":{"value":92}},"dd996f45-9436-494d-a22a-9ff74dba588d"],[{"index":{"value":802},"size":{"value":9}},"6c11c15f-71fa-4c52-af14-38b2451209e0"],[{"index":{"value":802},"size":{"value":17}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62"],[{"index":{"value":824},"size":{"value":7}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd"],[{"index":{"value":9082},"size":{"value":9}},"af2d16da-d4c2-4769-8a20-1f525e9abd2c"],[{"index":{"value":9082},"size":{"value":30}},"e568ccac-3270-4307-bbb3-cc01d9b278f0"],[{"index":{"value":9225},"size":{"value":10}},"e3a2f4b9-4af3-4557-bc7e-6b8ae40ba063"],[{"index":{"value":9225},"size":{"value":21}},"549052a3-8fb2-46ad-b695-02a9a6863726"],[{"index":{"value":9225},"size":{"value":31}},"8bcab4da-4426-4519-bc22-40d823a27b80"],[{"index":{"value":9402},"size":{"value":9}},"fb423f4a-7e49-414c-9fa9-e15526ef65cc"],[{"index":{"value":9402},"size":{"value":26}},"7a92b472-c599-460f-a4b4-bd4c47fa8c3f"],[{"index":{"value":9402},"size":{"value":33}},"66c69b71-04e6-4c14-b2f5-f58a3ca6abcc"],[{"index":{"value":9450},"size":{"value":16}},"9e4ee7a0-47c7-44f1-b3f7-435733346450"],[{"index":{"value":9630},"size":{"value":13}},"a30ed890-4f73-4689-a6f9-4b6499edb6a1"],[{"index":{"value":9630},"size":{"value":23}},"d0b66b47-775c-4150-964d-689fecbad79f"],[{"index":{"value":9630},"size":{"value":31}},"bf541690-67c8-427a-bfe7-99f90d9e14b7"],[{"index":{"value":9764},"size":{"value":12}},"98150bf3-4c89-4912-be60-74eda795627f"],[{"index":{"value":9764},"size":{"value":29}},"34a7a81c-6353-4d87-a5d8-73c1a6abaefd"],[{"index":{"value":9764},"size":{"value":36}},"3c155ecd-44e9-4532-836e-7d24fc668f6d"],[{"index":{"value":9764},"size":{"value":47}},"4d836176-4c36-4afc-8df5-979704a0f9d3"],[{"index":{"value":9955},"size":{"value":13}},"62820752-4b0e-4e85-ab76-9a890e2d2cb2"],[{"index":{"value":9955},"size":{"value":30}},"e4b2cda5-0d76-47ed-8e97-5c81851e4384"],[{"index":{"value":10157},"size":{"value":13}},"cc1b099a-698b-4a25-b6eb-0f353edb198e"],[{"index":{"value":10157},"size":{"value":30}},"fbaaea5d-8467-41c4-bc42-333b33537211"],[{"index":{"value":10157},"size":{"value":41}},"a3f2bdf0-0397-4f6b-8eb1-3be7b05156f2"],[{"index":{"value":10249},"size":{"value":18}},"88582da4-eaf9-4dfc-9b50-30eb00bfc223"]]
+{"ide":{"node":{"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5":{"position":{"vector":[-1024,721]}},"646985dc-ac5f-4821-8d5a-8861bf904ff8":{"position":{"vector":[-876,649]}},"8f6cef0d-c331-4557-8ba9-adb612b4329c":{"position":{"vector":[-765,514]}},"3350d1b6-464f-450d-8871-909cdfbc7c26":{"position":{"vector":[-848,421]}},"3addd758-8a24-4e7f-aced-70da03f75997":{"position":{"vector":[-826,349]},"visualization":{"show":true,"width":502.81198641202724,"height":264.3352446391665}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1":{"position":{"vector":[-683,13]}},"01af9746-4b49-4aaf-99a6-4a065f7f1974":{"position":{"vector":[-592,-50]},"visualization":{"show":true,"height":326.72607421875}},"88cd9951-89f4-47fb-b178-eaca2120da87":{"position":{"vector":[-814,-456]}},"dd996f45-9436-494d-a22a-9ff74dba588d":{"position":{"vector":[-814,-537]}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62":{"position":{"vector":[-1024,-642]}},"6c11c15f-71fa-4c52-af14-38b2451209e0":{"position":{"vector":[-1024,-642]}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd":{"position":{"vector":[-1024,-714]}},"e568ccac-3270-4307-bbb3-cc01d9b278f0":{"position":{"vector":[-233,1679]},"visualization":{"show":true,"width":2192.9837594648375}},"af2d16da-d4c2-4769-8a20-1f525e9abd2c":{"position":{"vector":[102,2048]}},"8bcab4da-4426-4519-bc22-40d823a27b80":{"position":{"vector":[782,1326]},"visualization":{"show":true,"width":975.093299483855,"height":178.62456537794978}},"549052a3-8fb2-46ad-b695-02a9a6863726":{"position":{"vector":[791,1041]}},"e3a2f4b9-4af3-4557-bc7e-6b8ae40ba063":{"position":{"vector":[791,1041]}},"66c69b71-04e6-4c14-b2f5-f58a3ca6abcc":{"position":{"vector":[1987,487]},"visualization":{"show":true,"width":1051.4061959682158}},"7a92b472-c599-460f-a4b4-bd4c47fa8c3f":{"position":{"vector":[849,747]}},"fb423f4a-7e49-414c-9fa9-e15526ef65cc":{"position":{"vector":[849,747]}},"9e4ee7a0-47c7-44f1-b3f7-435733346450":{"position":{"vector":[-233,1405]},"visualization":{"show":true,"width":878.2231443075985,"height":592.1013762169631}},"bf541690-67c8-427a-bfe7-99f90d9e14b7":{"position":{"vector":[782,1020]},"visualization":{"show":true,"width":996.6557617187499}},"d0b66b47-775c-4150-964d-689fecbad79f":{"position":{"vector":[749,950]}},"a30ed890-4f73-4689-a6f9-4b6499edb6a1":{"position":{"vector":[749,950]}},"4d836176-4c36-4afc-8df5-979704a0f9d3":{"position":{"vector":[782,741]},"visualization":{"show":true,"width":1117.1809920125932}},"3c155ecd-44e9-4532-836e-7d24fc668f6d":{"position":{"vector":[796,678]}},"34a7a81c-6353-4d87-a5d8-73c1a6abaefd":{"position":{"vector":[796,678]}},"98150bf3-4c89-4912-be60-74eda795627f":{"position":{"vector":[796,678]}},"e4b2cda5-0d76-47ed-8e97-5c81851e4384":{"position":{"vector":[782,487]},"visualization":{"show":true,"width":1117.1467685984142}},"62820752-4b0e-4e85-ab76-9a890e2d2cb2":{"position":{"vector":[782,446]}},"a3f2bdf0-0397-4f6b-8eb1-3be7b05156f2":{"position":{"vector":[917,172]},"visualization":{"show":true,"width":1100.2328008395523}},"fbaaea5d-8467-41c4-bc42-333b33537211":{"position":{"vector":[782,215]}},"cc1b099a-698b-4a25-b6eb-0f353edb198e":{"position":{"vector":[782,215]}},"88582da4-eaf9-4dfc-9b50-30eb00bfc223":{"position":{"vector":[-266,224]},"visualization":{"show":true,"width":904.0278795030382,"height":410.19992404513886}}},"widget":{},"snapshot":"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","import":{}}}

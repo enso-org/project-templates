@@ -1,0 +1,110 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+## ---
+   icon: group
+   ---
+   Add 2 date columns that have values close to today
+add_date_columns node1 =
+    date4 = Date.today
+    date6 = date4.date_add 8 ..Day
+    node2 = date4.up_to date6
+    table12 = node2.to_table
+    column1 = table12.get 'Date'
+    vector1 = Random.items column1 count=8
+    table13 = table12.zip vector1
+    table14 = table13.rename_columns [(Pair.Value 'Date' 'JoinDate'), (Pair.Value 'Value' 'PurchaseDate')]
+    table15 = node1.zip table14
+    table15
+
+## ![Step-by-Step Example](/images/step-by-step-example.png)
+   # Filtering Data in Enso Analytics
+
+   The filter component in Enso Analytics is a powerful tool designed to create a new table containing a filtered subset of rows from an input table based on user-defined conditions. By enabling users to selectively retain rows that meet specific criteria, the filter component facilitates precise data refinement, making it an essential part of data preparation and analysis workflows. This component is often enhanced with additional date columns for temporal filtering, improving its versatility.
+
+   ## Key Features
+
+   - **Row Selection with Conditions**: The filter component allows users to define conditions to select rows from the input table. Only rows where the condition evaluates to TRUE are included in the output table, ensuring targeted data extraction.
+   - **Flexible Condition Types**: Conditions can be applied in various ways, including:
+     - **Column Comparisons**: Compare values across different columns, such as filtering rows where JoinDate is greater than or equal to PurchaseDate.
+     - **Static Value Comparisons**: Filter rows based on comparisons with fixed values, such as selecting records where CustomerID is greater than 31.
+     - **Dynamic Arguments from Other Components**: Use outputs from other Enso components (e.g., computed dates or aggregated values) as parameters in the filter condition, enabling adaptive filtering.
+   - **Basic and Complex Expressions**: Supports simple filters (e.g., CustomerID > 31) and complex expressions (e.g., combining multiple conditions with logical operators or using regex patterns), accommodating diverse filtering needs.
+   - **Single Output Design**: Each filter component produces a single output table with rows satisfying the condition. To capture the inverse (rows not meeting the condition), users can duplicate the filter and adjust the logic.
+   - **Built-in Visualization**: Includes a built-in table visualization, accessible by clicking the eyeball icon, allowing users to quickly inspect filtered results.
+   - **Temporal Enhancement**: Integrates with the add_date_columns sub-flow to add dynamic date columns (JoinDate, PurchaseDate) for time-based filtering.
+
+   ## Use Cases
+
+   - **Basic Filtering**: Filter rows based on simple conditions, such as retaining records where CustomerID is greater than 31 or where LastName is not null.
+   - **Date-Based Filtering**: Use dynamic date expressions to filter rows, such as selecting records where JoinDate is on or before two days from today.
+   - **Complex Expression Filtering**: Apply advanced filters, such as retaining rows where Region is "South" or contains "est" (e.g., West, Midwest) using a regex pattern.
+   - **Multi-Column Comparisons**: Filter rows by comparing columns, such as keeping records where JoinDate is greater than or equal to PurchaseDate.
+   - **Dynamic Filtering**: Leverage computed values (e.g., median Score) or dates (e.g., tomorrow) from other components to create flexible, context-aware filters.
+   - **Null Value Handling**: Exclude rows with null values (e.g., LastName as Nothing) to focus on complete records.
+
+   ## Example Workflow
+
+   In this example workflow, a table with customer data (CustomerID, FirstName, LastName, Gender, Region, Score) is processed using the filter component, enhanced with date columns:
+
+   - **Data Input and Date Addition**: Use Table.input to load customer data and add_date_columns to append JoinDateand PurchaseDate columns, generating dates near today (e.g., September 25 to October 3, 2025).
+   - **Basic Filter - CustomerID Greater Than 31**: Use filter with ..Greater 31 on CustomerID to retain records with CustomerID above 31.
+   - **Basic Filter - CustomerID Less Than or Equal to 31**: Use filter with ..Equal_Or_Less 31 on CustomerID to retain the inverse set of records.
+   - **Basic Filter - Non-Null LastName**: Use filter with ..Not_Nothing on LastName to exclude rows where LastNameis null (e.g., Noah’s row).
+   - **Basic Filter - Date Less Than or Equal to Tomorrow**: Use filter with ..Equal_Or_Less and date1.next ..Day(tomorrow) on JoinDate to select records up to tomorrow.
+   - **Basic Filter - Date Less Than or Equal to Two Days from Now**: Use filter with ..Equal_Or_Less and date3.date_add 2 ..Day on JoinDate to select records up to two days from today.
+   - **Basic Filter - Date Expression**: Use filter with an expression date_add(today(),1) on JoinDate to match the tomorrow filter dynamically.
+   - **Complex Expression Filtering**: Use filter with a complex expression [Region] == "South" or regex_match([Region],r/.*est/) to retain rows from "South" or regions containing "est" (e.g., West, Midwest).
+   - **Multi-Column Comparison**: Use filter with ..Equal_Or_Greater to compare JoinDate with PurchaseDate, retaining rows where JoinDate is on or after PurchaseDate.
+   - **Dynamic Filter - Median Score**: Aggregate the median Score, extract it with get_value, and use filter with ..Equal_Or_Greater to retain rows where Score meets or exceeds the median.
+
+   ## Benefits
+
+   The filter component in Enso Analytics provides a robust and intuitive way to refine datasets by selecting rows that meet precise criteria. Its support for simple and complex conditions, dynamic inputs from other components, and multi-column comparisons makes it highly adaptable to diverse data preparation needs. The integration with add_date_columnsenhances temporal filtering capabilities, while the single-output design simplifies workflows. The built-in visualization feature allows users to quickly validate results. Whether performing basic filtering, advanced expressions, or dynamic subsetting, the filter component empowers users to create clean, focused datasets for analysis, visualization, or further processing in Enso Analytics.
+main =
+    node1 = Table.input [['CustomerID', ['42', '8', '14', '34', '98', '112', '12', '6']], ['FirstName', ['James', 'Sophia', 'Liam', 'Olivia', 'Ethan', 'Ava', 'Noah', 'Mia']], ['LastName', ['Hart', 'Lopez', 'Nguyen', 'Brown', 'Garcia', 'Kim', Nothing, 'Johnson']], ['Gender', ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'F']], ['Region', ['North', 'South', 'East', 'West', 'Midwest', 'North', 'South', 'West']], ['Score', ['12', '7', '3', '18', '5', '9', '4', '14']]]
+    date1 = Date.today
+    date2 = date1.next ..Day
+    date3 = Date.today
+    date5 = date3.date_add 2 ..Day
+    ## Create 2 date columns that are near today's date
+    table15 = Main.add_date_columns node1
+    ## Custom Fiilter - Complex Expression - Rows from the South and from the West and Midwest region remain as the filter evaluates to TRUE
+    table9 = table15.filter (expr '[Region] == "South"\nor\nregex_match([Region],r/.*est/) ')
+    ## Custom Fiilter - Multiple Columns. Rows with a JoinDate greater than or equal to the FirstPurchaseDate remain 
+    table8 = table15.filter 'JoinDate' (..Equal_Or_Greater (..Name 'PurchaseDate'))
+    ## Basic Filter - Date Expressions Filter records where the JoinDate is Equal or Less than two days from now by createing a dynamic value for the  equal or less value of Date.today, and then asking for the next Day. We could have added a second next component as an alternative.
+    table5 = table15.filter 'JoinDate' (..Equal_Or_Less date5)
+    ## Basic Filter - Date Expressions - Filter records where the JoinDate is Equal or Less than tomorrow by createing a dynamic value for the  equal or less value of Date.today, and then asking for the next Day.
+    table4 = table15.filter 'JoinDate' (..Equal_Or_Less date2)
+    ## Basic Filter - Is Not Nothing (null) - The LastName column is a char type. Noah's last name is Nothing (null) so his row is filtered out.
+    table3 = table15.filter 'LastName' ..Not_Nothing
+    ## Basic Filter - Records with a  CustomerID Equal or Less Than 31 remain (inverse of the above filter)
+    table7 = table15.filter 'CustomerID' (..Equal_Or_Less 31)
+    ## Basic Filter - Records with a  CustomerID Greater Than 31 remain
+    table1 = table15.filter 'CustomerID' (..Greater 31)
+    ## Basic Filter - Date Expressions - Filter records where the JoinDate is Equal or Less than tomorrow using an expression.
+    table2 = table15.filter 'JoinDate' (..Equal_Or_Less (expr 'tomorrow()'))
+    ## Calculate the Median Score
+    table6 = node1.aggregate columns=[..Median 'Score']
+    ## Use get_value to retrieve a float that can be passed into the filter 
+    node2 = table6.get_value 'Median Score' 0
+    ## Dynamic Filter - Median is calculated above and passed in as a filter value
+    table10 = node1.filter 'Score' (..Equal_Or_Greater node2)
+
+
+
+#### METADATA ####
+[[{"index":{"value":446},"size":{"value":5}},"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5"],[{"index":{"value":466},"size":{"value":10}},"646985dc-ac5f-4821-8d5a-8861bf904ff8"],[{"index":{"value":489},"size":{"value":22}},"8f6cef0d-c331-4557-8ba9-adb612b4329c"],[{"index":{"value":524},"size":{"value":17}},"3350d1b6-464f-450d-8871-909cdfbc7c26"],[{"index":{"value":556},"size":{"value":14}},"3addd758-8a24-4e7f-aced-70da03f75997"],[{"index":{"value":585},"size":{"value":18}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1"],[{"index":{"value":618},"size":{"value":28}},"01af9746-4b49-4aaf-99a6-4a065f7f1974"],[{"index":{"value":661},"size":{"value":19}},"88cd9951-89f4-47fb-b178-eaca2120da87"],[{"index":{"value":695},"size":{"value":92}},"dd996f45-9436-494d-a22a-9ff74dba588d"],[{"index":{"value":802},"size":{"value":9}},"6c11c15f-71fa-4c52-af14-38b2451209e0"],[{"index":{"value":802},"size":{"value":17}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62"],[{"index":{"value":824},"size":{"value":7}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd"],[{"index":{"value":6726},"size":{"value":446}},"eb4e4f23-c550-4501-b422-eab051d696fb"],[{"index":{"value":7185},"size":{"value":10}},"e28a19aa-771c-4949-aaf2-64ecef3e68e8"],[{"index":{"value":7208},"size":{"value":10}},"7a2c3650-d251-468e-879b-3e351774db99"],[{"index":{"value":7208},"size":{"value":16}},"58f3d2ef-7177-420c-8e83-3f1dea79fa18"],[{"index":{"value":7237},"size":{"value":10}},"78d37343-e785-4fd9-82cf-31517112ffde"],[{"index":{"value":7260},"size":{"value":14}},"35e89d29-b8df-4acf-82fb-31f4dca58e05"],[{"index":{"value":7260},"size":{"value":16}},"6e793f4a-5835-4e30-9e89-83b22ff8706d"],[{"index":{"value":7260},"size":{"value":22}},"e2ffa045-544b-4b11-beb5-965123abd0ee"],[{"index":{"value":7353},"size":{"value":27}},"ab279a44-dfeb-45d3-9fb7-c4aa973b2d16"],[{"index":{"value":7535},"size":{"value":14}},"be4fcf84-c14d-4728-a3de-e4a613f0afb0"],[{"index":{"value":7535},"size":{"value":80}},"058d9a10-c815-4b5b-9461-2815d6629e4c"],[{"index":{"value":7747},"size":{"value":70}},"b58a31cc-5a71-4294-95ca-c7df24a90f23"],[{"index":{"value":8114},"size":{"value":49}},"5f20d8fa-7e52-470c-ad7e-e0db2c015a4c"],[{"index":{"value":8390},"size":{"value":14}},"327f329e-c422-4791-94d8-e28d5de3d501"],[{"index":{"value":8390},"size":{"value":25}},"dcc2c152-dfe7-44ae-9a6d-ce1e4962617b"],[{"index":{"value":8390},"size":{"value":49}},"048234b9-e33d-45d7-aba0-5b8bfc71cf8b"],[{"index":{"value":8598},"size":{"value":14}},"77a86551-b02a-4fea-b579-87613140eebd"],[{"index":{"value":8598},"size":{"value":25}},"c8e1b023-10ba-4e7b-8ff8-fc901f2e802e"],[{"index":{"value":8598},"size":{"value":39}},"8375c5cb-31f2-4e60-b836-e60ab5283b65"],[{"index":{"value":8759},"size":{"value":48}},"a793ebf6-a3b3-4d4a-b932-98118be14aae"],[{"index":{"value":8893},"size":{"value":14}},"e9bd51ea-b023-4557-ab73-812422639dc2"],[{"index":{"value":8893},"size":{"value":27}},"0f8c6877-7306-409f-95d5-7afde337b792"],[{"index":{"value":8893},"size":{"value":42}},"c3480090-0b30-4ac0-91a0-08e720c6cab4"],[{"index":{"value":9076},"size":{"value":14}},"a1673332-542c-4e88-ad13-df6a6b74ed0a"],[{"index":{"value":9076},"size":{"value":25}},"49348471-592c-4ae7-b2f6-20d733f446d6"],[{"index":{"value":9076},"size":{"value":63}},"ffe01419-ed3f-44f5-8d71-3ff63543056f"],[{"index":{"value":9187},"size":{"value":42}},"6a078adb-f65e-4342-9738-1210a3470ee1"],[{"index":{"value":9319},"size":{"value":33}},"51544f6c-2e98-4f94-a636-38f7a37a755b"],[{"index":{"value":9450},"size":{"value":12}},"7c0637a2-427d-4b4a-99ec-ae265a55031b"],[{"index":{"value":9450},"size":{"value":20}},"ab99fdc0-f1c6-4780-ac0f-51b43d7c2439"],[{"index":{"value":9450},"size":{"value":47}},"8c02fb23-d90e-431e-b363-66ae521f7e9b"]]
+{"ide":{"node":{"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5":{"position":{"vector":[-1024,721]}},"646985dc-ac5f-4821-8d5a-8861bf904ff8":{"position":{"vector":[-876,649]}},"8f6cef0d-c331-4557-8ba9-adb612b4329c":{"position":{"vector":[-765,514]}},"3350d1b6-464f-450d-8871-909cdfbc7c26":{"position":{"vector":[-848,421]}},"3addd758-8a24-4e7f-aced-70da03f75997":{"position":{"vector":[-826,349]},"visualization":{"show":true,"width":502.81198641202724,"height":264.3352446391665}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1":{"position":{"vector":[-683,13]}},"01af9746-4b49-4aaf-99a6-4a065f7f1974":{"position":{"vector":[-592,-50]},"visualization":{"show":true,"height":326.72607421875}},"88cd9951-89f4-47fb-b178-eaca2120da87":{"position":{"vector":[-814,-456]}},"dd996f45-9436-494d-a22a-9ff74dba588d":{"position":{"vector":[-814,-537]}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62":{"position":{"vector":[-1024,-642]}},"6c11c15f-71fa-4c52-af14-38b2451209e0":{"position":{"vector":[-1024,-642]}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd":{"position":{"vector":[-1024,-714]}},"eb4e4f23-c550-4501-b422-eab051d696fb":{"position":{"vector":[-261,660]}},"e28a19aa-771c-4949-aaf2-64ecef3e68e8":{"position":{"vector":[409,-105]}},"58f3d2ef-7177-420c-8e83-3f1dea79fa18":{"position":{"vector":[409,-165]}},"7a2c3650-d251-468e-879b-3e351774db99":{"position":{"vector":[803,-436]}},"78d37343-e785-4fd9-82cf-31517112ffde":{"position":{"vector":[403,-325]}},"e2ffa045-544b-4b11-beb5-965123abd0ee":{"position":{"vector":[403,-380]}},"6e793f4a-5835-4e30-9e89-83b22ff8706d":{"position":{"vector":[824,-775]}},"35e89d29-b8df-4acf-82fb-31f4dca58e05":{"position":{"vector":[824,-775]}},"ab279a44-dfeb-45d3-9fb7-c4aa973b2d16":{"position":{"vector":[-261,358]},"visualization":{"show":false,"width":1481.034444173177,"height":282.74420166015625}},"058d9a10-c815-4b5b-9461-2815d6629e4c":{"position":{"vector":[-1,-782]},"visualization":{"show":true,"width":1342.6793975830076,"height":253.12137603759766}},"be4fcf84-c14d-4728-a3de-e4a613f0afb0":{"position":{"vector":[-209,-1945]},"visualization":{"show":true,"width":983.6063690185547}},"b58a31cc-5a71-4294-95ca-c7df24a90f23":{"position":{"vector":[-1,-673]},"visualization":{"show":false,"width":983.6063690185547}},"5f20d8fa-7e52-470c-ad7e-e0db2c015a4c":{"position":{"vector":[-1,-482]},"visualization":{"show":false,"width":983.6063690185547}},"048234b9-e33d-45d7-aba0-5b8bfc71cf8b":{"position":{"vector":[-1,-253]},"visualization":{"show":false,"width":983.6063690185547}},"dcc2c152-dfe7-44ae-9a6d-ce1e4962617b":{"position":{"vector":[-60,-426]}},"327f329e-c422-4791-94d8-e28d5de3d501":{"position":{"vector":[-60,-426]}},"8375c5cb-31f2-4e60-b836-e60ab5283b65":{"position":{"vector":[-1,64]},"visualization":{"show":false,"width":1003.3695220947266,"height":193.74908447265625}},"c8e1b023-10ba-4e7b-8ff8-fc901f2e802e":{"position":{"vector":[-28,-89]}},"77a86551-b02a-4fea-b579-87613140eebd":{"position":{"vector":[-28,-89]}},"a793ebf6-a3b3-4d4a-b932-98118be14aae":{"position":{"vector":[-1,156]},"visualization":{"show":false,"width":967.2501515819521,"height":188.22916932470105}},"c3480090-0b30-4ac0-91a0-08e720c6cab4":{"position":{"vector":[-1,262]},"visualization":{"show":false,"width":967.2501515819521,"height":188.22916932470105}},"0f8c6877-7306-409f-95d5-7afde337b792":{"position":{"vector":[-207,279]}},"e9bd51ea-b023-4557-ab73-812422639dc2":{"position":{"vector":[-207,279]}},"ffe01419-ed3f-44f5-8d71-3ff63543056f":{"position":{"vector":[-1,-33]}},"49348471-592c-4ae7-b2f6-20d733f446d6":{"position":{"vector":[30,-2]}},"a1673332-542c-4e88-ad13-df6a6b74ed0a":{"position":{"vector":[30,-2]}},"6a078adb-f65e-4342-9738-1210a3470ee1":{"position":{"vector":[1075,238]},"visualization":{"show":true}},"51544f6c-2e98-4f94-a636-38f7a37a755b":{"position":{"vector":[1075,-8]}},"8c02fb23-d90e-431e-b363-66ae521f7e9b":{"position":{"vector":[1024,-120]},"visualization":{"show":true,"width":682.4877014160156}},"ab99fdc0-f1c6-4780-ac0f-51b43d7c2439":{"position":{"vector":[1024,-120]}},"7c0637a2-427d-4b4a-99ec-ae265a55031b":{"position":{"vector":[1024,-120]}}},"widget":{"eb4e4f23-c550-4501-b422-eab051d696fb":{"WidgetTableEditor":{"size":{"x":600.2502453415265,"y":218.36670944314872}}}},"import":{},"snapshot":"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"}}

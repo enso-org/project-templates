@@ -1,0 +1,138 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+## ---
+   icon: group
+   ---
+   Documentation can be added here.
+write_to_individual_sheets table_input filter_column output_file_path filter_value =
+    table3 = table_input.filter filter_column (..Equal filter_value)
+    file6 = table3.write output_file_path (..Sheet filter_value) on_existing_file=..Overwrite
+    file6
+
+
+
+## ---
+   icon: group
+   ---
+   Takes a table input, column to filter on (e.g. Region), row_filter row value (Region: North). When used with a map, this value must be blank, as the map will map over the rows to loop over all values. It will output to the seperate csv files for each value.
+write_filtered_files input_table base_path_and_file_name row_filter =
+    ## Get the filter text (e.g. North
+    any6 = row_filter.at 0
+    ## Get the text of the column name (e.g. Region)
+    vector3 = row_filter.column_names
+    ## Create a filtered table just for this filter condition (e.g. Region = North)
+    table3 = input_table.filter vector3 (..Equal any6)
+    ## build the filename. E.g. "data/North.csv"
+    sum1 = base_path_and_file_name + any6 + ".csv"
+    ## Write the output file
+    file9 = table3.write sum1 on_existing_file=..Overwrite
+    file9
+
+## ![image](/images/step-by-step-example.png)
+   # Writing Data to Files in Enso Analytics
+
+   The  `write`  components in Enso Analytics provide a robust set of tools for exporting data from tables to file-based formats, such as CSV and Excel, enabling users to save results for reporting, sharing, or further processing. These components, primarily centered around the write component and User Defined Components (UDCs) like write_to_individual_sheets and write_filtered_files, support writing to single files, multiple files, specific Excel sheets, or named ranges, with options to overwrite existing files. This example focuses on file-based output techniques, while writing to databases and Web APIs will be covered in separate examples. Note that Enso does not output a file, write to a database, or post to a Web API unless the "Write All" button, resembling a play button at the top of the canvas, is clicked. Individual outputs can be written by clicking the "Write" button in the component's quarter circle menu.
+
+   ## Key Components
+
+   ### write
+
+   The write component exports a table to a file, such as a CSV or Excel workbook, with options to specify the output format, target location, and additional parameters like sheets or named ranges.
+
+   - **Functionality**: Writes a table to a specified file path, supporting formats like CSV and Excel. For Excel, it can target specific sheets or named ranges, with an on_existing_file=..Overwrite option to replace existing files.
+   - **Use Case**: Export a table to data/Output1.csv or write to a specific sheet (Sheet 1) in data/Output1.xlsx, overwriting the file if it already exists.
+   - **Benefit**: Provides flexible control over file output, enabling seamless export of processed data with customizable options.
+
+   ### write_to_individual_sheets
+
+   The write_to_individual_sheets User Defined Component (UDC) is a custom component that filters a table by a specified column value and writes the filtered data to a separate sheet in an Excel file, with the sheet named after the filter value.
+
+   - **Functionality**: Filters the input table by a column value (e.g., Region = West) and writes the result to a sheet in an Excel file (e.g., data/OutputMultipleSheets.xlsx, sheet West). When used with a map component, it creates a sheet for each distinct value.
+   - **Use Case**: Write customer data for each region to separate sheets in a single Excel file, with sheets named North, South, etc.
+   - **Benefit**: Simplifies the organization of data into multiple sheets within a single Excel file, enhancing accessibility for reporting.
+
+   ### write_filtered_files
+
+   The write_filtered_files User Defined Component (UDC) is a custom component that filters a table by a specified column value and writes the filtered data to a separate CSV file for each filter value.
+
+   - **Functionality**: Filters the input table based on a column (e.g., Region = North) using a row filter and writes the result to a CSV file with a dynamically generated name (e.g., data/Output_Region_North.csv). When used with a map component, it iterates over all distinct values in the column to create multiple files.
+   - **Use Case**: Generate separate CSV files for each region (e.g., North, South, East) from a customer dataset, with each file containing only the rows for that region.
+   - **Benefit**: Automates the creation of multiple output files based on grouped data, streamlining segmented data export.
+
+   ## Supported Output Formats
+
+   - **CSV Files**: Enso supports writing tables to CSV files, ideal for lightweight, portable data storage and compatibility with other tools.
+   - **Excel Files**: Enso supports writing to Excel workbooks (.xlsx), with options to target specific sheets or named ranges (pre-existing in the file).
+   - **Databases and Web APIs**: Enso can also write to databases and Web APIs, enabling dynamic data export to external systems (covered in separate examples).
+
+   ## Example Workflow
+
+   In this example workflow, a table with customer data (CustomerID, FirstName, LastName, Gender, Region, Score) is exported using file-based Data Output components:
+
+   - **Writing to a Single CSV File**: Use write to export the table to data/Output1.csv, overwriting the file if it exists, located in the data folder of the project launch directory.
+   - **Writing to a Single Excel Sheet**: Use write with ..Sheet 'Sheet 1' to export the table to Sheet 1 in data/Output1.xlsx, overwriting the file, located in the data folder of the project launch directory.
+   - **Writing to a Named Range in Excel**: Use write with ..Range 'MyNamedRange' to export the table to a pre-existing named range in data/NamedRangeExampleOutput.xlsx.
+   - **Writing to Multiple Excel Sheets by Region**: Extract the Region column, aggregate distinct values, and use write_to_individual_sheets with map to filter and write each region’s data to separate sheets (e.g., North, South) in data/OutputMultipleSheets.xlsx.
+   - **Writing to Multiple CSV Files by Region**: Select the Region column, get distinct values, convert to a row vector, and use write_filtered_files with map to filter and write each region’s data to separate CSV files (e.g., data/Output_Region_North.csv, data/Output_Region_South.csv) in the data folder of the Enso Favorites Examples directory.
+
+   ## Use Cases
+
+   - **Exporting to CSV for Sharing**: Write a processed table to a CSV file like data/Output1.csv for easy sharing with external systems or stakeholders.
+   - **Exporting to Excel Sheets**: Write data to a specific sheet in an Excel file for organized reporting, such as exporting customer data to Sheet 1.
+   - **Writing to Named Ranges**: Export data to a pre-existing named range in an Excel file for integration with pre-formatted templates.
+   - **Multi-Sheet Excel Outputs**: Use write_to_individual_sheets to create an Excel file with separate sheets for each category (e.g., regions), streamlining data organization for reporting.
+   - **Segmented CSV Outputs**: Use write_filtered_files to create separate CSV files for each region or category, facilitating targeted analysis or distribution.
+   - **Automated Data Export**: Combine aggregate and map with UDCs to automate the export of segmented data to multiple files or sheets.
+
+   ## Benefits
+
+   The file-based Data Output components in Enso Analytics provide a versatile and efficient approach to exporting data to CSV and Excel formats, complemented by support for databases and Web APIs (covered in separate examples). The writecomponent offers flexible options for single-file exports, while UDCs like write_to_individual_sheets and write_filtered_files enable automated, segmented outputs to multiple files or sheets. These components integrate seamlessly with Enso’s ecosystem, supporting preprocessing with components like filter, select, or aggregate and visualization (accessible via the eyeball icon) for data validation before export. By streamlining file-based data output, these components empower users to efficiently save and share processed datasets, enhancing reporting and collaboration in Enso Analytics.
+main =
+    node1 = Table.input [['CustomerID', ['42', '8', '14', '34', '98', '112', '12', '6']], ['FirstName', ['James', 'Sophia', 'Liam', 'Olivia', 'Ethan', 'Ava', 'Noah', 'Mia']], ['LastName', ['Hart', 'Lopez', 'Nguyen', 'Brown', 'Garcia', 'Kim', Nothing, 'Johnson']], ['Gender', ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'F']], ['Region', ['North', 'South', 'East', 'West', 'Midwest', 'North', 'South', 'West']], ['Score', ['12', '7', '3', '18', '5', '9', '1', '14']]]
+    ## Write a CSV file with the default options into the data folder inside of the One Component Examples folder where you launched this project. You can change the location to any local or Enso Cloud folder.
+    file1 = node1.write (File.new 'data/Output1.csv')
+    ## Write to a single Excel Worksheet called Sheet 1
+    file3 = node1.write (File.new 'data/Output1.xlsx') (..Sheet 'Sheet 1')
+    ## Write to a named range in an Excel Worksheet. The file must already exist and the named range must already be created.
+    file4 = node1.write (File.new 'data/NamedRangeExampleOutput.xlsx') (..Range 'MyNamedRange')
+    ## Write to multiple Sheets in an Excel files. This example wites a seperate sheet for each unique value in the Region column.
+    column3 = node1.get 'Region'
+    text4 = column3.name
+    ## Get the distinct list of values in the column
+    table2 = node1.aggregate [text4]
+    text5 = "data/OutputMultipleSheets.xlsx"
+    ## User defined component that filters to the subset of data for one region and writes to a sheet wiith that region's name
+    file6 = Main.write_to_individual_sheets node1 text4 text5
+    ## Map loops over each value in the distinct list of values and executes the user defined function above
+    column4 = table2.map file6
+    ## Write a CSV file with the default options into the data folder inside of the Enso Favorites Examples folder where you launched this project. You can change the location to any local or Enso Cloud folder.  Choose a single column that will be used for grouping for output files.
+    table4 = node1.select_columns ['Region']
+    ## Get the unique values in this column.
+    table5 = table4.distinct
+    ## Convert to a set of rows. This is required for the map component, which loops over each value and applies a function. This list contains North, South, East, West and Midwest.
+    vector2 = table5.rows
+    ## The path and file prefix. Here the path is the data folder inside of the Enso Favorites Examples folder where you launched this project.
+    text3 = "data/Output_Region_"
+    file9 = Main.write_filtered_files node1 base_path_and_file_name=text3
+    ## Map loops over each value in the distinct list of values and executes the user defined function above
+    vector3 = vector2.map file9
+
+
+
+#### METADATA ####
+[[{"index":{"value":483},"size":{"value":11}},"1c36fa9f-da15-4678-b1fe-a9ce044ee117"],[{"index":{"value":495},"size":{"value":13}},"157dc80c-03c3-4585-ad2f-128cf2e20608"],[{"index":{"value":509},"size":{"value":16}},"7c6b4789-a142-4d82-bf7d-8b9b2cd31817"],[{"index":{"value":526},"size":{"value":12}},"ef5e53d3-796a-4005-98b5-30bf537fa55a"],[{"index":{"value":554},"size":{"value":55}},"81f3e876-be3f-4d04-b7b6-cc7772e3c887"],[{"index":{"value":622},"size":{"value":81}},"2abca080-03bc-4ef7-be1c-8f5af13625f8"],[{"index":{"value":708},"size":{"value":5}},"066676bf-20af-4538-b859-30da69469522"],[{"index":{"value":1028},"size":{"value":11}},"9574266e-a115-461d-a038-035010325819"],[{"index":{"value":1040},"size":{"value":23}},"d98b0de8-a4ca-4a42-befe-2ba52d83c606"],[{"index":{"value":1064},"size":{"value":10}},"c95ad0d6-08a9-4c10-8dcd-5a647d942c5e"],[{"index":{"value":1127},"size":{"value":13}},"9af36d62-d631-4640-9eb8-a9a45c784f6c"],[{"index":{"value":1127},"size":{"value":15}},"9af36d62-d631-4640-9eb8-a9a45c784f6c"],[{"index":{"value":1210},"size":{"value":23}},"09bd42a1-c903-4c5e-865a-725103c29157"],[{"index":{"value":1331},"size":{"value":41}},"75fdce61-498e-4f02-8537-5e2a5678cb7f"],[{"index":{"value":1433},"size":{"value":39}},"c8e2b043-7e6d-425b-84c6-1dbee77f1612"],[{"index":{"value":1514},"size":{"value":46}},"a139e398-576b-4b71-aa99-043a5e553d57"],[{"index":{"value":1565},"size":{"value":5}},"2d7f3eae-886c-4f38-a42c-01aba32e6b0d"],[{"index":{"value":8726},"size":{"value":446}},"9322fa2e-b592-43b3-b717-e64520b52563"],[{"index":{"value":9395},"size":{"value":11}},"172dd729-4b36-474c-bd0c-1858c43e9522"],[{"index":{"value":9395},"size":{"value":41}},"3e9028eb-3a31-4c5b-bd13-6bd01af6289c"],[{"index":{"value":9505},"size":{"value":11}},"8257d6d7-b641-4043-925e-fe9e60094551"],[{"index":{"value":9505},"size":{"value":42}},"df622410-273c-4c06-99d9-5095772a1c6c"],[{"index":{"value":9505},"size":{"value":62}},"b1b4bdff-1774-4913-ac22-46851df54e6d"],[{"index":{"value":9706},"size":{"value":83}},"3dd87183-5415-4dd9-a28c-2b3eb55dcdc3"],[{"index":{"value":9935},"size":{"value":18}},"669ddf14-2d74-4908-b68e-8193a61353dc"],[{"index":{"value":9966},"size":{"value":12}},"84e9972f-db5d-4008-9f96-82f49d4041ae"],[{"index":{"value":10045},"size":{"value":23}},"9c5db1fc-8538-4d30-8c04-0c61ef48354f"],[{"index":{"value":10081},"size":{"value":32}},"8199754c-2709-4808-8347-54bea8cb3634"],[{"index":{"value":10253},"size":{"value":43}},"507a31b5-ab6f-43fc-9db1-60d32158ce12"],[{"index":{"value":10253},"size":{"value":49}},"5a44cbc8-4ff3-4c1c-b358-ce6707c6d677"],[{"index":{"value":10426},"size":{"value":10}},"7d36b174-cab0-437e-ac01-db39f3225c1e"],[{"index":{"value":10426},"size":{"value":16}},"c8d29613-5d51-4bc7-8acf-95987ef424d1"],[{"index":{"value":10740},"size":{"value":20}},"22fe2d08-a2f9-4142-9672-6d7a170cae64"],[{"index":{"value":10740},"size":{"value":31}},"624cb77d-f62e-41e7-a7a4-c301f5976da4"],[{"index":{"value":10830},"size":{"value":15}},"722bf9b5-00f0-481c-b25a-22c51f69ecd3"],[{"index":{"value":11042},"size":{"value":11}},"40b506d8-cb89-45f0-8264-a0fbd60a6343"],[{"index":{"value":11210},"size":{"value":21}},"52569ac6-e2d7-4d80-bdc9-cf2453985808"],[{"index":{"value":11244},"size":{"value":61}},"07fd6ffe-bd36-41b9-89bb-3ca216063a4b"],[{"index":{"value":11429},"size":{"value":11}},"bae3cdb9-68ce-48c1-8385-2dab673e1a61"],[{"index":{"value":11429},"size":{"value":17}},"755a8f0e-cc55-464d-816a-d2de56a492ef"]]
+{"ide":{"node":{"1c36fa9f-da15-4678-b1fe-a9ce044ee117":{"position":{"vector":[-1460,-2959]}},"157dc80c-03c3-4585-ad2f-128cf2e20608":{"position":{"vector":[-1141,-2815]}},"7c6b4789-a142-4d82-bf7d-8b9b2cd31817":{"position":{"vector":[-1322,-2779]}},"ef5e53d3-796a-4005-98b5-30bf537fa55a":{"position":{"vector":[-988,-2887]}},"81f3e876-be3f-4d04-b7b6-cc7772e3c887":{"position":{"vector":[-1354,-3087]}},"2abca080-03bc-4ef7-be1c-8f5af13625f8":{"position":{"vector":[-1354,-3204]}},"066676bf-20af-4538-b859-30da69469522":{"position":{"vector":[-1354,-3276]}},"9574266e-a115-461d-a038-035010325819":{"position":{"vector":[-1322,-1542]}},"d98b0de8-a4ca-4a42-befe-2ba52d83c606":{"position":{"vector":[-491,-1927]}},"c95ad0d6-08a9-4c10-8dcd-5a647d942c5e":{"position":{"vector":[-1103,-1434]}},"9af36d62-d631-4640-9eb8-a9a45c784f6c":{"position":{"vector":[-715,-1686]}},"09bd42a1-c903-4c5e-865a-725103c29157":{"position":{"vector":[-1065,-1707]}},"75fdce61-498e-4f02-8537-5e2a5678cb7f":{"position":{"vector":[-1103,-1810]}},"c8e2b043-7e6d-425b-84c6-1dbee77f1612":{"position":{"vector":[-983,-1999]}},"a139e398-576b-4b71-aa99-043a5e553d57":{"position":{"vector":[-1103,-2106]}},"2d7f3eae-886c-4f38-a42c-01aba32e6b0d":{"position":{"vector":[-1103,-2178]}},"9322fa2e-b592-43b3-b717-e64520b52563":{"position":{"vector":[-1600,-712]}},"3e9028eb-3a31-4c5b-bd13-6bd01af6289c":{"position":{"vector":[-507,-1238]}},"172dd729-4b36-474c-bd0c-1858c43e9522":{"position":{"vector":[-1416,-1312]}},"b1b4bdff-1774-4913-ac22-46851df54e6d":{"position":{"vector":[-507,-2178]}},"df622410-273c-4c06-99d9-5095772a1c6c":{"position":{"vector":[-915,-1484]}},"8257d6d7-b641-4043-925e-fe9e60094551":{"position":{"vector":[-915,-1484]}},"3dd87183-5415-4dd9-a28c-2b3eb55dcdc3":{"position":{"vector":[-507,-2379]}},"669ddf14-2d74-4908-b68e-8193a61353dc":{"position":{"vector":[-507,-2657]}},"84e9972f-db5d-4008-9f96-82f49d4041ae":{"position":{"vector":[-445,-2729]}},"9c5db1fc-8538-4d30-8c04-0c61ef48354f":{"position":{"vector":[-507,-2835]}},"8199754c-2709-4808-8347-54bea8cb3634":{"position":{"vector":[-258,-2932]}},"5a44cbc8-4ff3-4c1c-b358-ce6707c6d677":{"position":{"vector":[-445,-3004]}},"507a31b5-ab6f-43fc-9db1-60d32158ce12":{"position":{"vector":[-742,-3034]}},"c8d29613-5d51-4bc7-8acf-95987ef424d1":{"position":{"vector":[-507,-3126]},"visualization":{"show":true,"width":899.75341796875}},"7d36b174-cab0-437e-ac01-db39f3225c1e":{"position":{"vector":[-799,-3195]},"visualization":{"show":true,"width":899.75341796875}},"624cb77d-f62e-41e7-a7a4-c301f5976da4":{"position":{"vector":[-509,-1464]}},"22fe2d08-a2f9-4142-9672-6d7a170cae64":{"position":{"vector":[-1019,-1068]}},"722bf9b5-00f0-481c-b25a-22c51f69ecd3":{"position":{"vector":[-509,-1536]}},"40b506d8-cb89-45f0-8264-a0fbd60a6343":{"position":{"vector":[-507,-1649]}},"52569ac6-e2d7-4d80-bdc9-cf2453985808":{"position":{"vector":[-2,-1721]}},"07fd6ffe-bd36-41b9-89bb-3ca216063a4b":{"position":{"vector":[-394,-1793]}},"755a8f0e-cc55-464d-816a-d2de56a492ef":{"position":{"vector":[-505,-1881]}},"bae3cdb9-68ce-48c1-8385-2dab673e1a61":{"position":{"vector":[-1162,-2046]}}},"widget":{"9322fa2e-b592-43b3-b717-e64520b52563":{"WidgetTableEditor":{"size":{"x":974.4246826171875,"y":258.58172607421875}}}},"snapshot":"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","import":{}}}

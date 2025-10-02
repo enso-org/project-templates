@@ -1,0 +1,69 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Adding a Lookup Table with Text Input in Enso Analytics
+
+   The Text Input component in Enso Analytics provides a flexible and user-friendly method for creating tables directly within a workflow, without relying on external files, databases, or Web APIs. This component is particularly useful for defining small datasets, such as lookup tables or test data, allowing users to manually input data, edit column headers, modify the structure of the table, or copy and paste data directly from a spreadsheet. The primary component, `Table.input`, enables rapid data entry and customization, making it an essential tool for prototyping, small-scale data analysis, or creating reference datasets. However, a downside is that if the same data needs to be used in multiple workflows, recreating or copying the table in each new project can be cumbersome.
+
+   ## Key Component
+
+   ### Table.input
+
+   The `Table.input` component allows users to manually define a table by specifying column names and row values directly in the workflow or by pasting data from a spreadsheet, creating a structured dataset that can be used immediately in Enso Analytics.
+
+   - **Functionality**: Creates a table by defining columns and their corresponding data in a list-based format, where each column is represented as a pair of a column name and a vector of values. Users can edit column headers, add or remove columns, and add or remove rows as needed. Additionally, users can copy data (including headers) from a spreadsheet, select the desired location in the Enso workflow, and paste the data using `Cmd+V` (Mac) or `Ctrl+V`(Windows) to automatically create a table with the pasted content.
+   - **Use Case**: Create a small lookup table with customer data, such as `CustomerID`, `FirstName`, `LastName`, `Gender`, `Region`, and `Score`, by manually entering data or pasting it from a spreadsheet for use in joins, filtering, or testing workflows.
+   - **Benefit**: Eliminates the need for external data sources, enabling quick creation of datasets for prototyping, testing, or small-scale analysis, with the added convenience of pasting spreadsheet data to streamline data entry.
+   - **Downside**: If the same dataset is needed across multiple workflows, manually recreating the table or copying and pasting it into each new project can be time-consuming and error-prone, as `Table.input` is embedded within the workflow and not stored as a reusable external source.
+
+   ## Supported Features
+
+   - **Manual Data Entry**: Users can input data directly in the workflow, specifying column names and row values in a structured format, ideal for small datasets or reference tables.
+   - **Spreadsheet Copy-Paste**: Users can select and copy data (including headers) from a spreadsheet, then paste it into Enso using `Cmd+V` or `Ctrl+V` at the desired workflow location, automatically creating a table with the copied data.
+   - **Editable Structure**: The component supports editing of column headers, adding or removing columns, and adjusting row counts, providing flexibility to refine the dataset as needed.
+   - **Handling Missing Data**: Supports the inclusion of `Nothing` (null) values to represent missing data, ensuring compatibility with Enso's data processing capabilities.
+   - **Integration with Enso Ecosystem**: The resulting table can be seamlessly used with other Enso components, such as `filter`, `select`, or `aggregate`, for further processing or visualization.
+
+   ## Example Workflow
+
+   In this example workflow, a small customer dataset is created using the Text Input component:
+
+   - **Creating a Table Manually**: Use `Table.input` to define a table with columns `CustomerID`, `FirstName`, `LastName`, `Gender`, `Region`, and `Score`, populated with 8 rows of data. For example, the table includes entries like `CustomerID: 42`, `FirstName: James`, `LastName: Hart`, and a `Nothing` value for a missing `LastName`.
+   - **Pasting from a Spreadsheet**: Copy a range of data (e.g., a table with columns `CustomerID`, `FirstName`, etc.) from a spreadsheet, click in the Enso workflow where the table should be inserted, and paste using `Cmd+V` or `Ctrl+V` to create a table with the copied data.
+   - **Further Processing**: The resulting table, whether manually entered or pasted, can be used in subsequent steps, such as filtering rows where `Region` is `North`, selecting specific columns, or joining with other datasets.
+
+   ## Use Cases
+
+   - **Creating Lookup Tables**: Define a small table with reference data, such as customer categories or region codes, for use in joins or mappings within a workflow, either by manual entry or pasting from a spreadsheet.
+   - **Prototyping Workflows**: Create or paste a sample dataset to test data transformations, filters, or visualizations without needing an external file or database.
+   - **Manual Data Entry for Testing**: Input a small dataset manually or paste it from a spreadsheet to simulate real-world data for debugging or validating workflow logic.
+   - **Ad Hoc Analysis**: Build a quick dataset for one-off analyses, such as a table of test scores or customer attributes, using manual entry or spreadsheet data, without the overhead of external data sources.
+   - **Streamlining Spreadsheet Integration**: Paste data copied from a spreadsheet to quickly import small datasets.
+
+   ## Benefits
+
+   The Text Input component in Enso Analytics provides a simple and efficient way to create and customize tables directly within a workflow, eliminating dependencies on external files, databases, or Web APIs (database and API inputs are covered in separate examples). The `Table.input` component’s flexibility in editing column headers, rows, and columns, combined with the ability to copy and paste data from spreadsheets using `Cmd+V` or `Ctrl+V`, makes it ideal for creating lookup tables, prototyping, or handling small datasets. Its seamless integration with other Enso components, such as filtering, ranking, or visualization tools (accessible via the eyeball icon), allows users to immediately process and inspect the created table. However, users should note that recreating or copying the table for use in multiple workflows can be cumbersome, as the data is embedded in the workflow and not stored externally. By enabling rapid and flexible data entry, including spreadsheet integration, the Text Input component empowers users to streamline data preparation and analysis in Enso Analytics.
+main =
+    ## Text Input allows you to create a table inside of a workflow, without a dependency on a file or database. It is useful for small datasets, often used as a lookup table. You can edit data and column headers, add or remove columns, and add or remove rows.
+    node1 = Table.input [['CustomerID', ['42', '8', '14', '34', '98', '112', '12', '6']], ['FirstName', ['James', 'Sophia', 'Liam', 'Olivia', 'Ethan', 'Ava', 'Noah', 'Mia']], ['LastName', ['Hart', 'Lopez', 'Nguyen', 'Brown', 'Garcia', 'Kim', Nothing, 'Johnson']], ['Gender', ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'F']], ['Region', ['North', 'South', 'East', 'West', 'Midwest', 'North', 'South', 'West']], ['Score', ['12', '7', '3', '18', '5', '9', '1', '14']]]
+
+
+
+#### METADATA ####
+[[{"index":{"value":7181},"size":{"value":446}},"9322fa2e-b592-43b3-b717-e64520b52563"]]
+{"ide":{"node":{"9322fa2e-b592-43b3-b717-e64520b52563":{"position":{"vector":[-1600,-712]}}},"widget":{"9322fa2e-b592-43b3-b717-e64520b52563":{"WidgetTableEditor":{"size":{"x":974.4246826171875,"y":258.58172607421875}}}},"import":{},"snapshot":"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"}}

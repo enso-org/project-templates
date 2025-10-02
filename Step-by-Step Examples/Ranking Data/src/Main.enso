@@ -1,0 +1,119 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+## ---
+   icon: group
+   ---
+   Add 2 date columns that have values close to today
+add_date_columns node1 =
+    date4 = Date.today
+    date6 = date4.date_add 8 ..Day
+    node2 = date4.up_to date6
+    table12 = node2.to_table
+    column1 = table12.get 'Date'
+    vector1 = Random.items column1 count=8
+    table13 = table12.zip vector1
+    table14 = table13.rename_columns [(Pair.Value 'Date' 'JoinDate'), (Pair.Value 'Value' 'PurchaseDate')]
+    table15 = node1.zip table14
+    table15
+
+## ![One Component Example](/images/step-by-step-example.png)
+   # Ranking Data in Enso Analytics
+
+   The ranking components in Enso Analytics, add_row_number and add_group_number, provide robust tools for adding ranking or enumeration columns to a table, enabling users to organize and analyze data based on row order or grouped values. These components are essential for tasks requiring ordinal, dense, standard, modified competition, or fractional ranking, offering flexibility for a wide range of analytical scenarios.
+
+   ## Key Components
+
+   ### add_row_number
+
+   The add_row_number component adds a new column to the table that enumerates each row with a unique sequential number based on the specified order. This is particularly useful for creating ordinal ranks or indexing rows in a dataset.
+
+   - **Functionality**: Assigns a unique number to each row, starting from a user-defined value (e.g., 1), based on the order of rows, which can be determined by sorting on one or more columns.
+   - **Ordering**: Users can specify the column(s) and direction (ascending or descending) to define the row order before numbering. For example, ranking rows by Units Sold in descending order assigns the lowest number (e.g., 1) to the highest value.
+   - **Use Case**: Create an ordinal ranking of records, such as ranking sales transactions by quantity sold, where each row receives a unique rank.
+
+   ### add_group_number
+
+   The add_group_number component adds a new column that enumerates groups of rows, assigning the same number to all rows within a group based on shared values in specified columns. This is ideal for ranking or grouping rows with identical values.
+
+   - **Functionality**: Groups rows based on unique values in one or more columns (e.g., Units Sold) and assigns a single group number to all rows within each group, starting from a user-defined value (e.g., 1).
+   - **Grouping**: The component uses the unique combinations of values in the specified column(s) to define groups, ensuring that rows with identical values receive the same group number.
+   - **Use Case**: Assign group numbers to records with the same value, such as grouping sales records by the number of units sold to support dense or fractional ranking.
+
+   ## Supported Ranking Methods
+
+   Using add_row_number and add_group_number, Enso Analytics supports multiple ranking methods, each suited to different analytical needs:
+
+   - **Ordinal Ranking**: Uses add_row_number to assign a unique rank to each row based on the sorted order of a column (e.g., ranking sales by Units Sold in descending order).
+   - **Dense Ranking**: Uses add_group_number to assign the same rank to rows with identical values in the sorted column, with no gaps between ranks (e.g., if two rows tie, they both get rank 1, and the next rank is 2).
+   - **Standard Ranking**: Combines add_group_number and add_row_number to assign tied values the lowest possible rank, with subsequent ranks accounting for the number of tied rows (e.g., ties at rank 1 are followed by rank 3 if two rows tie).
+   - **Modified Competition Ranking**: Uses add_group_number and add_row_number to assign tied values the same rank based on their position, with the next rank skipping to the next available position (e.g., ties at rank 1 are followed by rank 3).
+   - **Fractional Ranking**: Builds on add_group_number and add_row_number to assign tied values the average of the ranks they would occupy (e.g., if three rows tie for positions 2, 3, and 4, they each get rank 3). This requires additional steps, such as aggregating counts and sums to calculate the average rank.
+
+   ## Example Workflow
+
+   In a sample workflow, a table with columns Record, Units Sold, and Group is processed to demonstrate various ranking methods:
+
+   - **Ordinal Ranking**: Apply add_row_number to rank rows by Units Sold in descending order, creating a column like Ordinal Rank with unique values (e.g., 1, 2, 3, ...).
+   - **Dense Ranking**: Sort by Units Sold, then use add_group_number to assign the same rank to rows with identical Units Sold values, creating a Dense Rank column with no gaps in rank numbers.
+   - **Standard Ranking**: Sort by Units Sold, use add_group_number to group ties, then apply add_row_number and aggregate to assign the lowest rank to ties, followed by an adjusted rank for subsequent rows.
+   - **Modified Competition Ranking**: Similar to standard ranking, but aggregates the last rank for ties to ensure the next rank skips positions based on the number of tied rows.
+   - **Fractional Ranking**: Sort by Units Sold, use add_group_number and add_row_number, then aggregate to calculate the average rank for tied values, creating a Fractional Rank column with values like 1.5 or 3.5 for ties.
+
+   ## Use Cases
+
+   - **Sales Leaderboards**: Use add_row_number to rank salespeople by total sales, creating an ordinal ranking for performance tracking.
+   - **Grouped Analysis**: Apply add_group_number to assign group numbers to records with identical values, such as grouping transactions by sales volume for dense ranking.
+   - **Competitive Rankings**: Implement standard or modified competition ranking to fairly rank participants in a contest where ties are common, ensuring consistent rank progression.
+   - **Statistical Analysis**: Use fractional ranking to assign averaged ranks to tied values, supporting fair comparisons in datasets with frequent ties, such as test scores or survey results.
+   - **Data Indexing**: Add row numbers to a dataset for reference or to facilitate joins and merges in larger workflows.
+
+   ## Benefits
+
+   The add_row_number and add_group_number components in Enso Analytics provide a flexible and powerful approach to ranking data, supporting a variety of ranking methods from simple ordinal rankings to complex fractional rankings. Their ability to integrate with sorting, aggregation, and other Enso components makes them versatile for both basic and advanced data preparation tasks. With built-in visualization (accessible via the eyeball icon), users can easily inspect ranking results. These components empower users to create meaningful, ordered datasets tailored to their analytical needs, enhancing the precision and clarity of data analysis in Enso Analytics.
+main =
+    node2 = Table.input [['Record', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']], ['Units Sold', ['22', '17', '21', '19', '18', '20', '23', '17', '19', '22', '18', '20', '21', '17', '23', '18', '20', '19', '22', '21']], ['Group', ['3', '1', '4', '2', '3', '1', '4', '2', '3', '1', '4', '2', '1', '3', '4', '2', '3', '4', '1', '2']]]
+    ## Ordinal Ranking
+    table2 = node2.add_row_number "Ordinal Rank" 1 order_by=[(..Name 'Units Sold' ..Descending)]
+    table3 = node2.sort [(..Name 'Units Sold' ..Descending)]
+    ## Dense Ranking
+    table1 = table3.add_group_number (..Unique ['Units Sold']) "Dense Rank" 1
+    ## Standard Ranking - Each item is ranked by its position in the sorted list. Equal items share the lowest possible rank. Subsequent items are ranked as if the equal items occupied consecutive positions
+    table4 = node2.sort [(..Name 'Units Sold' ..Descending)]
+    table5 = table4.add_group_number (..Unique ['Units Sold']) "Temp Rank" 1
+    table7 = table5.add_row_number "Rank" 1
+    table11 = table7.aggregate ['Temp Rank'] [..First 'Rank' "Standard Rank"]
+    table6 = table7.join table11 ..Inner [(..Equals 'Temp Rank' 'Temp Rank')]
+    table8 = table6.remove_columns ['Temp Rank', 'Rank']
+    ## Modified Competiton Ranking -Items are ranked by their position in the sorted list. Equal items share the same rank ordered by their position.The next rank gets the following rank, regardless of ties.
+    table9 = node2.sort [(..Name 'Units Sold' ..Descending)]
+    table10 = table9.add_group_number (..Unique ['Units Sold']) "Temp Rank" 1
+    table12 = table10.add_row_number "Rank" 1
+    table13 = table12.aggregate ['Temp Rank'] [..Last 'Rank' "Competition Rank"]
+    table14 = table12.join table13 ..Inner [(..Equals 'Temp Rank' 'Temp Rank')]
+    table15 = table14.remove_columns ['Temp Rank', 'Rank']
+    ## Fractional ranking: Items are assigned ranks based on their sorted order, and tied items receive the average of the ranks they would occupy. This ensures a fair distribution of ranks, especially in cases of ties, by using fractional values like 1.5 or 3.5 instead of skipping positions.
+    table16 = node2.sort [(..Name 'Units Sold' ..Descending)]
+    table17 = table16.add_group_number (..Unique ['Units Sold']) "Temp Rank" 1
+    table18 = table17.add_row_number "Rank" 1
+    table19 = table18.aggregate ['Temp Rank'] [..Count "count", ..Sum 'Rank' "Sum of Rank"]
+    table20 = table18.join table19 ..Inner [(..Equals 'Temp Rank' 'Temp Rank')]
+    table22 = table20.set (expr 'if [count] = 1 \nthen \n[Rank] \nelse \n[Sum of Rank]  / [count]') "Fractional Rank"
+    table21 = table22.remove_columns ['Temp Rank', 'Rank', 'count', 'Sum of Rank']
+
+
+
+#### METADATA ####
+[[{"index":{"value":446},"size":{"value":5}},"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5"],[{"index":{"value":466},"size":{"value":10}},"646985dc-ac5f-4821-8d5a-8861bf904ff8"],[{"index":{"value":489},"size":{"value":22}},"8f6cef0d-c331-4557-8ba9-adb612b4329c"],[{"index":{"value":524},"size":{"value":17}},"3350d1b6-464f-450d-8871-909cdfbc7c26"],[{"index":{"value":556},"size":{"value":14}},"3addd758-8a24-4e7f-aced-70da03f75997"],[{"index":{"value":585},"size":{"value":18}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1"],[{"index":{"value":618},"size":{"value":28}},"01af9746-4b49-4aaf-99a6-4a065f7f1974"],[{"index":{"value":661},"size":{"value":19}},"88cd9951-89f4-47fb-b178-eaca2120da87"],[{"index":{"value":695},"size":{"value":92}},"dd996f45-9436-494d-a22a-9ff74dba588d"],[{"index":{"value":802},"size":{"value":9}},"6c11c15f-71fa-4c52-af14-38b2451209e0"],[{"index":{"value":802},"size":{"value":17}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62"],[{"index":{"value":824},"size":{"value":7}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd"],[{"index":{"value":7122},"size":{"value":388}},"f96249d6-ad49-4edd-9686-ffef35a78d0f"],[{"index":{"value":7547},"size":{"value":37}},"991b4c42-fbd3-431d-88cb-e73b5b05cd21"],[{"index":{"value":7547},"size":{"value":83}},"e40de856-3083-4fd6-8092-32d8031cac5c"],[{"index":{"value":7644},"size":{"value":10}},"a205dc2e-d7c2-44ce-bffe-854d79bb8dfe"],[{"index":{"value":7644},"size":{"value":47}},"ff6fe443-cbd2-4a64-bbed-39e398d33a1d"],[{"index":{"value":7726},"size":{"value":23}},"ee7b51b2-1f05-47d3-a10e-bc5b4de8a05e"],[{"index":{"value":7726},"size":{"value":49}},"a0fe757c-836d-4bb9-b3bd-6178a6bc4a1a"],[{"index":{"value":7726},"size":{"value":62}},"79b43e72-e92b-4ae2-ad1d-e07819b137b3"],[{"index":{"value":7726},"size":{"value":64}},"0c0125ee-f3b0-4302-8fed-aa588b480408"],[{"index":{"value":8011},"size":{"value":47}},"b7d81e61-71d2-4bc0-a8f5-95539f6862d7"],[{"index":{"value":8072},"size":{"value":63}},"8b46fd8a-bd49-45b7-a225-8494d4687636"],[{"index":{"value":8149},"size":{"value":21}},"667311c3-a0dd-4d88-9b0c-29d29b7d5ff2"],[{"index":{"value":8149},"size":{"value":28}},"270c0b7e-1530-45a6-a6ea-06fb4f3030b1"],[{"index":{"value":8149},"size":{"value":30}},"9d447bf0-76de-4048-a02c-f4d0838134e5"],[{"index":{"value":8194},"size":{"value":16}},"62261761-1ddc-40f0-be09-ab5bea8caa6f"],[{"index":{"value":8194},"size":{"value":30}},"05938141-6eb7-4add-89ab-4bde45bfc3a1"],[{"index":{"value":8194},"size":{"value":63}},"5b4d3de5-fc62-4b89-a029-a1a1b340aaa5"],[{"index":{"value":8271},"size":{"value":11}},"56abf7d3-f5ea-4356-ba78-6bb27b9048a3"],[{"index":{"value":8271},"size":{"value":19}},"b3eb1776-d5e5-4ad4-a45d-d180cbcc77d0"],[{"index":{"value":8271},"size":{"value":27}},"2cda9498-8586-410e-bd11-f0c1c52811b8"],[{"index":{"value":8271},"size":{"value":64}},"b75300da-9946-4e0e-8d6a-5207d5d8d4c1"],[{"index":{"value":8349},"size":{"value":21}},"61149e77-2685-48c7-8a31-1464b8d81ac1"],[{"index":{"value":8349},"size":{"value":43}},"e1279e33-5bb3-40d8-835b-685eb89eaa97"],[{"index":{"value":8614},"size":{"value":47}},"260675e3-a62e-40b5-8f77-0b507bbbd283"],[{"index":{"value":8676},"size":{"value":63}},"d99239f3-5dfd-426a-83fe-5ef022309c4c"],[{"index":{"value":8754},"size":{"value":31}},"ad2aafbe-9617-4ef6-a245-2b8ce158e753"],[{"index":{"value":8800},"size":{"value":66}},"6daafd9a-72d8-46c0-a91b-1b18945577fb"],[{"index":{"value":8881},"size":{"value":65}},"645b474d-411e-4b0c-a806-afebd231843b"],[{"index":{"value":8961},"size":{"value":44}},"e6e6e7e1-93f0-424b-bb0d-7bca04d8cacc"],[{"index":{"value":9314},"size":{"value":47}},"6cbc994f-a185-45b9-ad00-bc00c51cbc51"],[{"index":{"value":9376},"size":{"value":64}},"c0e7504b-010a-4b8d-bd25-d8ead20c699d"],[{"index":{"value":9455},"size":{"value":31}},"f07408a3-612f-4d81-a8d3-010e34ee87c4"],[{"index":{"value":9501},"size":{"value":77}},"7a719d6e-d6b8-4197-b061-afa1c7bc23c7"],[{"index":{"value":9593},"size":{"value":65}},"1faddf4b-5fb7-4097-8314-54ad3427417f"],[{"index":{"value":9673},"size":{"value":11}},"caee7662-ce47-42d4-bcc6-15a92fe48487"],[{"index":{"value":9673},"size":{"value":85}},"c450f64f-53a6-46ff-8566-d6ca5d0f8387"],[{"index":{"value":9673},"size":{"value":103}},"d2cef9ea-a210-41c7-b65f-013b0083fc64"],[{"index":{"value":9791},"size":{"value":68}},"912ef00c-281f-4bd7-b07c-03972ac061c0"]]
+{"ide":{"node":{"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5":{"position":{"vector":[-1024,721]}},"646985dc-ac5f-4821-8d5a-8861bf904ff8":{"position":{"vector":[-876,649]}},"8f6cef0d-c331-4557-8ba9-adb612b4329c":{"position":{"vector":[-765,514]}},"3350d1b6-464f-450d-8871-909cdfbc7c26":{"position":{"vector":[-848,421]}},"3addd758-8a24-4e7f-aced-70da03f75997":{"position":{"vector":[-826,349]},"visualization":{"show":true,"width":502.81198641202724,"height":264.3352446391665}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1":{"position":{"vector":[-683,13]}},"01af9746-4b49-4aaf-99a6-4a065f7f1974":{"position":{"vector":[-592,-50]},"visualization":{"show":true,"height":326.72607421875}},"88cd9951-89f4-47fb-b178-eaca2120da87":{"position":{"vector":[-814,-456]}},"dd996f45-9436-494d-a22a-9ff74dba588d":{"position":{"vector":[-814,-537]}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62":{"position":{"vector":[-1024,-642]}},"6c11c15f-71fa-4c52-af14-38b2451209e0":{"position":{"vector":[-1024,-642]}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd":{"position":{"vector":[-1024,-714]}},"f96249d6-ad49-4edd-9686-ffef35a78d0f":{"position":{"vector":[-1421,1735]}},"e40de856-3083-4fd6-8092-32d8031cac5c":{"position":{"vector":[-479,1483]},"visualization":{"show":true}},"991b4c42-fbd3-431d-88cb-e73b5b05cd21":{"position":{"vector":[-768,1461]}},"ff6fe443-cbd2-4a64-bbed-39e398d33a1d":{"position":{"vector":[-479,1261]}},"a205dc2e-d7c2-44ce-bffe-854d79bb8dfe":{"position":{"vector":[-707,1307]}},"0c0125ee-f3b0-4302-8fed-aa588b480408":{"position":{"vector":[-479,1135]},"visualization":{"show":true,"width":1094.1827850341797}},"79b43e72-e92b-4ae2-ad1d-e07819b137b3":{"position":{"vector":[-439,1202]},"visualization":{"show":true}},"a0fe757c-836d-4bb9-b3bd-6178a6bc4a1a":{"position":{"vector":[-439,1202]}},"ee7b51b2-1f05-47d3-a10e-bc5b4de8a05e":{"position":{"vector":[-450,1182]}},"b7d81e61-71d2-4bc0-a8f5-95539f6862d7":{"position":{"vector":[-480,873]}},"8b46fd8a-bd49-45b7-a225-8494d4687636":{"position":{"vector":[-480,801]},"visualization":{"show":false,"width":1094.1827850341797}},"9d447bf0-76de-4048-a02c-f4d0838134e5":{"position":{"vector":[-479,729]},"visualization":{"show":false,"width":891.5936584472656}},"270c0b7e-1530-45a6-a6ea-06fb4f3030b1":{"position":{"vector":[-521,627]}},"667311c3-a0dd-4d88-9b0c-29d29b7d5ff2":{"position":{"vector":[-521,627]}},"5b4d3de5-fc62-4b89-a029-a1a1b340aaa5":{"position":{"vector":[-419,657]}},"05938141-6eb7-4add-89ab-4bde45bfc3a1":{"position":{"vector":[-1124,686]}},"62261761-1ddc-40f0-be09-ab5bea8caa6f":{"position":{"vector":[-1124,686]}},"b75300da-9946-4e0e-8d6a-5207d5d8d4c1":{"position":{"vector":[-479,584]}},"2cda9498-8586-410e-bd11-f0c1c52811b8":{"position":{"vector":[-521,118]}},"b3eb1776-d5e5-4ad4-a45d-d180cbcc77d0":{"position":{"vector":[-521,118]}},"56abf7d3-f5ea-4356-ba78-6bb27b9048a3":{"position":{"vector":[-521,118]}},"e1279e33-5bb3-40d8-835b-685eb89eaa97":{"position":{"vector":[-479,512]},"visualization":{"show":true,"width":770.5526733398438,"height":247.35801696777344}},"61149e77-2685-48c7-8a31-1464b8d81ac1":{"position":{"vector":[-521,-113]}},"260675e3-a62e-40b5-8f77-0b507bbbd283":{"position":{"vector":[-479,138]}},"d99239f3-5dfd-426a-83fe-5ef022309c4c":{"position":{"vector":[-479,66]},"visualization":{"show":false,"width":1094.1827850341797}},"ad2aafbe-9617-4ef6-a245-2b8ce158e753":{"position":{"vector":[-479,-6]},"visualization":{"show":false,"width":891.5936584472656}},"6daafd9a-72d8-46c0-a91b-1b18945577fb":{"position":{"vector":[-390,-78]}},"645b474d-411e-4b0c-a806-afebd231843b":{"position":{"vector":[-479,-150]}},"e6e6e7e1-93f0-424b-bb0d-7bca04d8cacc":{"position":{"vector":[-479,-222]},"visualization":{"show":true,"width":770.5526733398438,"height":247.35801696777344}},"6cbc994f-a185-45b9-ad00-bc00c51cbc51":{"position":{"vector":[-479,-631]}},"c0e7504b-010a-4b8d-bd25-d8ead20c699d":{"position":{"vector":[-479,-703]},"visualization":{"show":false,"width":1094.1827850341797}},"f07408a3-612f-4d81-a8d3-010e34ee87c4":{"position":{"vector":[-479,-775]},"visualization":{"show":false,"width":891.5936584472656}},"7a719d6e-d6b8-4197-b061-afa1c7bc23c7":{"position":{"vector":[-325,-908]},"visualization":{"show":false,"height":318.7607955932617}},"1faddf4b-5fb7-4097-8314-54ad3427417f":{"position":{"vector":[-479,-1006]},"visualization":{"show":false,"width":1394.3754882812498}},"d2cef9ea-a210-41c7-b65f-013b0083fc64":{"position":{"vector":[-479,-1078]},"visualization":{"show":false,"width":1325.2879333496094,"height":288.0004119873047}},"c450f64f-53a6-46ff-8566-d6ca5d0f8387":{"position":{"vector":[-545,-1388]}},"caee7662-ce47-42d4-bcc6-15a92fe48487":{"position":{"vector":[-470,-1099]}},"912ef00c-281f-4bd7-b07c-03972ac061c0":{"position":{"vector":[-480,-1216]},"visualization":{"show":true,"width":1246.1814880371094,"height":247.35801696777344}}},"widget":{"f96249d6-ad49-4edd-9686-ffef35a78d0f":{"WidgetTableEditor":{"size":{"x":778.1201366720529,"y":150}}}},"import":{},"snapshot":"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"}}

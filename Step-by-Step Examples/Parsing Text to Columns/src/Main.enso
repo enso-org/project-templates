@@ -1,0 +1,119 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Parsing Text to Columns in Enso Analytics
+
+   The Text to Columns components in Enso Analytics provide a powerful set of tools for splitting text-based columns into multiple columns or rows, enabling users to transform unstructured or delimited data into structured formats for analysis, reporting, or visualization. These components, primarily centered around `split_to_columns`, `split_to_rows`, `parse_to_columns`, and `tokenize_to_rows`, support splitting by delimiters (e.g., commas, spaces, pipes) or using regular expressions, with options to rename resulting columns and handle multi-valued fields. This functionality is essential for preparing text-heavy datasets within a workflow.
+
+   ## Key Components
+
+   ### split_to_columns
+
+   The `split_to_columns` component splits a single text column into multiple columns based on a specified delimiter.
+
+   - **Functionality**: Divides a text column (e.g., `Address`) into new columns using a delimiter (e.g., comma), naming the resulting columns with a numeric suffix (e.g., `Address 1`, `Address 2`).
+   - **Use Case**: Split an `Address` column containing "Street, City, State" into separate `Address 1` (Street), `Address 2` (City), and `Address 3` (State) columns.
+   - **Benefit**: Simplifies the extraction of structured data from delimited text, improving data organization for further analysis.
+
+   ### split_to_rows
+
+   The `split_to_rows` component splits a single text column into multiple rows based on a specified delimiter, duplicating other columns for each new row.
+
+   - **Functionality**: Breaks a text column (e.g., `Category_and_Search_Tags 2`) into individual rows using a delimiter (e.g., pipe `|`), replicating associated row data across the new rows.
+   - **Use Case**: Convert a `Category_and_Search_Tags 2` column with "Beef|FastFood" into separate rows, each with a single tag and the original `Category_and_Search_Tags 1` value.
+   - **Benefit**: Enables row-level analysis of multi-valued fields, preserving context from other columns.
+
+   ### parse_to_columns
+
+   The `parse_to_columns` component splits a text column into multiple columns using a regular expression with named capture groups.
+
+   - **Functionality**: Uses a regex pattern (e.g., `^(?<category>[^\[]+)\[(?<tags>[^\]]+)\]$`) to extract and name new columns from a text column, handling complex delimiters or patterns.
+   - **Use Case**: Parse a `Category_and_Search_Tags` column like "Burgers[Beef|FastFood]" into `category` (Burgers) and `tags`(Beef|FastFood) columns in one step.
+   - **Benefit**: Offers precise control over column splitting with regex, reducing the need for multiple transformation steps.
+
+   ### tokenize_to_rows
+
+   The `tokenize_to_rows` component splits a text column into multiple rows based on a regular expression, treating each match as a new row.
+
+   - **Functionality**: Uses a regex pattern (e.g., `"([^"]+)"|([^|]+)`) to extract tokens from a text column, creating a new row for each match and duplicating other columns.
+   - **Use Case**: Tokenize a `tags` column with "Beef|FastFood" or '"Chicken","Pizza"' into separate rows, stripping optional quotes and pipe delimiters.
+   - **Benefit**: Facilitates detailed row-based analysis of tokenized data with flexible regex-based splitting.
+
+   ## Supported Features
+
+   - **Delimiter-Based Splitting**: Use `split_to_columns` or `split_to_rows` with simple delimiters like commas, spaces, or pipes.
+   - **Regex-Based Splitting**: Use `parse_to_columns` or `tokenize_to_rows` with regular expressions for complex patterns or named captures.
+   - **Text Cleaning**: Combine with `text_cleanse` to remove punctuation and symbols (e.g., quotes, brackets) before or after splitting.
+   - **Column Renaming**: Use `rename_columns` to assign meaningful names to split columns or rows.
+   - **Integration with Enso Ecosystem**: Transformed tables integrate seamlessly with components like `filter`, `join`, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect split data immediately.
+
+   ## Example Workflow
+
+   In this example workflow, text-based columns from datasets like `newport_beach_customers_100.csv` and `mcdonalds_menu_with_tags.csv` are processed using Text to Columns components:
+
+   - **Comma Delimiter on Address**: Use `split_to_columns` to split the `Address` column (e.g., "Street, City, State") into `Address 1`, `Address 2`, and `Address 3` using a comma delimiter.
+   - **Space Delimiter on Address 3**: Use `split_to_columns` to further split `Address 3` (e.g., "CA 92660") into `Address 3 1` (CA) and `Address 3 2` (92660) using a space delimiter, then rename to `Address`, `City`, `State`, and `ZIP Code`.
+   - **Single Delimiter Split**: Use `split_to_columns` with `[` to split `Category_and_Search_Tags` (e.g., "Burgers[Beef|FastFood]") into `Category_and_Search_Tags 1` (Burgers) and `Category_and_Search_Tags 2` (Beef|FastFood).
+   - **Pipe Delimiter to Rows**: Use `split_to_rows` with `|` to convert `Category_and_Search_Tags 2` (e.g., "Beef|FastFood") into separate rows, duplicating other columns.
+   - **Regex Parse to Columns**: Use `parse_to_columns` with a regex `^(?<category>[^\[]+)\[(?<tags>[^\]]+)\]$` to split `Category_and_Search_Tags` into `category` and `tags` in one step.
+   - **Regex Tokenize to Rows**: Use `tokenize_to_rows` with a regex `"([^"]+)"|([^|]+)` to create rows for each tag in `tags`, handling quoted or pipe-delimited values.
+   - **Single-Step Address Parse**: Use `parse_to_columns` with a regex `^(?<Address>[^,]+),\s*(?<City>[^,]+),\s*(?<State>[A-Z]{2})\s+(?<ZIP_Code>\d{5}(?:-\d{4})?)$` to split `Address` into `Address`, `City`, `State`, and `ZIP_Code` columns directly.
+   - **Text Cleaning**: Use `text_cleanse` with `..Punctuation` and `..Symbols` to remove quotes and the `]` character from `Category_and_Search_Tags 2`.
+   - **Column Renaming**: Use `rename_columns` to rename `Category_and_Search_Tags 1` to `Category` and `Category_and_Search_Tags 2`to `Search Tag` for the final structure.
+
+   ## Use Cases
+
+   - **Address Parsing**: Split an `Address` column into `Street`, `City`, `State`, and `ZIP Code` for geospatial analysis.
+   - **Tag Extraction**: Convert a `Category_and_Search_Tags` column into separate `Category` and `Search Tag` rows for detailed tagging analysis.
+   - **Data Cleaning**: Use `text_cleanse` to remove punctuation or symbols from split data to prepare it for further processing.
+   - **Multi-Value Row Expansion**: Transform multi-valued fields (e.g., "Beef|FastFood") into individual rows for item-level insights.
+   - **Complex Pattern Matching**: Use regex with `parse_to_columns` to extract structured data from unstructured text in one step.
+
+   ## Benefits
+
+   The Text to Columns components in Enso Analytics provide a flexible and efficient approach to transforming text-based data into structured formats, supporting delimiter-based and regex-based splitting for columns and rows. The `split_to_columns`, `split_to_rows`, `parse_to_columns`, and `tokenize_to_rows` components enable precise data restructuring, while `text_cleanse` and `rename_columns` enhance cleaning and naming. These components integrate seamlessly with Enso’s ecosystem, supporting further processing with components like `filter`, `join`, or visualization tools (accessible via the eyeball icon) for immediate data inspection. By streamlining text data transformation, these components empower users to prepare clean, analysis-ready datasets in Enso Analytics.
+main =
+    any1 = Data.read 'data/newport_beach_customers_100.csv'
+    ## Comma Delimiter on the address column
+    table1 = any1.split_to_columns 'Address' ','
+    ## Space delimiter on the Address 3 column
+    table2 = table1.split_to_columns 'Address 3' ' '
+    table3 = table2.rename_columns [(Pair.Value 'Address 1' 'Address'), (Pair.Value 'Address 2' 'City'), (Pair.Value 'Address 3 1' 'State'), (Pair.Value 'Address 3 2' 'ZIP Code')]
+    ## The goal is to Category and Tag columns and to have a each tag on its own row for the item name and category
+    any2 = Data.read 'data/mcdonalds_menu_with_tags.csv' (..Delimited headers=..Has_Headers)
+    ## Split using a single delimiter
+    table4 = any2.split_to_columns 'Category_and_Search_Tags' '['
+    ## Tags are delimited with a pipe character. For each tag in the list, duplicate the row  putting individual tags into the tag column
+    table6 = table4.split_to_rows 'Category_and_Search_Tags 2' '|'
+    ## Alternate approach Using a regular expression to create two columns, and rename them in a single step
+    table10 = any2.parse_to_columns 'Category_and_Search_Tags' '^(?<category>[^\\[]+)\\[(?<tags>[^\\]]+)\\]$'
+    ## Using a regular expression, create a new row for each of the tags. The regular expression strips the pipe delimiters and the optional quotes
+    table9 = table10.tokenize_to_rows 'tags' '"([^"]+)"|([^|]+)'
+    ## Single Step using a regular expression to convert the address to multiple columns and set the column names
+    table11 = any1.parse_to_columns 'Address' '^(?<Address>[^,]+),\\s*(?<City>[^,]+),\\s*(?<State>[A-Z]{2})\\s+(?<ZIP_Code>\\d{5}(?:-\\d{4})?)$'
+    ## Remove the quotes and the ] character using text_cleanse
+    table12 = table6.text_cleanse ['Category_and_Search_Tags 2'] [..Punctuation, ..Symbols]
+    ## Rename the columns to create final result
+    table8 = table12.rename_columns [(Pair.Value 'Category_and_Search_Tags 1' 'Category'), (Pair.Value 'Category_and_Search_Tags 2' 'Search Tag')]
+
+
+
+#### METADATA ####
+[[{"index":{"value":8028},"size":{"value":9}},"cf91181d-7548-4851-99d6-f0b588182c36"],[{"index":{"value":8028},"size":{"value":48}},"925eb8b4-df96-44d7-82ae-27625c97215b"],[{"index":{"value":8135},"size":{"value":21}},"a6c7ea5e-6457-45aa-953e-63e3770fb31f"],[{"index":{"value":8135},"size":{"value":31}},"6d50f9f4-1134-4223-9ff9-187c290efcc7"],[{"index":{"value":8135},"size":{"value":35}},"2ad20de0-e0a4-4b16-9080-06034cc1ac32"],[{"index":{"value":8231},"size":{"value":23}},"c37b032b-04fe-4584-99f2-2d2b1bcd1a80"],[{"index":{"value":8231},"size":{"value":35}},"ef97b5e2-77e9-4757-862a-d31d6d9eb76f"],[{"index":{"value":8231},"size":{"value":39}},"c9e9187a-bb8c-4791-a9fc-6cb42e3aa97a"],[{"index":{"value":8284},"size":{"value":21}},"b8ffeed4-a099-43a0-bee3-0f1aecf90075"],[{"index":{"value":8284},"size":{"value":166}},"d547c4ae-6bbd-421d-8d1b-57e5a8b06aab"],[{"index":{"value":8578},"size":{"value":9}},"8b64d09f-da0c-489c-ba19-82fd7eacd978"],[{"index":{"value":8578},"size":{"value":45}},"c35f9b17-7eab-4201-9f93-e270a0cbe45b"],[{"index":{"value":8578},"size":{"value":81}},"d830d4f2-8af0-4c54-b7eb-fd1ba43bb817"],[{"index":{"value":8711},"size":{"value":21}},"e1a0f68d-fb6b-468b-88eb-c3e60540e93c"],[{"index":{"value":8711},"size":{"value":48}},"05423915-f90b-440e-b2c4-ee5a68b9fae5"],[{"index":{"value":8711},"size":{"value":52}},"e3443002-2325-4e99-ab24-a792e6330341"],[{"index":{"value":8915},"size":{"value":20}},"54c3dc16-a7ab-498a-ad99-41ba183e4148"],[{"index":{"value":8915},"size":{"value":49}},"c8079fb0-a65a-47f2-8326-377182990b7d"],[{"index":{"value":8915},"size":{"value":53}},"b96d8c5a-32a7-4781-a97f-9018bee08d22"],[{"index":{"value":9092},"size":{"value":21}},"b27d6755-1552-4954-b9fe-93f7485f1c2c"],[{"index":{"value":9092},"size":{"value":48}},"a8bb7966-a7ed-4af7-a9f1-35305cf1952f"],[{"index":{"value":9092},"size":{"value":95}},"c1fc0ef8-a8c5-46fb-8e89-e6c475906917"],[{"index":{"value":9349},"size":{"value":24}},"f481cc8f-5d18-44f1-becd-e896a3cf2553"],[{"index":{"value":9349},"size":{"value":31}},"57efa8f7-6507-460e-a2a7-81dd1716ccae"],[{"index":{"value":9349},"size":{"value":51}},"b6763432-1b6c-4230-9932-ab6f7999ce85"],[{"index":{"value":9529},"size":{"value":21}},"53c2b8e8-093b-43ee-98ff-a0803d01019b"],[{"index":{"value":9529},"size":{"value":31}},"94018616-3b63-4b0d-a4f2-23b8959b7ea6"],[{"index":{"value":9529},"size":{"value":130}},"a22161d6-a387-40aa-82fa-0e3dea5eb45e"],[{"index":{"value":9738},"size":{"value":19}},"1efaca62-7fc7-4eb8-ad82-55f9a466467f"],[{"index":{"value":9738},"size":{"value":50}},"a002be58-ffe8-4a91-8278-542019d19ea6"],[{"index":{"value":9738},"size":{"value":77}},"e9ab229f-dcf2-488e-84d8-756eb4bac805"],[{"index":{"value":9878},"size":{"value":22}},"46a9b9e8-b404-49f7-8ead-146a98ad48c7"],[{"index":{"value":9878},"size":{"value":133}},"14cbaae5-36d7-44c5-aa01-d9db95003084"]]
+{"ide":{"node":{"925eb8b4-df96-44d7-82ae-27625c97215b":{"position":{"vector":[-1000,-614]},"visualization":{"show":true,"width":946.5816609073545}},"cf91181d-7548-4851-99d6-f0b588182c36":{"position":{"vector":[-654,-1019]}},"2ad20de0-e0a4-4b16-9080-06034cc1ac32":{"position":{"vector":[-866,-909]},"visualization":{"show":true,"width":1181.5078161526694}},"6d50f9f4-1134-4223-9ff9-187c290efcc7":{"position":{"vector":[-1000,-912]}},"a6c7ea5e-6457-45aa-953e-63e3770fb31f":{"position":{"vector":[-1000,-912]}},"c9e9187a-bb8c-4791-a9fc-6cb42e3aa97a":{"position":{"vector":[-866,-1226]},"visualization":{"show":true,"width":1321.7853759385212}},"ef97b5e2-77e9-4757-862a-d31d6d9eb76f":{"position":{"vector":[-1000,-1143]}},"c37b032b-04fe-4584-99f2-2d2b1bcd1a80":{"position":{"vector":[-1000,-1143]}},"d547c4ae-6bbd-421d-8d1b-57e5a8b06aab":{"position":{"vector":[-866,-1457]},"visualization":{"show":true}},"b8ffeed4-a099-43a0-bee3-0f1aecf90075":{"position":{"vector":[-1000,-1458]}},"d830d4f2-8af0-4c54-b7eb-fd1ba43bb817":{"position":{"vector":[-1000,-2071]},"visualization":{"show":true,"width":1104.7432194209616,"height":315.909120668885}},"c35f9b17-7eab-4201-9f93-e270a0cbe45b":{"position":{"vector":[-1180,-1777]},"visualization":{"show":true,"width":845.8779250415299,"height":315.909120668885}},"8b64d09f-da0c-489c-ba19-82fd7eacd978":{"position":{"vector":[-577,-1680]}},"e3443002-2325-4e99-ab24-a792e6330341":{"position":{"vector":[-953,-2460]},"visualization":{"show":false,"width":1578.0489942492538,"height":329.83743460136543}},"05423915-f90b-440e-b2c4-ee5a68b9fae5":{"position":{"vector":[-1139,-2259]}},"e1a0f68d-fb6b-468b-88eb-c3e60540e93c":{"position":{"vector":[-1139,-2259]}},"b96d8c5a-32a7-4781-a97f-9018bee08d22":{"position":{"vector":[-953,-2549]},"visualization":{"show":false,"height":324.646552754241}},"c8079fb0-a65a-47f2-8326-377182990b7d":{"position":{"vector":[-1139,-2901]}},"54c3dc16-a7ab-498a-ad99-41ba183e4148":{"position":{"vector":[-1139,-2901]}},"c1fc0ef8-a8c5-46fb-8e89-e6c475906917":{"position":{"vector":[-1007,-3341]},"visualization":{"show":true,"width":1258.932479308913}},"a8bb7966-a7ed-4af7-a9f1-35305cf1952f":{"position":{"vector":[-2196,-2706]}},"b27d6755-1552-4954-b9fe-93f7485f1c2c":{"position":{"vector":[-2196,-2706]}},"b6763432-1b6c-4230-9932-ab6f7999ce85":{"position":{"vector":[-1007,-3582]},"visualization":{"show":true,"width":1301.149621215003,"height":176.01286473718923}},"57efa8f7-6507-460e-a2a7-81dd1716ccae":{"position":{"vector":[-1252,-3370]}},"f481cc8f-5d18-44f1-becd-e896a3cf2553":{"position":{"vector":[-1252,-3370]}},"a22161d6-a387-40aa-82fa-0e3dea5eb45e":{"position":{"vector":[-1000,-1703]},"visualization":{"show":true,"width":1169.2326821013853,"height":251.19279689377788}},"94018616-3b63-4b0d-a4f2-23b8959b7ea6":{"position":{"vector":[-1574,-1642]}},"53c2b8e8-093b-43ee-98ff-a0803d01019b":{"position":{"vector":[-1574,-1642]}},"e9ab229f-dcf2-488e-84d8-756eb4bac805":{"position":{"vector":[-953,-2621]}},"a002be58-ffe8-4a91-8278-542019d19ea6":{"position":{"vector":[-920,-2636]}},"1efaca62-7fc7-4eb8-ad82-55f9a466467f":{"position":{"vector":[-920,-2636]}},"14cbaae5-36d7-44c5-aa01-d9db95003084":{"position":{"vector":[-953,-2693]},"visualization":{"show":true,"height":392.09887228602076}},"46a9b9e8-b404-49f7-8ead-146a98ad48c7":{"position":{"vector":[-1139,-3538]}}},"widget":{},"import":{},"snapshot":"eJylWu1uGzcW/Z+nuGsXkJTIauJ0g22RDzhOsg0WwRpx2gK1FYmeuZJYz5BTkmNZaQrsa+w/P4sfZZ9kcS85nBlpJKdt/yTRDDn349x7zyE7MzqHUydUKkw6eiksgswLbRyILLs3az39IC6yHY9fCScudm5w9NPp9of/RL3jodbzXd9+JxOjrZ657a+cKr2cZeLyLgdF2Xwh/DW+8vpa5EWGduPBj9KWIpOfhJNare1LYR29QyeqnV8rqycnRv+CibvH/+3vw9/OZC7mOO5/zX/ar63D4uBidcB/ov/wqFDzwT0A2IcTYaxUc/iA1w6chmOdlbmyIBXvD0dKZCsnE3uP3v+wwI03E50XWqFyHYugMPpKpggCCr1EMyszsOhAz8BpnVmYaQO2yKRzZITDa3dA2U8hiXY4DXmZOVlkGH/VBoxe2iGgEhcZLS0tGktmOSOUnWmTQ6msM2XiSoMprUgxk7l0mEIqKIq0c+MNWiOcN0mQA1baIRikWEs1H9IWV838jCgcFhsBGEJhZC6MzFaQoHJI+wqjS5Xe3kzZz4nTk+DFdNj8kfzhXwphLLZeA8Hrnb5EJT9h/TbYsmAo1CG8WEU/jYU+juajIVmYCzsEW4gEyUpZoB2QQyUn3+C8zIQBvC4MWiu1skNYSrcAXZCnHFiDSuQIBi1lQ81jMoRKYSFUmqFP1MGVyEoKqMQstRQlaWFWqoS2Epl0K5AW0FpUToqMA14YLISJGFiguFpxmiw6y6ZIBQKW2lzOMr0cMRr39+FfuILjGP/w6z6sh7oCb1cWbm9iAv06CwIoLBmyMcHPLUj0aNVknC0wkTNJ+Koy4O08gPv33zT9v3//O3glqTDoW82P+ITd3kyP0pRSMR347ypcxk/6nIn6K600D4agRM6RXHRli9MqQJU5GpmALWczeb3xXXg0bf7rcDoYVZ78YBGOhUVy4pTiBUI1DKZwsiuJVk5IRd/eO3UG0Q3hWLrVkFqaw71QgJR34bD16dubvl8xaBtxe9OnHQZVRVRPHvsVwuGg8jOa+xIVzqRja2VeZJQhy7HBa2cEJ4X6UaMTcHvg5lu3DErSkDovNTQ19+9oMxcqdAOG8aw0boF1/xhtIpIqtwuOXNF/Dou09A4gDiEti0wmgrGg2cgKEWQ4imTBIDNVcXWC9qVBcbkVs8fC4Vyb1USodHKKwiSLyQcxZ/h4k6VKCfalyLzRW6FMHer2Zvp5OuAWHC0X1upECsqI0UufBUFT26c0eGA7wXqs1RXSRN5tagQwV8reS8TZ5zfCujdap2ugrYYQBS/UVZUsMee+SEZpI+dSiWzXZwnz3Da7cPuahhxa+tpBhleYRXwRcDt6Ls0htGiufOErzhYDupX5Gp3rM6cB0I1x1InRuxtllerNWeNDR8MlhUQUVIMwN7os7A4k/mC5dxqc4zUUwjk0DSR+7L94moRYPz/7eH42fjA4P+u/eOrE3NIPY/ph/NV0QJMtNAJOGM+4ZrflsLUcHPpp52NLdOq6OXJpmHlzulFIhAt3YrBGYCYvEfZelmaOxp61kDj2ULy9mVZ+Ug8Mrw4qxkC79VvrBg1mBVohEC/sAt2/ZzNypzCYSCY5yhmdgb6K+GmwDs4g54LKNS2Tav4o9MyqxkPkZ75r0ucbQFznOA0gbtCfPwjE9S65CcQhOIO+z3BJ58IlCxC07d2tcTcg9/pnH/fGDwZ7n/tnHz+PHwzayGPfurGWVCZFI+qGHQxU6fbu3onBDyGUDEPXglxn09MGenvHC5lcotob7p3IT5/EXq+zF1pnZFGwGYWPD/xaaoeeJlJbbxRLF+7eiERmkma5hRSdkJnv9UEXNDtfhYgwsdn0WYbXkhQmJyIsikCNvPHUE2dM4Q0K6jg2ZvZVZd7BS158Wi0OWe7mkNp0DHO2yBLraHrty3qdk1PfIFoeY/KeHdhqQ0dfZhs6yqSqznWOz0CqWljVtMiQVi+uLWLld5yhUMGSY51fSIUcefo0XrtJQs8tTm9vWDPk+gqhoGIpfcETDOwqvyD1F4a9B8gQLoxILtHZAVzgTBuanCBmxAoaCQy2ePUJ79GT3TouXqY0ouI0sQY5V5B7y0mE0jusanjndV0Zv/JWOZwbbzhHkeXt60TblXWYcy1V/YxIop/TMqxCsCjyDK3NVn55QysTCG5vpjOZOTRMtn/RUk03ZaZXytGk1hFBhWPmZqXM3IFU3oq1PfoiSSjr/onw/HeFFyLLQCZaDeicwjOyoKOlIhoZOmtQzHmOKZGvbBULKRxlwE9BmfHvbxU4En3huCHKtmGXwvdEu5J6ISwKl+TX5IL63CQprdM5Gjt59PDhKLFX09sbP+HyJKUek9pJjqqcUJAn1NCqlwzSEQS5jmmgINvPL767V6MrzwXETkADI2iNnU0g4sktsEsSBbx3yqFBNc+3KbAu0VORKm4mTdkZ/Dil5tLpBzy+y5NKy/DTdbEVHDk+gm8Pnzx5uGn9Yy/jjo8G62Z7HcfLBpEVchdsyhW3QFUdOTQ35qBQ3PgvHLoYmZ/fnsCxTnFa++/ZeB0AbqQ7PQ+97KyRzt1crYrFFpoWI7OT+68zt536ZI3RRW9PaLrWvjoN7/WyC7GNucAii11NvDy68+OVuy2KMOgkA3ezEh5ygRPXNblzygWhxfP9j1D9L83nJq1ukGl6vEmbvReRVW0EfttMrr3Y5Ic+J0T+AnWNrI+0pVSVRQ01wnM0rZjEQX14weLQrlXFwanDIrYDTsEfjXtY/Pzs43D8YDA8t/f7L55ScbZ/4Sp9fnZ08PP4t8PfB+f2Qf/F05/fnkyoWJ+fp7/9/ff+i+8OztPfvvl98GKwlqq6i7ZbzB2dgDePrddCKg0mjibXNjYTctUmMaFGRqOTmsNESIxGp57JtNhOg+/6OTAmMxaCmD4anne7i+zPkRz/212NptWKoiM7jOEF/if4IObT2xsCIvGHGR1q1OdmkRJUSqOm1E2QBT92nRyGPPsp+UUN3xs1R20LwWfK9QFclW0xh9fxwO9Lj4PaNjUPKzdC2ApRLNioYJyYz3nUrRtGF153w7CbS9PlSaDSzKIaXM3pcKaOIF3rbDLwoSaZfsdHSD9Sl6DOBa+vC6FsiFMkuF0nTbBzHKwf95EZ0mEeTrGksnK+cLaBd69FToJ8fkf6tg5LENehJDtaVENRdx7ntm6EWGW3unnAbxCjf/nGK0pR6gQ4m8lE0lGFKAqjuY83LqvWbr92XVDFWx8+ho5itZLHabfyDVqvvrFhnbPtTuSv3kw1jmasv6PDeJLEvhmsHOOrteVCZh2o97tvNDtUC6EShCRUTXVwR5DeuJPbocYoc//7z38tYCXoWrHdLJi/KuK+QIZxiVQ6q8IBKzG+cXy5IkSQH/5mhUHsC751rsYEuh0HzPkKtlZ4VX/gMA5jZzowKNLG5dsGxEf3ciEVPKPyAKFWj+AZUBcb0ULo0cKv79BvPV67vw8dQotiIsLA8Dnnl1nV0qfoi6N1xEIvTJEe9IZx99O2qqh2r6XI+v6H8Cx8aPsX4HEPetCrFz2uFh2O2lCFs/6JkGbkG2tc/6hXWzsYQuc7hz3o0dDb+sJj3obH4Y53aJtqSPYG4you1NTmWmR0D0t9LcwyriMalM0+4TQsxBX1s0g+tQI6bNVLFY8jKazU2f35Oa2r+HOFksMOlOxS7z3oj0avIoVdoEjR2Gej0ffCTr73/xrUiabBF8WkV30x73WqvvH4OezI7jYK0IPeWQQUcyKqmZpbB1rMJ5uR5I3gTZutc4AyaV0titBf0OolQFH6Ht2YlxQGPwHoLReTUvvypILdN6NWq97uCsPhc3TmiJqWIkPiSPph+yVNrUbcUlcIGYaB42X6AnPga/qQAJqqjdp9WAV/fY7sDP66vvMCr6XwvMQ7H38VXdvux7DyouM4nY6UfbD9ZOwKA59v+8vGtcPs+r6vffBdR+Db2F0ejtZHJvSc93dDCdbdzEeVZduO27RayrdaadedHJ/Fon8v8Fw+GG0kLXbczaTVHbdLC3aIwW41uC4Haz0YBWEMwXvPgcnetsqCcV18IThNLtFwKLb4J6PmG3C2q2zGcNZSgEOI0m9c21ZVQYxvXTNeK/n/G6M25h8REHeMju2Srlc/3JgDO/tArVdoMPwfGcdveQ=="}}

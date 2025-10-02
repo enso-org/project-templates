@@ -1,0 +1,106 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Summarizing and Aggregating Data in Enso Analytics
+
+   The Aggregate Data component in Enso Analytics provides a robust set of tools for aggregating and summarizing data from tables, enabling users to derive insights through statistical, mathematical, and text-based summaries for analysis, reporting, or visualization. The primary component, `aggregate`, supports a variety of aggregation functions such as sum, minimum, maximum, count, median, mode, and custom concatenations, with options to group data by columns or apply advanced calculations. This component is essential for transforming raw data into meaningful summaries within a workflow.
+
+   ## Key Component
+
+   ### aggregate
+
+   The `aggregate` component computes summary statistics or grouped aggregations over a table based on specified columns and aggregation functions.
+
+   - **Functionality**: Performs aggregations like sum, minimum, maximum, count, median, mode, standard deviation, and text operations (e.g., concatenate, longest, shortest) on specified columns, with options to group by one or more columns or order results for functions like first and last.
+   - **Use Case**: Calculate the total spend across all customers, find the median number of visits per city and state, or concatenate first names into a single string with custom separators.
+   - **Benefit**: Offers a flexible and powerful way to summarize data, supporting both simple totals and complex grouped statistics to meet diverse analytical needs.
+   - **Downside**: Certain operations, like mode on floating-point numbers, may trigger warnings due to precision issues, requiring careful interpretation or use of `remove_warnings` to manage downstream visibility.
+
+   ## Supported Features
+
+   - **Simple Aggregations**: Compute sums (e.g., `..Sum 'Spend'`), minimums, maximums, or counts over the entire table.
+   - **Grouped Aggregations**: Group data by one or more columns (e.g., `['City']`) and apply aggregations like count or median within each group.
+   - **Text Operations**: Concatenate values (e.g., `..Concatenate 'FirstName'` with custom prefix, suffix, and separators), or find the longest and shortest text values.
+   - **Statistical Calculations**: Perform advanced math like average, median, mode, and standard deviation on numeric columns.
+   - **Ordered Aggregations**: Use `order_by` with `..First` and `..Last` to get the first or last value in a sorted sequence (e.g., first ZIP code by ascending order).
+   - **Null Handling**: Supports counting blank (`..Count_Nothing`) and non-blank (`..Count_Not_Nothing`) values to handle missing data.
+   - **Warning Management**: Use `remove_warnings` to suppress downstream warnings (e.g., mode precision issues) or adjust `on_problems` to `ignore_warnings` at the source, though this may hide evolving data issues.
+   - **Integration with Enso Ecosystem**: Summarized tables integrate seamlessly with other components like `filter`, `join`, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect summary results immediately.
+
+   ## Example Workflow
+
+   In this example workflow, various summarization techniques are applied to a customer dataset read from `data/customer_data_100_OC.csv`:
+
+   - **Simple Sum**: Use `aggregate` with `..Sum 'Spend'` to calculate the total spending across all customers.
+   - **Overall Minimum and Maximum**: Use `aggregate` with `..Minimum 'JoinDate'` and `..Maximum 'JoinDate'` to find the earliest and latest join dates.
+   - **Count**: Use `aggregate` with `..Count` to determine the total number of rows.
+   - **Group By**: Use `aggregate ['City']` to group data by city, providing a breakdown of all columns per city.
+   - **Group By and Count**: Use `aggregate ['City'] [..Count]` to count the number of records per city.
+   - **Concatenate**: Use `aggregate` with `..Concatenate 'FirstName' separator=">,<" prefix="<" suffix=">"` to combine first names into a string like ",,".
+   - **Basic Math**: Use `aggregate ['State', 'City'] [..Median 'Visits', ..Sum 'Spend' "Total Spend"]` to calculate the median visits and total spend per city and state.
+   - **Ordered Aggregations**: Use `aggregate` with `..First 'ZIP' order_by=[(..Name 'ZIP' ..Ascending)]` and `..Last 'ZIP'` to get the first and last ZIP codes by ascending order.
+   - **Advanced Math**: Use `aggregate` with `..Average 'Spend'`, `..Median 'Spend'`, `..Mode 'Spend'`, and `..Standard_Deviation 'Spend'` to compute multiple statistics, noting a warning on mode due to floating-point equality.
+   - **Text Summarizing**: Use `aggregate` with `..Longest 'FirstName'`, `..Shortest 'FirstName'`, `..Count_Nothing 'LastName'`, and `..Count_Not_Nothing 'LastName'` to analyze text length and null counts.
+   - **Warning Removal**: Use `remove_warnings` on the advanced math result to suppress the mode warning from downstream components.
+
+   ## Use Cases
+
+   - **Total Calculations**: Use `..Sum 'Spend'` to compute overall spending for budgeting.
+   - **Date Range Analysis**: Use `..Minimum` and `..Maximum` to identify the time span of customer join dates.
+   - **Record Counting**: Use `..Count` to verify the total number of customers or transactions.
+   - **Geographic Grouping**: Use `aggregate ['City']` to summarize data by location for regional reports.
+   - **Custom Text Aggregation**: Use `..Concatenate` to create a single string of names for display or export.
+   - **Statistical Insights**: Use `..Median 'Visits'` and `..Sum 'Spend'` to analyze visit frequency and spending by region.
+   - **Ordered Data Points**: Use `..First` and `..Last` to extract boundary values like the earliest or latest ZIP code.
+   - **Advanced Analytics**: Use `..Average`, `..Mode`, and `..Standard_Deviation` to profile spending patterns, handling mode warnings appropriately.
+   - **Text Data Analysis**: Use `..Longest`, `..Shortest`, and null counts to assess data quality or naming conventions.
+
+   ## Benefits
+
+   The Summarizing Data component in Enso Analytics provides a comprehensive and efficient way to aggregate and summarize tables, supporting a wide range of statistical and text-based operations to derive actionable insights. The `aggregate` component’s flexibility with grouped calculations, ordered aggregations, and custom text handling ensures robust data summarization, while `remove_warnings` enhances workflow clarity by managing precision-related alerts. Its integration with other Enso components, such as `join`, `filter`, or visualization tools (accessible via the eyeball icon), allows for immediate inspection and further processing. By enabling precise and versatile data summarization, the Summarizing Data component empowers users to transform raw data into analysis-ready insights in Enso Analytics.
+main =
+    any1 = Data.read 'data/customer_data_100_OC.csv'
+    ## Simple Sum - Summarize Spending
+    table1 = any1.aggregate columns=[..Sum 'Spend']
+    ## Overall Minimum and Maximum
+    table2 = any1.aggregate columns=[..Minimum 'JoinDate', ..Maximum 'JoinDate']
+    ## Count
+    table3 = any1.aggregate columns=[..Count]
+    ## Group By
+    table4 = any1.aggregate ['City']
+    ## Group By and Count
+    table5 = any1.aggregate ['City'] [..Count]
+    ## Concatenate - First Names are concatenated together into a single string, adding prefix, suffix and separators to wrap names in <> and add commas between . 
+    table6 = any1.aggregate columns=[..Concatenate 'FirstName' separator=">,<" prefix="<" suffix=">"]
+    ## Basic Math - Calculate median visits and total spend per city and state.
+    table7 = any1.aggregate ['State', 'City'] [..Median 'Visits', ..Sum 'Spend' "Total Spend"]
+    ## Get the first and last ZIP Code, ordered by ZIP Code.
+    table8 = any1.aggregate columns=[..First 'ZIP' order_by=[(..Name 'ZIP' ..Ascending)], ..Last 'ZIP' order_by=[(..Name 'ZIP' ..Ascending)]]
+    ## Advanced Math - Several calculations on the Spend Column. Note that Mode has triggered a warning about relying on equality of floating point numbers
+    table9 = any1.aggregate columns=[..Average 'Spend', ..Median 'Spend', ..Mode 'Spend', ..Standard_Deviation 'Spend']
+    ## Text summarizing - Longest, Shortest, Count blank (Nothing), Count non-blank (Not Nothing)
+    table10 = any1.aggregate columns=[..Longest 'FirstName', ..Shortest 'FirstName', ..Count_Nothing 'LastName', ..Count_Not_Nothing 'LastName']
+    ## The warning will show on every downstream component. Adding a remove_warnings component let's you see the warning appear on the component that triggered the warning, but will remove it from downstream components. Alternately, you can change the on_problems parameter on the component above to ignore_warnings, but you will not see any warning triggered by the component as data changes, which may be undesirable.
+    any2 = table9.remove_warnings
+
+
+
+#### METADATA ####
+[[{"index":{"value":7284},"size":{"value":9}},"1a7cff2b-be60-4d54-a80f-499c914fa714"],[{"index":{"value":7284},"size":{"value":41}},"f89e516f-c920-456d-ac2e-9a4c36188bf2"],[{"index":{"value":7378},"size":{"value":38}},"e90d913c-3c09-46ac-aa2b-65d3f96b6f78"],[{"index":{"value":7465},"size":{"value":67}},"20325353-15bf-4f60-9196-d5d907900a33"],[{"index":{"value":7559},"size":{"value":32}},"a654bcbc-7bc3-4907-a822-cc7a5eba5d89"],[{"index":{"value":7621},"size":{"value":14}},"438326ed-1cd2-4797-a906-1bf2aaa1de44"],[{"index":{"value":7621},"size":{"value":23}},"6863d58f-66da-404d-8a03-e30193244daf"],[{"index":{"value":7684},"size":{"value":23}},"14c1b93e-2fc2-49e4-b73b-6edca75e6d3a"],[{"index":{"value":7684},"size":{"value":33}},"4f291b27-54c1-4754-a464-b71f878d656a"],[{"index":{"value":7895},"size":{"value":88}},"c242b499-9c08-4680-88bf-cf7f46c16252"],[{"index":{"value":8077},"size":{"value":14}},"57489a6f-1b84-4ea3-b874-85a79fe58c02"],[{"index":{"value":8077},"size":{"value":32}},"36792e11-face-4859-ad10-8ca76c6f0ee7"],[{"index":{"value":8077},"size":{"value":81}},"9e22334e-8e37-4d3f-8cf3-7aabd34403af"],[{"index":{"value":8233},"size":{"value":128}},"d3e0ffc7-6332-4bd2-9016-cd5ada90a5ab"],[{"index":{"value":8531},"size":{"value":14}},"34cca3de-7934-43c3-a728-d52ce8dd7e60"],[{"index":{"value":8531},"size":{"value":106}},"591fca65-8f2f-4e4c-80e0-e36f7e581a3a"],[{"index":{"value":8750},"size":{"value":14}},"3114db4e-0119-4cce-89b3-be262380729c"],[{"index":{"value":8750},"size":{"value":130}},"dd40a3f5-7838-4c50-bab1-942ee6743e2e"],[{"index":{"value":9312},"size":{"value":22}},"ae170217-71f9-435f-a375-88696ef46157"]]
+{"ide":{"node":{"f89e516f-c920-456d-ac2e-9a4c36188bf2":{"position":{"vector":[-2621,-741]},"visualization":{"show":true,"width":750.8861694335938,"height":187.99468994140625}},"1a7cff2b-be60-4d54-a80f-499c914fa714":{"position":{"vector":[-1529,-1132]}},"e90d913c-3c09-46ac-aa2b-65d3f96b6f78":{"position":{"vector":[-1800,-1060]},"visualization":{"show":true}},"20325353-15bf-4f60-9196-d5d907900a33":{"position":{"vector":[-1800,-1310]},"visualization":{"show":true}},"a654bcbc-7bc3-4907-a822-cc7a5eba5d89":{"position":{"vector":[-1800,-1577]},"visualization":{"show":true}},"6863d58f-66da-404d-8a03-e30193244daf":{"position":{"vector":[-1800,-1834]},"visualization":{"show":true}},"438326ed-1cd2-4797-a906-1bf2aaa1de44":{"position":{"vector":[-1901,-1851]}},"4f291b27-54c1-4754-a464-b71f878d656a":{"position":{"vector":[-1800,-2097]},"visualization":{"show":true,"width":500.98956298828125}},"14c1b93e-2fc2-49e4-b73b-6edca75e6d3a":{"position":{"vector":[-1901,-2194]},"visualization":{"show":true}},"c242b499-9c08-4680-88bf-cf7f46c16252":{"position":{"vector":[-1800,-2393]},"visualization":{"show":true}},"9e22334e-8e37-4d3f-8cf3-7aabd34403af":{"position":{"vector":[-1800,-2642]},"visualization":{"show":true}},"36792e11-face-4859-ad10-8ca76c6f0ee7":{"position":{"vector":[-2484,-1206]}},"57489a6f-1b84-4ea3-b874-85a79fe58c02":{"position":{"vector":[-2484,-1206]}},"d3e0ffc7-6332-4bd2-9016-cd5ada90a5ab":{"position":{"vector":[-1800,-3605]},"visualization":{"show":true}},"591fca65-8f2f-4e4c-80e0-e36f7e581a3a":{"position":{"vector":[-1800,-2900]},"visualization":{"show":true,"width":901.3627319335938}},"34cca3de-7934-43c3-a728-d52ce8dd7e60":{"position":{"vector":[-3026,-1094]}},"dd40a3f5-7838-4c50-bab1-942ee6743e2e":{"position":{"vector":[-1800,-3334]},"visualization":{"show":true,"width":1070.9302368164062}},"3114db4e-0119-4cce-89b3-be262380729c":{"position":{"vector":[-3067,-1532]}},"ae170217-71f9-435f-a375-88696ef46157":{"position":{"vector":[-1800,-3188]}}},"widget":{},"import":{},"snapshot":"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"}}

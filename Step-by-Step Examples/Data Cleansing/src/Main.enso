@@ -1,0 +1,92 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+## ---
+   icon: group
+   ---
+   Add 2 date columns that have values close to today
+add_date_columns node1 =
+    date4 = Date.today
+    date6 = date4.date_add 8 ..Day
+    node2 = date4.up_to date6
+    table12 = node2.to_table
+    column1 = table12.get 'Date'
+    vector1 = Random.items column1 count=8
+    table13 = table12.zip vector1
+    table14 = table13.rename_columns [(Pair.Value 'Date' 'JoinDate'), (Pair.Value 'Value' 'PurchaseDate')]
+    table15 = node1.zip table14
+    table15
+
+## ![Step by Step Example](/images/step-by-step-example.png)
+   # Data Cleansing in Enso Analytics
+
+   Data cleaning is a critical step in preparing datasets for analysis, and Enso Analytics provides a suite of powerful components designed to streamline and simplify the process of cleansing data. These components enable users to transform and refine data by addressing inconsistencies, missing values, formatting issues, and extraneous characters, ensuring high-quality, analysis-ready datasets. Below is an overview of the key data cleaning components in Enso Analytics, illustrated with practical examples from a sample workflow using the "Anonymized_Customers_2025.csv" dataset.
+
+   ## Key Components
+
+   - **Text Cleanse**: The text_cleanse component is tailored for cleaning data in text columns. It allows users to standardize and refine text data by removing unwanted characters, correcting formatting inconsistencies, or normalizing text values. This is particularly useful for tasks such as removing extra spaces, eliminating letters or special characters, or trimming leading and trailing whitespace to ensure uniformity across text-based data. For instance, it can be applied to columns like "FirstName" and "LastName" to remove duplicate, leading, and trailing whitespace, or to a "Term" column to strip letters and trailing whitespace in preparation for numeric conversion.
+   - **Fill Nothing**: The fill_nothing component addresses missing or null values in a dataset by replacing them with user-specified content. Users have multiple options for filling these gaps, including:
+     - **Static Value**: Replace missing values with a fixed value, such as a default number (e.g., 0) or text string (e.g., an empty string "").
+     - **Previous Value**: Fill missing values with the last valid value in the column, ideal for sequential or time-series data.
+     - **Expression-Based Value**: Use a custom formula to compute replacement values based on other data in the dataset.
+     - **Value from Another Column**: Populate missing values with data from a different column, enabling dynamic and context-aware replacements. This flexibility makes fill_nothing a versatile tool for handling incomplete datasets, such as replacing nulls in a "Score" column with 0 or in "LastName" with an empty string.
+   - **Parse**: The parse component is designed to convert text data into more usable formats, such as numeric, date, or boolean types. Key features include:
+     - **Text to Numeric**: Converts text representations of numbers into numeric values, automatically stripping extraneous characters like letters, currency symbols (e.g., "$" or "€"), commas, or trailing text to produce clean numerical data. For example, parsing a "Term" column (e.g., containing values like "12 months") directly to an integer type handles the conversion in one step.
+     - **Text to Date**: Transforms text-based date representations into standardized date formats, facilitating time-based analysis.
+     - **Text to Boolean**: Converts text values (e.g., "true"/"false" or "yes"/"no") into boolean data types for logical operations. The parse component ensures that data is correctly typed for downstream analysis, reducing errors in calculations or visualizations. Note that while text_cleanse can prepare data by removing specific elements (e.g., letters from a "Term" column), parse offers a simpler, integrated approach for type conversion with built-in stripping of extra characters.
+
+   In addition to the standard formats provided on the `parse` component, Enso supports custom formats as well. Refer to <https://help.enso.org/docs/using-enso/custom-formats>.
+
+
+   ## Workflow Example
+
+   Enso Analytics workflows demonstrate these components in action. For example, starting with a dataset loaded from "Anonymized_Customers_2025.csv":
+
+   - Replace null values in the "Score" column with 0 using fill_nothing.
+   - Clean "FirstName", "LastName" and "Region" columns by removing duplicate, leading, and trailing whitespace with text_cleanse.
+   - Fill any remaining nulls in "LastName" with an empty string using fill_nothing.
+   - For the "Term" column, use text_cleanse to remove letters and trailing whitespace as a preparatory step, or directly apply parse to convert the numeric portion (e.g., stripping " months" from "12 months") to an integer in a single operation.
+
+   Additionally, Enso visualizations highlight data issues, such as orange dots indicating whitespace (e.g., extra spaces after "Anderson" in "LastName" or before "West" in "Region"). Users can customize whitespace rendering by clicking the paragraph symbol icon at the top of the visualization to show all whitespace (revealing hidden spaces, like between "12" and "months" in "Term") or disable it entirely.
+
+
+   ## Use Cases
+
+   - **Standardizing Text Data**: Use text_cleanse to normalize customer names (e.g., "FirstName" and "LastName") by removing inconsistencies like extra spaces or varying whitespace, or to clean address fields by eliminating punctuation.
+   - **Handling Missing Data**: Apply fill_nothing to replace missing customer scores with 0 or blank last names with empty strings, ensuring complete records for reporting.
+   - **Data Type Conversion**: Leverage parse to convert text-based term lengths (e.g., "12 months") into integers for summation or comparisons, or standardize financial strings (e.g., "$1,234.56 USD") into numerics for aggregation. Alternatively, combine text_cleanse for targeted removals before parsing.
+
+   ## Benefits
+
+   The data cleaning components in Enso Analytics empower users to efficiently prepare their datasets by addressing common data quality issues. Whether standardizing text, filling in missing values, or converting data types, these tools combine ease of use with robust functionality, making them accessible to both technical and non-technical users. By integrating seamlessly into Enso Analytics workflows—complete with visual cues for issues like whitespace—these components ensure that data is clean, consistent, and ready for advanced analysis, reporting or visualization.
+main =
+    ## Notice the 2 orange dots after 'Anderson' in the last name column and the dot in front of "West" in the Region column. Enso shows these by default. You can change settings by clicking on the icon at the top of the visualization that looks like a paragraph symbol to see all whitespace (this would include a dot between 12 and months in the Term column, or No Whitespace Rendering to turn off this capability.
+    node1 = Data.read 'data/Anonymized_Customers_2025.csv'
+    ## Replace nothing values in the Score column with 0
+    table3 = node1.fill_nothing ['Score'] 0
+    ## Removes duplicate whitespace, leading and trailing whitespace from text columns
+    table4 = table3.text_cleanse ['FirstName', 'LastName', 'Region'] [..Duplicate_Whitespace, ..Leading_Whitespace, ..Trailing_Whitespace]
+    ## Replace Nothing value with an empty string in the LastName column
+    table5 = table4.fill_nothing ['LastName'] ""
+    ## Remove letters and whitespace from the Term Column. Note, often you are doing this to convert the numeric portion to a numeric column, which can be done in a single step with a parse component.
+    table6 = table5.text_cleanse ['Term'] [..Letters, ..Trailing_Whitespace]
+    ## Parse is a simpler way to do the step above, stripping the extra characters from a column and converting the data to a chosen data type
+    table7 = table5.parse ['Term'] ..Integer
+
+
+
+#### METADATA ####
+[[{"index":{"value":490},"size":{"value":5}},"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5"],[{"index":{"value":510},"size":{"value":10}},"646985dc-ac5f-4821-8d5a-8861bf904ff8"],[{"index":{"value":533},"size":{"value":22}},"8f6cef0d-c331-4557-8ba9-adb612b4329c"],[{"index":{"value":568},"size":{"value":17}},"3350d1b6-464f-450d-8871-909cdfbc7c26"],[{"index":{"value":600},"size":{"value":14}},"3addd758-8a24-4e7f-aced-70da03f75997"],[{"index":{"value":629},"size":{"value":18}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1"],[{"index":{"value":662},"size":{"value":28}},"01af9746-4b49-4aaf-99a6-4a065f7f1974"],[{"index":{"value":705},"size":{"value":19}},"88cd9951-89f4-47fb-b178-eaca2120da87"],[{"index":{"value":739},"size":{"value":92}},"dd996f45-9436-494d-a22a-9ff74dba588d"],[{"index":{"value":846},"size":{"value":9}},"6c11c15f-71fa-4c52-af14-38b2451209e0"],[{"index":{"value":846},"size":{"value":17}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62"],[{"index":{"value":868},"size":{"value":7}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd"],[{"index":{"value":7433},"size":{"value":9}},"56061d01-6048-400c-a6df-0ecd54ef0438"],[{"index":{"value":7433},"size":{"value":46}},"df97d38b-87cb-4b54-a512-6dba545ce856"],[{"index":{"value":7550},"size":{"value":18}},"110185a9-51e4-449c-a5cc-e91adf0cdec4"],[{"index":{"value":7550},"size":{"value":28}},"9a7480ed-c3d7-4da6-9fc4-d8a3b9f7c832"],[{"index":{"value":7550},"size":{"value":30}},"43654e6f-e971-4a5f-89c8-759881e055af"],[{"index":{"value":7681},"size":{"value":19}},"75057552-8492-4b8f-a330-ed166ecddf4a"],[{"index":{"value":7681},"size":{"value":55}},"61b1e4e2-1e4a-47b3-8a18-8b54641819af"],[{"index":{"value":7681},"size":{"value":125}},"2afa0fe6-ff88-465c-9edc-0a53c1e9da2f"],[{"index":{"value":7893},"size":{"value":19}},"f11d6863-37ed-40e1-bd47-70f051840a85"],[{"index":{"value":7893},"size":{"value":32}},"9360e94b-3489-403e-a9b8-7a5d9c9a89c8"],[{"index":{"value":7893},"size":{"value":35}},"a051047a-45fe-42c8-a8dc-20050acf2b7b"],[{"index":{"value":8143},"size":{"value":19}},"4b344f28-6237-497d-9a6e-074130c53d11"],[{"index":{"value":8143},"size":{"value":28}},"43518e59-a157-45ed-a666-7337167010fb"],[{"index":{"value":8143},"size":{"value":63}},"b35c675a-5a18-47ab-a69e-c0bc8bba927c"],[{"index":{"value":8363},"size":{"value":12}},"9d7e7948-82b5-4430-9480-ab45dd1b6cca"],[{"index":{"value":8363},"size":{"value":21}},"682a662d-a1fa-4c6e-8487-c89c60094216"],[{"index":{"value":8363},"size":{"value":31}},"14fa5487-8977-4646-80c7-71938c360932"]]
+{"ide":{"node":{"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5":{"position":{"vector":[-1024,721]}},"646985dc-ac5f-4821-8d5a-8861bf904ff8":{"position":{"vector":[-876,649]}},"8f6cef0d-c331-4557-8ba9-adb612b4329c":{"position":{"vector":[-765,514]}},"3350d1b6-464f-450d-8871-909cdfbc7c26":{"position":{"vector":[-848,421]}},"3addd758-8a24-4e7f-aced-70da03f75997":{"position":{"vector":[-826,349]},"visualization":{"show":true,"width":502.81198641202724,"height":264.3352446391665}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1":{"position":{"vector":[-683,13]}},"01af9746-4b49-4aaf-99a6-4a065f7f1974":{"position":{"vector":[-592,-50]},"visualization":{"show":true,"height":326.72607421875}},"88cd9951-89f4-47fb-b178-eaca2120da87":{"position":{"vector":[-814,-456]}},"dd996f45-9436-494d-a22a-9ff74dba588d":{"position":{"vector":[-814,-537]}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62":{"position":{"vector":[-1024,-642]}},"6c11c15f-71fa-4c52-af14-38b2451209e0":{"position":{"vector":[-1024,-642]}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd":{"position":{"vector":[-1024,-714]}},"df97d38b-87cb-4b54-a512-6dba545ce856":{"position":{"vector":[158,1297]},"visualization":{"show":true,"width":1361.243554898121,"height":227.61623016289906}},"56061d01-6048-400c-a6df-0ecd54ef0438":{"position":{"vector":[-898,711]},"visualization":{"show":true,"width":941.3015382965584,"height":242.12941375664906}},"43654e6f-e971-4a5f-89c8-759881e055af":{"position":{"vector":[158,997]},"visualization":{"show":false,"width":1349.1256103515625,"height":234.5760498046875}},"9a7480ed-c3d7-4da6-9fc4-d8a3b9f7c832":{"position":{"vector":[412,279]}},"110185a9-51e4-449c-a5cc-e91adf0cdec4":{"position":{"vector":[412,279]}},"2afa0fe6-ff88-465c-9edc-0a53c1e9da2f":{"position":{"vector":[158,899]},"visualization":{"show":false,"width":1347.9254150390625,"height":223.9068603515625}},"61b1e4e2-1e4a-47b3-8a18-8b54641819af":{"position":{"vector":[250,-18]}},"75057552-8492-4b8f-a330-ed166ecddf4a":{"position":{"vector":[250,-18]}},"a051047a-45fe-42c8-a8dc-20050acf2b7b":{"position":{"vector":[158,798]},"visualization":{"show":false,"width":1324.3906112823531,"height":199.04180908203125}},"9360e94b-3489-403e-a9b8-7a5d9c9a89c8":{"position":{"vector":[250,-266]}},"f11d6863-37ed-40e1-bd47-70f051840a85":{"position":{"vector":[250,-266]}},"b35c675a-5a18-47ab-a69e-c0bc8bba927c":{"position":{"vector":[158,707]},"visualization":{"show":false,"width":1316.7689208984375,"height":181.34429931640625}},"43518e59-a157-45ed-a666-7337167010fb":{"position":{"vector":[179,-654]}},"4b344f28-6237-497d-9a6e-074130c53d11":{"position":{"vector":[179,-654]}},"14fa5487-8977-4646-80c7-71938c360932":{"position":{"vector":[125,616]},"visualization":{"show":true,"width":1326.3339233398438,"height":220.24976942274304}},"682a662d-a1fa-4c6e-8487-c89c60094216":{"position":{"vector":[138,-953]}},"9d7e7948-82b5-4430-9480-ab45dd1b6cca":{"position":{"vector":[138,-953]}}},"widget":{},"import":{},"snapshot":"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"}}

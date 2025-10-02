@@ -1,0 +1,78 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Sorting Data in Enso Analytics
+
+   The Sort component in Enso Analytics provides a powerful and flexible tool for ordering rows in a table based on one or more columns, enabling users to organize data for analysis, reporting, or visualization. The primary component, sort, supports sorting by single or multiple columns in ascending or descending order, with options to handle numeric strings and null values. This component is essential for preparing datasets in a meaningful order, ensuring data is structured to meet analytical or presentation needs.
+
+   ## Key Component
+
+   ### sort
+
+   The sort component reorders the rows of a table based on specified columns and sorting directions, with options to customize the sorting behavior for different data types.
+
+   - **Functionality**: Sorts rows based on one or more columns, with each column assigned a sorting direction (ascending or descending). Supports text, numeric, and numeric string sorting, with special handling for null values (Nothing) and text-based numbers using the text_ordering option.
+   - **Use Case**: Sort a customer table by CustomerID in ascending order, or sort by LastName and then FirstName to organize records hierarchically, or sort a text-based Score column as numeric values using sort_digits_by_numbers.
+   - **Benefit**: Offers flexible sorting options for single or multiple columns, with precise control over ordering behavior, making it easy to prepare data for analysis or reporting.
+   - **Downside**: When sorting text-based numeric values (e.g., Score as a string), default text sorting may produce unexpected results (e.g., "18" before "3"), requiring the use of text_ordering with sort_digits_by_numbers to treat strings as numbers.
+
+   ## Supported Features
+
+   - **Single-Column Sorting**: Sort by a single column, such as CustomerID, in ascending (default) or descending order.
+   - **Multi-Column Sorting**: Sort by multiple columns hierarchically, where subsequent columns (e.g., FirstName) resolve ties in earlier columns (e.g., LastName).
+   - **Null Value Handling**: Null values (Nothing) are placed at the beginning of the sorted order by default, ensuring consistent handling of missing data.
+   - **Text Ordering for Numeric Strings**: Use the text_ordering option (e.g., ..Default True) with sort_digits_by_numbers to sort text-based numeric values (e.g., "12", "7", "3") as numbers rather than character-by-character.
+   - **Integration with Enso Ecosystem**: The sorted table integrates seamlessly with other Enso components, such as filter, select, or visualization tools, for further processing or inspection.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect the sorted results immediately.
+
+   ## Example Workflow
+
+   In this example workflow, a customer dataset with columns CustomerID, FirstName, LastName, Gender, Region, and Score is sorted using the sort component:
+
+   - **Single-Column Sorting**: Use sort to order the table by CustomerID in ascending order, producing a table with rows arranged from the lowest to highest CustomerID.
+   - **Multi-Column Sorting**: Use sort with [(..Name 'LastName' ..Ascending), (..Name 'FirstName' ..Ascending)] to sort by LastName first, then resolve ties by FirstName, with null LastName values appearing first.
+   - **Sorting Numeric Strings as Text**: Convert the Score column to text using format, then sort using sort with default text ordering, resulting in a character-based sort (e.g., "18" before "3").
+   - **Sorting Numeric Strings as Numbers**: Sort the text-based Score column using sort with text_ordering=(..Default True) to treat values as numbers, ensuring a correct numerical order (e.g., "3" before "18").
+
+   ## Use Cases
+
+   - **Organizing Data for Reporting**: Sort a customer table by CustomerID or LastName to create an ordered list for reports or dashboards.
+   - **Hierarchical Sorting**: Sort by multiple columns, such as LastName and FirstName, to organize records hierarchically for clear presentation or analysis.
+   - **Preparing Numeric Data**: Sort text-based numeric columns like Score as numbers using sort_digits_by_numbersfor accurate ranking or comparison.
+   - **Data Exploration**: Sort a dataset by key columns to identify patterns, such as sorting by Score to highlight top performers.
+   - **Preprocessing for Analysis**: Sort data before applying filters or aggregations to ensure consistent ordering for downstream operations.
+
+   ## Benefits
+
+   The Sort component in Enso Analytics provides a versatile and efficient way to order table rows, supporting single and multi-column sorting with customizable options for text, numeric, and numeric string data. The sort component’s flexibility in handling null values and text-based numbers ensures accurate and meaningful results, while its integration with other Enso components, such as filter, select, or visualization tools (accessible via the eyeball icon), enables immediate inspection and further processing. However, users should be aware that sorting text-based numeric values requires explicit use of text_ordering to avoid character-based sorting issues. By enabling precise and flexible data ordering, the Sort component empowers users to prepare structured, analysis-ready datasets in Enso Analytics.
+main =
+    node1 = Table.input [['CustomerID', ['42', '8', '14', '34', '98', '112', '12', '6']], ['FirstName', ['James', 'Sophia', 'Liam', 'Olivia', 'Ethan', 'Ava', 'Noah', 'Mia']], ['LastName', ['Hart', 'Lopez', 'Nguyen', 'Brown', 'Garcia', 'Kim', Nothing, 'Johnson']], ['Gender', ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'F']], ['Region', ['North', 'South', 'East', 'West', 'Midwest', 'North', 'South', 'West']], ['Score', ['82%', '67%', '53%', '18%', '5%', '9%', '42%', '86%']]]
+    ## Rows are sorted by Customer ID in ascending order (the default value for direction)
+    table1 = node1.sort [(..Name 'CustomerID')]
+    ## Sort by 2 columns. LastName is sorted in ascending order.. Then the LastName  values are sorted by FirstName. Note that the Nothing (null) value in LastName appears as the first value. You can sort by as many columns as you choose.
+    table2 = node1.sort [(..Name 'LastName' ..Ascending), (..Name 'FirstName' ..Ascending)]
+    ## Sort by a numeric string value using sort_digits_by_numbers. To expose this option, you need to specify a text_ordering method (Default chosen below)
+    table4 = node1.sort [(..Name 'Score' ..Ascending)] (..Default True)
+    ## Sort by a numeric string value. Note that 42% appears before 5% because numeric strings are sorted by character, left to right, character by character.
+    table5 = table2.sort [(..Name 'Score' ..Ascending)]
+
+
+
+#### METADATA ####
+[[{"index":{"value":5796},"size":{"value":457}},"9322fa2e-b592-43b3-b717-e64520b52563"],[{"index":{"value":6358},"size":{"value":10}},"e41b7751-3fa3-4e9e-8f53-9076f1ca4ac5"],[{"index":{"value":6358},"size":{"value":34}},"8912c4fc-c196-4461-9c76-8918057f2cfc"],[{"index":{"value":6645},"size":{"value":10}},"c9ae5618-6e86-4724-ba14-a41e420168b1"],[{"index":{"value":6645},"size":{"value":78}},"8fb598fc-f703-427a-a2e1-b1523a1db6cd"],[{"index":{"value":6894},"size":{"value":10}},"9b03d8a9-c01b-4528-ace2-427607fc6eb8"],[{"index":{"value":6894},"size":{"value":41}},"86dcbb62-e766-44f2-a1d5-3f9c7d1a25da"],[{"index":{"value":6894},"size":{"value":58}},"a2350dbb-ef4c-4c86-a3b9-c8641f16ad9a"],[{"index":{"value":7125},"size":{"value":42}},"bbfa6284-77fe-43a8-9705-9ace0d396025"]]
+{"ide":{"node":{"9322fa2e-b592-43b3-b717-e64520b52563":{"position":{"vector":[-603,-765]}},"8912c4fc-c196-4461-9c76-8918057f2cfc":{"position":{"vector":[-603,-1113]},"visualization":{"show":true,"width":705.7442406391327}},"e41b7751-3fa3-4e9e-8f53-9076f1ca4ac5":{"position":{"vector":[-1261,-1174]}},"8fb598fc-f703-427a-a2e1-b1523a1db6cd":{"position":{"vector":[-603,-1388]},"visualization":{"show":true,"width":879.1135710175545}},"c9ae5618-6e86-4724-ba14-a41e420168b1":{"position":{"vector":[-941,-1441]}},"a2350dbb-ef4c-4c86-a3b9-c8641f16ad9a":{"position":{"vector":[-603,-2029]},"visualization":{"show":true,"width":1147.672367667445}},"86dcbb62-e766-44f2-a1d5-3f9c7d1a25da":{"position":{"vector":[-986,-1820]}},"9b03d8a9-c01b-4528-ace2-427607fc6eb8":{"position":{"vector":[-986,-1820]}},"bbfa6284-77fe-43a8-9705-9ace0d396025":{"position":{"vector":[-603,-1750]},"visualization":{"show":true,"width":1046.9752161360216}}},"widget":{"9322fa2e-b592-43b3-b717-e64520b52563":{"WidgetTableEditor":{"size":{"x":974.4246826171875,"y":258.58172607421875}}}},"import":{},"snapshot":"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"}}

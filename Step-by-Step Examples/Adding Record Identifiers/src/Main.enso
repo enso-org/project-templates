@@ -1,0 +1,78 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+
+
+## ![Image](/images/step-by-step-example.png)
+   # Adding Record Identifiers in Enso Analytics
+
+   The `add_row_number` component in Enso Analytics provides a robust tool for adding unique identifier columns to a table, enabling users to enumerate rows or group them based on specific columns for organized data analysis, indexing, or integration with other workflows. This component is essential for tasks requiring unique row IDs or grouped identifiers, with optional sorting to control the order of numbering, making it ideal for tracking records, facilitating joins, or preparing data for visualization.
+
+
+   ## Key Component
+
+   ### add_row_number
+
+   The `add_row_number` component adds a new column to a table that assigns a unique sequential number to each row or group of rows, based on the specified order or grouping criteria.
+
+   - **Functionality**: Assigns a unique number to each row, starting from a user-defined value (e.g., 1 or 5001), with optional sorting by one or more columns to define the row order (e.g., `JoinDate` in ascending order). Users can also group rows by specific columns (e.g., `Region`), assigning sequential numbers within each group.
+   - **Ordering and Grouping**: When sorting is specified (e.g., `order_by=[(..Name 'JoinDate' ..Ascending)]`), rows are ordered by the chosen column(s) before numbering, but the output table retains its original row order, with the new column reflecting the sorted sequence. When grouping is used, rows with identical values in the specified column(s) are assigned sequential numbers within each group.
+   - **Use Case**: Add a `Record ID` column to a customer dataset to assign unique identifiers starting from 1, sort by `JoinDate`to assign IDs based on the earliest join date, or group by `Region` to assign sequential IDs within each region (e.g., South, Midwest) for regional analysis.
+   - **Benefit**: Simplifies data indexing and organization, enabling easy reference to rows or groups in downstream operations like joins, filters, or visualizations, with flexible sorting and grouping options.
+   - **Downside**: Requires careful specification of sorting or grouping criteria to achieve the desired numbering sequence, and the output table’s row order may not reflect the sorted sequence used for numbering, potentially requiring additional sorting. Additional steps (e.g., `reorder_columns`) may be needed to adjust column placement.
+
+   ## Supported Features
+
+   - **Customizable Starting Number**: Users can define the starting value for the identifier column (e.g., 1, 5001), allowing flexibility for different indexing needs.
+   - **Sorting-Based Numbering**: Supports sorting by one or more columns (e.g., `JoinDate`, `Score`) in ascending or descending order to determine the sequence of row numbers, with the numbering reflecting the sorted order while preserving the original row order in the output.
+   - **Grouped Numbering**: Allows grouping by one or more columns (e.g., `Region`), assigning sequential numbers within each group for localized indexing.
+   - **Column Placement**: The new identifier column is typically added as the last column but can be repositioned using `reorder_columns` (e.g., to place `Record ID` as the first column).
+   - **Integration with Enso Ecosystem**: Identifier columns integrate seamlessly with other Enso components, such as `filter`, `join`, `sort`, or visualization tools, for further processing or inspection.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect the results of adding identifiers immediately.
+
+   ## Example Workflow
+
+   In this example workflow, a customer dataset with columns `CustomerID`, `FirstName`, `LastName`, `Term`, `JoinDate`, `Region`, and `Score`is processed to add record identifiers:
+
+   - **Basic Row Numbering**: Use `add_row_number "Record ID" 1` to add a `Record ID` column to `node1`, assigning unique sequential numbers starting from 1 (e.g., 1, 2, 3, ...) to each row in the table’s original order.
+   - **Sorted Row Numbering**: Apply `add_row_number "Record ID" 5001 order_by=[(..Name 'JoinDate' ..Ascending)]` to `node1`, assigning numbers starting from 5001 based on the ascending order of `JoinDate` (e.g., earliest date, 2025-01-17, gets 5001), with the output retaining the original row order.
+   - **Reordering Columns**: After adding `Record ID` starting from 1, use `reorder_columns ['Record ID'] ..Before_Other_Columns` to move the `Record ID` column to the first position in the table for better visibility.
+   - **Grouped Numbering**: Use `add_row_number "Grouped Record ID" 1 group_by=['Region']` to assign sequential numbers within each `Region` group (e.g., South: 1, 2; Midwest: 1, 2; Northeast: 1; West: 1), enabling region-specific indexing.
+
+   ## Use Cases
+
+   - **Data Indexing**: Add a `Record ID` column to a dataset for unique row identification, facilitating reference in reports or downstream joins.
+   - **Temporal Analysis**: Assign identifiers based on sorted `JoinDate` values to track customer onboarding order, with the earliest join date receiving the lowest ID.
+   - **Regional Analysis**: Use grouped numbering to assign sequential IDs within groups (e.g., by `Region`) for tracking records within specific categories.
+   - **Data Preparation**: Add identifiers to prepare datasets for merges or joins, ensuring each row has a unique or group-based reference.
+   - **Visualization Preparation**: Create identifier columns to enhance table readability in visualizations, such as placing `Record ID` as the first column for clarity.
+
+   ## Benefits
+
+   The `add_row_number` component in Enso Analytics provides a flexible and intuitive way to add unique or grouped identifiers to datasets, supporting tasks from simple row indexing to sorted or region-specific numbering. Its ability to customize starting numbers, sort rows by columns like `JoinDate`, and group by columns like `Region` makes it versatile for various analytical scenarios. Seamless integration with other Enso components, such as `reorder_columns`, `filter`, or visualization tools (accessible via the eyeball icon), enhances its utility for data preparation and exploration. However, users should ensure proper sorting or grouping criteria to achieve the desired numbering sequence and be aware that the output table retains its original row order, which may require additional sorting for alignment. By simplifying the addition of record identifiers, `add_row_number` empowers users to create organized, analysis-ready datasets in Enso Analytics.
+main =
+    node1 = Table.input [['CustomerID', ['102', '587', '33', '7', '11', '205']], ['FirstName', ['James', 'Olivia', 'Michael', 'Emma', 'William', 'Ava']], ['LastName', ['Johnson', 'Miller', Nothing, 'Anderson  ', 'Taylor', 'Wilson']], ['Term', ['12 months', '12 months', '36 months', '12 months', '60 months', '36 months']], ['JoinDate', ['2025-11-24', '2025-05-21', '2025-02-22', '2025-02-14', '2025-01-17', '2025-04-30']], ['Region', ['South', 'South', 'Midwest', 'Northeast', ' West', 'Midwest']], ['Score', ['24', '5', '18', Nothing, '7', '1']]]
+    ## Add an ID column starting from 1, and then reorder the columns so that it becomes the first column
+    table23 = node1.add_row_number "Record ID" 1
+    ## Add a Record ID starting with an arbitrary number and leave it as the last column. Order the Record IDs by JoinDate. Note: the output is not sorted, but the RecordID reflects the earliest join date as Record 5001, etc.
+    table24 = node1.add_row_number "Record ID" 5001 order_by=[(..Name 'JoinDate' ..Ascending)]
+    table25 = table23.reorder_columns ['Record ID'] ..Before_Other_Columns
+    ## Add a Grouped Record ID column, grouping the ID by the Region column.
+    table26 = node1.add_row_number "Grouped Record ID" 1 group_by=['Region']
+
+
+
+#### METADATA ####
+[[{"index":{"value":6958},"size":{"value":536}},"09d2d3cd-2538-4a31-b0bf-600902eabf5a"],[{"index":{"value":7615},"size":{"value":20}},"7965aa73-eecb-424a-8665-53651c565383"],[{"index":{"value":7615},"size":{"value":32}},"3c75b788-ad44-49a4-9c41-284ec7b814c7"],[{"index":{"value":7615},"size":{"value":34}},"198c2828-8546-43fd-9054-a9eedaff21f2"],[{"index":{"value":7890},"size":{"value":20}},"0583ba7c-b5e3-4ec5-a6b7-2810d6c81b8c"],[{"index":{"value":7890},"size":{"value":32}},"0ab2e41b-efd0-4245-816b-84e53c1b827b"],[{"index":{"value":7890},"size":{"value":37}},"82b5adf8-d601-44b8-a8fa-ebd193e4a49a"],[{"index":{"value":7890},"size":{"value":80}},"c0a6f2c8-65c8-4512-bf3a-2de78907d26c"],[{"index":{"value":7985},"size":{"value":23}},"79d23304-53e3-411a-990e-15fd1ba161cf"],[{"index":{"value":7985},"size":{"value":37}},"f1602566-a56e-4824-917c-cba15fdb42db"],[{"index":{"value":7985},"size":{"value":60}},"39ba5f8b-693d-4c2a-be35-39a713a7cba0"],[{"index":{"value":8137},"size":{"value":20}},"8ffaa60d-5ead-43e9-b990-54a38f16b9d5"],[{"index":{"value":8137},"size":{"value":40}},"335543ce-830d-402e-961f-010f94741d8b"],[{"index":{"value":8137},"size":{"value":42}},"9f20736e-a1c0-40b7-b1d9-3d0afc68c6b6"],[{"index":{"value":8137},"size":{"value":62}},"99d530e6-e0e7-479c-853b-6dcd9ab6cb0e"]]
+{"ide":{"node":{"09d2d3cd-2538-4a31-b0bf-600902eabf5a":{"position":{"vector":[-2204,1606]}},"198c2828-8546-43fd-9054-a9eedaff21f2":{"position":{"vector":[-2204,1338]}},"3c75b788-ad44-49a4-9c41-284ec7b814c7":{"position":{"vector":[-2204,1338]}},"7965aa73-eecb-424a-8665-53651c565383":{"position":{"vector":[-2204,1338]}},"c0a6f2c8-65c8-4512-bf3a-2de78907d26c":{"position":{"vector":[-2204,1009]},"visualization":{"show":true,"width":1514.1450632579288}},"82b5adf8-d601-44b8-a8fa-ebd193e4a49a":{"position":{"vector":[-2204,1009]},"visualization":{"show":true,"width":1514.1450632579288}},"0ab2e41b-efd0-4245-816b-84e53c1b827b":{"position":{"vector":[-2327,913]}},"0583ba7c-b5e3-4ec5-a6b7-2810d6c81b8c":{"position":{"vector":[-2159,985]}},"39ba5f8b-693d-4c2a-be35-39a713a7cba0":{"position":{"vector":[-2204,1261]},"visualization":{"show":true,"width":1502.9617245802237}},"f1602566-a56e-4824-917c-cba15fdb42db":{"position":{"vector":[-2156,1096]}},"79d23304-53e3-411a-990e-15fd1ba161cf":{"position":{"vector":[-2156,1096]}},"99d530e6-e0e7-479c-853b-6dcd9ab6cb0e":{"position":{"vector":[-2204,739]},"visualization":{"show":true,"width":1527.5484200093285}},"9f20736e-a1c0-40b7-b1d9-3d0afc68c6b6":{"position":{"vector":[-2400,685]}},"335543ce-830d-402e-961f-010f94741d8b":{"position":{"vector":[-2400,685]}},"8ffaa60d-5ead-43e9-b990-54a38f16b9d5":{"position":{"vector":[-2400,685]}}},"widget":{"09d2d3cd-2538-4a31-b0bf-600902eabf5a":{"WidgetTableEditor":{"size":{"x":598.701257163728,"y":150}}}},"import":{},"snapshot":"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"}}

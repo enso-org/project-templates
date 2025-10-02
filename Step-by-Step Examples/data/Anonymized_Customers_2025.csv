@@ -1,0 +1,7 @@
+CustomerID,FirstName,LastName,Term,JoinDate,Region,Score,FirstPurchaseDate
+102,James,Johnson,12 months,2025-11-24,South,24.0,2025-11-24
+587,Olivia,Miller,12 months,2025-05-21,South,5.0,2025-05-21
+33,Michael,,36 months,2025-02-22,Midwest,18.0,2025-02-22
+7,Emma, "Anderson  ",12 months,2025-02-14,Northeast,,2025-02-14
+11,William,Taylor,60 months,2025-01-17," West",7.0,2025-01-17
+205,Ava,Wilson,36 months,2025-04-30,Midwest,1.0,2025-04-30

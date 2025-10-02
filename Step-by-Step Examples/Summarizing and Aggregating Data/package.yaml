@@ -1,0 +1,4 @@
+name: Summarizing and Aggregating Data
+namespace: local
+version: 0.0.1
+prefer-local-libraries: true

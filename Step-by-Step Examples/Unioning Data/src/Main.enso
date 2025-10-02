@@ -1,0 +1,99 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Unioning Data in Enso Analytics
+
+   The Union component in Enso Analytics provides a powerful set of tools for vertically stacking multiple tables into a single table, enabling users to consolidate related datasets for analysis, reporting, or visualization. Unlike a join, which combines tables horizontally by matching rows based on specific conditions (e.g., column equality or range overlaps), a union stacks tables vertically, appending rows while aligning columns by name or position, making it ideal for combining datasets with similar structures. This component, centered around the union operation and supported by Table.from_union, offers automatic column matching, positional alignment, and flexible handling of differing column structures, with options to include or exclude extra columns. It is essential for aggregating data from multiple sources or streams within a workflow.
+
+   ## Key Component
+
+   ### union
+
+   The union component stacks rows from multiple tables into a single table based on column alignment rules.
+
+   - **Functionality**: Combines rows from input tables, aligning columns by name (default) or position with match_columns=..By_Position, and handles extra columns using ..In_Any (includes all columns with nulls for missing ones) or ..In_All (includes only columns present in all tables, with a warning for lost data).
+   - **Use Case**: Stack customer data from two streams (e.g., Stream 1 and Stream 2) into one table, merge tables with reordered columns by aligning positionally, or consolidate streams with varying columns while retaining all data.
+   - **Benefit**: Offers a flexible and efficient way to consolidate datasets, accommodating varying structures and ensuring comprehensive data integration.
+   - **Downside**: Misaligned column names or positions can lead to data mismatches; using ..In_All may discard data, requiring careful configuration to avoid unintended loss.
+
+   ### Table.from_union
+
+   The Table.from_union component consolidates a collection of tables into a single unified table, particularly useful for handling multiple tables simultaneously.
+
+   - **Functionality**: Takes a vector of tables and unions them into a single table, aligning columns by name or position (e.g., match_columns=..By_Position), supporting any number of input tables.
+   - **Use Case**: Union a large set of tables (e.g., node3, node2, node1) into one table for streamlined processing.
+   - **Benefit**: Simplifies the consolidation of multiple tables into a single dataset, enhancing scalability for complex workflows.
+   - **Downside**: Requires consistent column alignment or explicit positional matching to avoid data misalignment.
+
+   ## Supported Features
+
+   - **Automatic Column Name Matching**: Aligns columns by name by default, stacking tables with matching column names vertically.
+   - **Positional Alignment**: Use match_columns=..By_Position to stack tables based on column order, ignoring names.
+   - **Flexible Column Handling**: Use ..In_Any to include all columns from any table, filling missing values with Nothing (null), or ..In_All to include only common columns, with a warning for data loss.
+   - **Column Reordering**: Combine with reorder_columns to adjust column order for positional matching.
+   - **Multi-Table Union**: Use Table.from_union to process and stack multiple tables in one operation.
+   - **Integration with Enso Ecosystem**: Unioned tables integrate seamlessly with components like filter, join, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect unioned data immediately.
+
+   ## Example Workflow
+
+   In this example workflow, multiple tables are combined using the union and Table.from_union components:
+
+   - **Automatic Configuration by Column Name**: Use union to stack node3 (Stream 1) and node2 (Stream 2) tables, both with columns Stream, CustomerID, FirstName, and LastName, aligning by name to create a single table.
+   - **Positional Union**: Use union with match_columns=..By_Position to stack table1 (from the previous union) with node1 (columns Column 1, Column 2, Column 3, Column 4), aligning by position.
+   - **Reordered Positional Union**: Use reorder_columns on node4 to match the order of table2 (e.g., Column 4, Column 3, Column 2, Column 1), then use union with match_columns=..By_Position to stack into table4.
+   - **Union with Extra Columns (In_Any)**: Use union ..In_Any to stack table4 with node5 (which includes an extra Gender column), adding Gender to the result with Nothing for rows from tables without it.
+   - **Union without Extra Columns (In_All)**: Use union ..In_All to stack table4 with node5, limiting the output to columns common to all tables (e.g., excluding Gender), with a warning for lost data.
+   - **Multi-Table Union**: Use Table.from_union with match_columns=..By_Position to stack node3, node2, and node1into a single table, handling multiple inputs efficiently.
+
+   ## Use Cases
+
+   - **Consolidating Customer Streams**: Stack multiple customer data streams with matching column names (e.g., CustomerID, FirstName) into a single table for unified analysis.
+   - **Merging Positionally Aligned Data**: Combine tables with differing column names but consistent order (e.g., Column 1, Column 2) using positional alignment.
+   - **Handling Variable Structures**: Use ..In_Any to merge tables with extra columns (e.g., adding Gender with nulls) for comprehensive data retention.
+   - **Standardizing Common Data**: Use ..In_All to focus on shared columns across tables, ideal for standardized reporting despite potential data loss.
+   - **Batch Table Consolidation**: Use Table.from_union to combine a large number of tables into one dataset for scalable processing.
+   - **Data Reconciliation**: Reorder columns with reorder_columns to align structures before unioning, ensuring accurate stacking of heterogeneous datasets.
+
+   ## Benefits
+
+   The Union component in Enso Analytics provides a flexible and efficient approach to vertically stacking tables, distinct from joins by appending rows rather than matching them, supporting automatic name-based matching, positional alignment, and multi-table consolidation. The union component’s ability to manage varying table structures with ..In_Anyand ..In_All ensures robust data aggregation, while Table.from_union enhances scalability for large datasets. Its integration with other Enso components, such as filter, join, or visualization tools (accessible via the eyeball icon), allows for immediate inspection and further processing. By streamlining data unification, the Union component empowers users to create integrated, analysis-ready datasets in Enso Analytics.
+main =
+    node2 = Table.input [['Stream', ['2', '2', '2', '2']], ['CustomerID', ['5', '6', '7', '8']], ['FirstName', ['Ethan', 'Ava', 'Noah', 'Mia']], ['LastName', ['Garcia', 'Kim', 'Blom', 'Johnson']]]
+    node3 = Table.input [['Stream', ['1', '1', '1', '1']], ['CustomerID', ['1', '2', '3', '4']], ['FirstName', ['James', 'Sophia', 'Liam', 'Olivia']], ['LastName', ['Hart', 'Lopez', 'Nguyen', 'Brown']]]
+    ## Automatic Configuration by Column Name - Union Stacks the two streams on top of each other
+    table1 = node3.union node2
+    node1 = Table.input [['Column 1', ['3', '3', '3', '3']], ['Column 2', ['9', '10', '11', '12']], ['Column 3', ['Bill', 'Richard', 'Clay', 'JP']], ['Column 4', ['Nye', 'Delzer', 'Travis', 'Turley']]]
+    table2 = table1.union node1 match_columns=..By_Position
+    node4 = Table.input [['Column 1', ['Harding', 'Dunkerley', 'Riley', 'Brodacka']], ['Column 2', ['Ned', 'James', 'Adam', 'Sylwia']], ['Column 3', ['13', '14', '15', '16']], ['Column 4', ['4', '4', '4', '4']]]
+    table3 = node4.reorder_columns ['Column 4', 'Column 3', 'Column 2', 'Column 1']
+    ## Reorder or rename columns to match the structure above if neither the order nor the names are the same
+    table4 = table2.union table3 match_columns=..By_Position
+    node5 = Table.input [['Stream', ['5', '5', '5', '5']], ['CustomerID', ['17', '18', '19', '20']], ['FirstName', ['Lotfi', 'Jane', 'Steve', 'Cameron']], ['LastName', ['Belgrade', 'Smith', 'Walden', 'Epstein']], ['Gender', ['M', 'F', 'M', 'F']]]
+    ## Add an extra column - the last stream has a Gender column not found in the other streams. By setting columns_to_keep to In_Any, if there are additional columns, they are added. Streams without this column name will have a value of Nothing (null) 
+    table5 = table4.union node5 ..In_Any
+    ## Do not add extra column s- the last stream has a Gender column not found in the other streams By setting colums._to_keep to In_All, only the subset of columns present in all streams will appear in the output. A warning is set to indicate data is lost in this operation.
+    table6 = table4.union node5 ..In_All
+    ## Alternate Method to Union Tables: If you have a large number of tables to union, you can use Table.from_union. You can union as many tables as you wish at the same time. 
+    any1 = Table.from_union [node3, node2, node1] match_columns=..By_Position
+
+
+
+#### METADATA ####
+[[{"index":{"value":7207},"size":{"value":184}},"6ffcfc43-a02c-4611-bea6-f8bfbf1e6159"],[{"index":{"value":7404},"size":{"value":190}},"259a04cf-119c-4f03-80c9-49c07a59d03b"],[{"index":{"value":7706},"size":{"value":11}},"698daaf8-4bc1-411c-b281-1bc739683e28"],[{"index":{"value":7706},"size":{"value":17}},"97576063-77ce-470d-a193-b905e08e9b47"],[{"index":{"value":7736},"size":{"value":189}},"14b2c4ca-c82b-417f-8f3f-12bf22ffe437"],[{"index":{"value":7939},"size":{"value":12}},"ee461eef-f855-4ed9-a148-c5fdde2a1c0c"],[{"index":{"value":7939},"size":{"value":18}},"f44273a9-7938-4b2f-b00e-8850cb999ee2"],[{"index":{"value":7939},"size":{"value":46}},"1493e5b3-6441-476f-9227-5ef79d9f928f"],[{"index":{"value":7998},"size":{"value":199}},"b3734711-c438-436b-a005-e8f6ed3bbf12"],[{"index":{"value":8211},"size":{"value":21}},"52c9e7a9-2836-4641-9397-b0f83b715a79"],[{"index":{"value":8211},"size":{"value":70}},"b2490a56-53cb-4818-8c16-941e6a091617"],[{"index":{"value":8405},"size":{"value":12}},"571b76b2-e170-4cb1-ba21-ea9b224921ae"],[{"index":{"value":8405},"size":{"value":19}},"d1129457-6205-436a-b3ca-dd34468ee51b"],[{"index":{"value":8405},"size":{"value":47}},"aede4abb-0fa9-41aa-a487-1216c0ddf942"],[{"index":{"value":8465},"size":{"value":234}},"42caa0ff-27d8-4183-91e8-be713e0c9aed"],[{"index":{"value":8967},"size":{"value":12}},"ff1ddbab-fc7f-47aa-a6ae-0a36cbd75aa6"],[{"index":{"value":8967},"size":{"value":18}},"b5306b71-2296-495c-97c9-14c3a4befdf0"],[{"index":{"value":8967},"size":{"value":27}},"05cb0c73-b4f9-43a0-8582-54cc0fdd4989"],[{"index":{"value":9285},"size":{"value":18}},"16f3bb42-e15a-4831-a02b-75bd506b312c"],[{"index":{"value":9285},"size":{"value":27}},"57091403-7894-4073-90ba-73e82d784f64"],[{"index":{"value":9502},"size":{"value":16}},"7c8f48d2-be9b-4a05-8824-428c23e50e26"],[{"index":{"value":9502},"size":{"value":38}},"cac09bf5-1327-48fd-9eb9-e7a9260e1846"],[{"index":{"value":9502},"size":{"value":66}},"17beb88a-d9f9-4b39-b227-2c2a05c7d2aa"]]
+{"ide":{"node":{"6ffcfc43-a02c-4611-bea6-f8bfbf1e6159":{"position":{"vector":[-188,-616]}},"259a04cf-119c-4f03-80c9-49c07a59d03b":{"position":{"vector":[-261,-418]}},"97576063-77ce-470d-a193-b905e08e9b47":{"position":{"vector":[-261,-894]},"visualization":{"show":true,"width":908.2394829099301,"height":276.97954293973487}},"698daaf8-4bc1-411c-b281-1bc739683e28":{"position":{"vector":[-259,-1177]}},"14b2c4ca-c82b-417f-8f3f-12bf22ffe437":{"position":{"vector":[103,-1330]}},"1493e5b3-6441-476f-9227-5ef79d9f928f":{"position":{"vector":[-261,-1641]},"visualization":{"show":true,"width":768.0531166121087,"height":343.58474828175855}},"f44273a9-7938-4b2f-b00e-8850cb999ee2":{"position":{"vector":[-281,-1641]}},"ee461eef-f855-4ed9-a148-c5fdde2a1c0c":{"position":{"vector":[-281,-1641]}},"b3734711-c438-436b-a005-e8f6ed3bbf12":{"position":{"vector":[218,-2097]}},"b2490a56-53cb-4818-8c16-941e6a091617":{"position":{"vector":[218,-2295]}},"52c9e7a9-2836-4641-9397-b0f83b715a79":{"position":{"vector":[218,-2295]}},"aede4abb-0fa9-41aa-a487-1216c0ddf942":{"position":{"vector":[-261,-2490]}},"d1129457-6205-436a-b3ca-dd34468ee51b":{"position":{"vector":[-261,-2490]}},"571b76b2-e170-4cb1-ba21-ea9b224921ae":{"position":{"vector":[-261,-2490]}},"42caa0ff-27d8-4183-91e8-be713e0c9aed":{"position":{"vector":[27,-2588]}},"05cb0c73-b4f9-43a0-8582-54cc0fdd4989":{"position":{"vector":[-261,-2867]},"visualization":{"show":true,"width":1175.924602296505,"height":496.5090218357714}},"b5306b71-2296-495c-97c9-14c3a4befdf0":{"position":{"vector":[-228,-2867]},"visualization":{"show":true,"width":1175.924602296505,"height":496.5090218357714}},"ff1ddbab-fc7f-47aa-a6ae-0a36cbd75aa6":{"position":{"vector":[-228,-2867]}},"57091403-7894-4073-90ba-73e82d784f64":{"position":{"vector":[-261,-3619]},"visualization":{"show":true,"width":1175.924602296505,"height":496.5090218357714}},"16f3bb42-e15a-4831-a02b-75bd506b312c":{"position":{"vector":[-203,-3621]},"visualization":{"show":true,"width":1175.924602296505,"height":496.5090218357714}},"17beb88a-d9f9-4b39-b227-2c2a05c7d2aa":{"position":{"vector":[952,-1763]},"visualization":{"show":true}},"cac09bf5-1327-48fd-9eb9-e7a9260e1846":{"position":{"vector":[1268,-1659]},"visualization":{"show":true}},"7c8f48d2-be9b-4a05-8824-428c23e50e26":{"position":{"vector":[1811,-672]}}},"widget":{"6ffcfc43-a02c-4611-bea6-f8bfbf1e6159":{"WidgetTableEditor":{"size":{"x":872.1272401774354,"y":150}}},"259a04cf-119c-4f03-80c9-49c07a59d03b":{"WidgetTableEditor":{"size":{"x":705.580617679497,"y":150}}},"14b2c4ca-c82b-417f-8f3f-12bf22ffe437":{"WidgetTableEditor":{"size":{"x":671.2181335013023,"y":150}}},"b3734711-c438-436b-a005-e8f6ed3bbf12":{"WidgetTableEditor":{"size":{"x":536.3396781408453,"y":150}}},"42caa0ff-27d8-4183-91e8-be713e0c9aed":{"WidgetTableEditor":{"size":{"x":831.689855683601,"y":150}}}},"import":{},"snapshot":"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"}}
