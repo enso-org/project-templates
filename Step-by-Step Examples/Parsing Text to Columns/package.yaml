@@ -1,4 +1,0 @@
-name: Parsing Text to Columns
-namespace: local
-version: 0.0.1
-prefer-local-libraries: true

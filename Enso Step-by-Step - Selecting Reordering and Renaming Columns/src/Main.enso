@@ -1,0 +1,155 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+## ---
+   icon: group
+   ---
+   Add 2 date columns that have values close to today
+add_date_columns node1 =
+    date4 = Date.today
+    date6 = date4.date_add 8 ..Day
+    node2 = date4.up_to date6
+    table12 = node2.to_table
+    column1 = table12.get 'Date'
+    vector1 = Random.items column1 count=8
+    table13 = table12.zip vector1
+    table14 = table13.rename_columns [(Pair.Value 'Date' 'JoinDate'), (Pair.Value 'Value' 'PurchaseDate')]
+    table15 = node1.zip table14
+    table15
+
+## ![One Component Example](/images/step-by-step-example.png)
+   # Selecting, Reordering and Renaming Columns in Enso Analytics
+
+   The `select` functionality in Enso Analytics encompasses a suite of components designed to refine, reorganize, and rename table structures by selecting and reordering columns, enhancing dataset management for analysis and visualization. These components allow users to streamline datasets by focusing on relevant columns, reordering them for better accessibility, and renaming them for clarity, optimizing performance and usability early in workflows. Note that data type conversion will be covered in a separate example.
+
+   ## Key Components
+
+   ### select_columns
+
+   The `select_columns` component allows users to create a new table containing only a specified subset of columns from the input table or reorder them, ideal for reducing dataset size and improving structure.
+
+   - **Functionality**: Selects a user-defined list of columns, discarding all others, or reorders them based on the specified order, with an option to apply reordering by clicking the "reorder" button.
+   - **Use Case**: Select and reorder `CustomerID`, `LastName`, and `FirstName` to prioritize key identifiers, or select all numeric columns (e.g., `Visits`, `Spend`) for focused analysis.
+   - **Benefit**: Enhances workflow efficiency by removing irrelevant columns and organizing data for better readability and performance.
+
+   ### rename_columns
+
+   The `rename_columns` component allows users to rename one or more columns in a table, either by specifying new names directly or using a mapping table.
+
+   - **Functionality**: Renames columns based on a provided list of old-to-new name pairs or a dynamic table mapping original names to new ones. This can also be used programmatically to add prefixes or modify names based on expressions.
+   - **Use Case**: Rename `CustomerID` to `Customer ID`, `Spend` to `Total Spent`, or programmatically add a "Customer " prefix to specific columns for clarity.
+   - **Benefit**: Improves dataset readability and consistency by aligning column names with analytical or reporting conventions.
+
+   ### reorder_columns
+
+   The `reorder_columns` component reorders columns in a table to place specified columns in a desired position, such as at the beginning of the table.
+
+   - **Functionality**: Moves selected columns to a specified position (e.g., before other columns) while maintaining the relative order of unspecified columns.
+   - **Use Case**: Reorder columns to place `Customer ID`, `Total Visits`, `Total Spent`, and `Store Number` as the leftmost columns for easier data interpretation.
+   - **Benefit**: Improves the visual and functional organization of tables, making key data more accessible in reports or visualizations.
+
+   ### sort_columns
+
+   The `sort_columns` component arranges columns in a table based on their names, with options for ascending or descending order.
+
+   - **Functionality**: Sorts column names alphabetically or based on a custom ordering (e.g., after a `cross_tab` operation where columns represent years).
+   - **Use Case**: Sort columns in ascending order to organize a table for consistency, especially after operations that generate dynamically named columns.
+   - **Benefit**: Enhances dataset structure, particularly for tables with many columns or dynamically generated column names.
+
+   ### remove_columns
+
+   The `remove_columns` component excludes specified columns from a table, creating a new table with the remaining columns.
+
+   - **Functionality**: Removes a user-defined list of columns, retaining all others in their original order.
+   - **Use Case**: Remove `Plus4` to exclude less critical data, simplifying the dataset for analysis.
+   - **Benefit**: Streamlines datasets by eliminating unnecessary columns, improving performance and focus.
+
+   ## Supported Features
+
+   - **Column Selection**: Use `select_columns` to choose specific columns or filter by type (e.g., `..By_Type ..Float`) or regex (e.g., `^.*Name` for columns ending in "Name").
+   - **Column Reordering**: Apply `reorder_columns` or use the "reorder" button in `select_columns` to adjust column positions, with drag-and-drop support.
+   - **Column Renaming**: Use `rename_columns` with direct pairs, mapping tables, or regex patterns to modify names programmatically.
+   - **Column Sorting**: Use `sort_columns` to alphabetically order columns, enhancing consistency.
+   - **Column Removal**: Use `remove_columns` to exclude specific columns based on name.
+   - **Integration with Enso Ecosystem**: Transformed tables integrate seamlessly with components like `filter`, `join`, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows users to inspect changes immediately.
+
+   ## Example Workflow
+
+   In this example workflow, a table with columns like `CustomerID`, `FirstName`, `LastName`, `Spend`, `Visits`, and others is processed using the select, reorder, and rename components:
+
+   - **Simple Selection**: Use `select_columns` to retain only `CustomerID`, `FirstName`, and `LastName`, reducing the dataset for faster processing.
+   - **Metadata Inspection**: Use `column_info` to display metadata, including column names, data types, summary statistics, and min/max values.
+   - **Reordering and Renaming Columns**: Use `rename_columns` to rename `CustomerID` to `Customer ID`, `Spend` to `Total Spent`, `Visits` to `Total Visits`, and `StoreNumber` to `Store Number`, then apply `reorder_columns` to position these as the leftmost columns.
+   - **Sorting Columns**: Apply `sort_columns` to arrange all columns alphabetically in ascending order for consistent presentation.
+   - **Programmatic Prefix Addition**: Extract column names with `column_info`, filter for specific columns (e.g., `CustomerID`, `StoreNumber`, `Customer Segment`, `Latitude`, `Longitude`), create a mapping table with a "Customer " prefix using `set`, and use `rename_columns` to apply the changes.
+   - **Alternate Regex Renaming**: Use `rename_columns` with a regex `^(.*)$` to add a "Customer " prefix to all column names, or a targeted regex `^(FirstName|LastName|Address|City|State|ZIP|Plus4|Latitude|Longitude)$` to apply the prefix selectively.
+   - **Numeric Column Selection**: Use `select_columns` with `..By_Type ..Float` and `..By_Type ..Integer` to isolate numeric columns like `Visits` and `Spend`.
+   - **Regex-Based Selection**: Use `select_columns` with a regex `^.*Name` to select columns ending in "Name" (e.g., `FirstName`, `LastName`).
+   - **Column Removal**: Use `remove_columns` to exclude `Plus4`, simplifying the dataset.
+   - **Select and Reorder**: Use `select_columns` with `['CustomerID', 'LastName', 'FirstName']` and the "reorder" button (or drag-and-drop handles) to reorder columns, applying the new order if selected.
+   - **Adding Date Columns**: Use a sub-flow (`add_date_columns`) to generate a date range close to today (e.g., 8 days from September 25, 2025), convert it to a table, sample 8 dates, rename columns to `JoinDate` and `PurchaseDate`, and zip with the input dataset to add these columns for temporal context.
+
+   ## Use Cases
+
+   - **Dataset Simplification**: Use `select_columns` to focus on a subset of columns, such as customer identifiers and names, to streamline analysis or reporting.
+   - **Metadata Review**: Use `column_info` to inspect column metadata for informed selection or reordering decisions.
+   - **Improving Readability**: Rename columns with `rename_columns` to make names more descriptive or add prefixes for clarity in large datasets.
+   - **Organizing Tables**: Reorder columns with `reorder_columns` or `select_columns` with reordering to prioritize key fields.
+   - **Consistent Presentation**: Sort columns with `sort_columns` for uniform structure after dynamic operations.
+   - **Targeted Data Focus**: Remove non-essential columns with `remove_columns` to enhance focus and performance.
+   - **Numeric Data Isolation**: Use `select_columns` with type filters to isolate numeric columns for calculations.
+   - **Pattern-Based Selection**: Use regex in `select_columns` to select columns by pattern (e.g., ending in "Name").
+   - **Temporal Data Enrichment**: Add contextual date columns (e.g., `JoinDate`, `PurchaseDate`) using a separate `zip`operation to support time-based analysis.
+
+   ## Benefits
+
+   The select, reorder, and rename components in Enso Analytics provide a comprehensive toolkit for refining table structures and enhancing dataset organization. By enabling users to select, reorder, and rename columns with precision, these components streamline data preparation and improve workflow efficiency, excluding data type conversion which is covered separately. Their integration with other Enso components, such as visualization tools (accessible via the eyeball icon), allows users to inspect changes instantly. The addition of temporal context via `add_date_columns` further enhances analytical capabilities. Whether simplifying datasets, organizing data for readability, or adding temporal context, these components empower users to create clean, well-structured datasets tailored to their analytical needs in Enso Analytics.
+main =
+    ## When reading delimted files, Enso will automatically convert text to other data types where possible. Notice the ZIP, Plus4, StoreNumber Latitude and Longitude were converted to Integer and Float. Dates that are ISO formatted yyyy-MM-dd are also automatically converted.  Leading zeros on numeric columns will not be automatically converted. 
+    any1 = Data.read 'data/customers.csv'
+    ## Alternate Method to Rename Specific Columns using a regular expression. The regular expression gets the field name only if it is in the list provided, and updates with a new column name that has the prefix 'Customer'
+    table7 = any1.rename_columns [(Pair.Value (regex '^(FirstName|LastName|Address|City|State|ZIP|Plus4|Latitude|Longitude)$') 'Customer $1')]
+    ## Alternate Method to Rename All Columns using a regular expression. The regular expression gets the field name, and updates with a new column name that has the prefix 'Customer'
+    table6 = any1.rename_columns [(Pair.Value (regex '^(.*)$') 'Customer $1')]
+    ## Add a prefix to column names programatically. Get the list of column names. Select the ones you want to rename and use an expression to create a 2 column table that has the original name and the new column name and pass this into the column_map argument.
+    vector1 = any1.column_info
+    vector2 = vector1.filter 'Column' (..Is_In ["CustomerID", "StoreNumber", "Customer Segment", "PurchaseDate"] ..Remove)
+    table3 = vector2.set (expr '"Customer " + [Column]') "New Column Name"
+    ## Keep only the Original and New Name columns
+    table1 = table3.select_columns ['Column', 'New Column Name']
+    table4 = any1.rename_columns table1
+    ## Sort Column by name: Enso Step-by-Step - additional options are unlocked by specifying the text_ordering. We don't have numeric columns in this case, but after a cross_tab component where the columns become the year, this is very powerful. 
+    table16 = any1.sort_columns ..Ascending (..Default True)
+    ## Reorder and Rename Columns: reordering of columns can also be done in the select_columns component. In this case, since we simply wanted to move 4 columns to be the left most columns, reorder_columns is the fastest approach
+    table13 = any1.rename_columns [(Pair.Value 'CustomerID' 'Customer ID'), (Pair.Value 'Spend' 'Total Spent'), (Pair.Value 'Visits' 'Total Visits'), (Pair.Value 'StoreNumber' 'Store Number')]
+    table14 = table13.reorder_columns ['Customer ID', 'Total Visits', 'Total Spent', 'Store Number'] ..Before_Other_Columns
+    ## Select and reorder columns:  Select columns in the order you require, or drag them to reorder using the handle to the left of the column hames below, and click the reorder button. If the reorder button is not selected, columns will be returned in the order from the original table, regardless of the order you select them.
+    table10 = any1.select_columns ['CustomerID', 'LastName', 'FirstName'] True
+    ## Remove columns instead of selecting columns. The example below returns all columns except Plus4
+    table9 = any1.remove_columns ['Plus4']
+    ## Select Columns using a regular expression. The example below finds all columns that end with the word Name.
+    table8 = any1.select_columns [(regex '^.*Name')]
+    ## Select Numeric Columns
+    table5 = any1.select_columns [(..By_Type ..Float), (..By_Type ..Integer)]
+    ## Simple Select: Only the first 3 columns are selected. Removing columns early in your workflows will make them run faster!
+    table2 = any1.select_columns ['CustomerID', 'FirstName', 'LastName']
+    ## column_info shows metadata including column names, data types, summary statistics and min & max values. 
+    table11 = any1.column_info
+
+
+
+#### METADATA ####
+[[{"index":{"value":446},"size":{"value":5}},"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5"],[{"index":{"value":466},"size":{"value":10}},"646985dc-ac5f-4821-8d5a-8861bf904ff8"],[{"index":{"value":489},"size":{"value":22}},"8f6cef0d-c331-4557-8ba9-adb612b4329c"],[{"index":{"value":524},"size":{"value":17}},"3350d1b6-464f-450d-8871-909cdfbc7c26"],[{"index":{"value":556},"size":{"value":14}},"3addd758-8a24-4e7f-aced-70da03f75997"],[{"index":{"value":585},"size":{"value":18}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1"],[{"index":{"value":618},"size":{"value":28}},"01af9746-4b49-4aaf-99a6-4a065f7f1974"],[{"index":{"value":661},"size":{"value":19}},"88cd9951-89f4-47fb-b178-eaca2120da87"],[{"index":{"value":695},"size":{"value":92}},"dd996f45-9436-494d-a22a-9ff74dba588d"],[{"index":{"value":802},"size":{"value":9}},"6c11c15f-71fa-4c52-af14-38b2451209e0"],[{"index":{"value":802},"size":{"value":17}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62"],[{"index":{"value":824},"size":{"value":7}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd"],[{"index":{"value":10459},"size":{"value":30}},"e6a68dc3-298e-4630-a3bb-a5ed3d116f51"],[{"index":{"value":10727},"size":{"value":129}},"2062357b-c4c1-4de2-aa02-e1d290542522"],[{"index":{"value":11054},"size":{"value":19}},"e8a4be48-2885-42de-b29d-0f5abc73659b"],[{"index":{"value":11054},"size":{"value":65}},"a620a0fd-a1f8-46c3-bdcd-7ce975bb85fb"],[{"index":{"value":11396},"size":{"value":16}},"cffb07b9-c2b9-4a21-bf15-176eb3b9c684"],[{"index":{"value":11427},"size":{"value":14}},"a7268bd5-e607-42a2-8ee9-51c71234791e"],[{"index":{"value":11427},"size":{"value":108}},"791bc5f7-29c7-48a7-9d54-c7b045793d79"],[{"index":{"value":11549},"size":{"value":11}},"46ef9b8d-0305-41ad-8c72-fe4d3a2cf406"],[{"index":{"value":11549},"size":{"value":43}},"eb779f96-e0cb-4cae-852b-b9ec60cd7394"],[{"index":{"value":11549},"size":{"value":61}},"dd1e9862-379f-41eb-a5a5-5a3aac8387ea"],[{"index":{"value":11675},"size":{"value":21}},"4facc38e-1b77-4417-83ff-b99e4fd0c4f4"],[{"index":{"value":11675},"size":{"value":51}},"707a6634-1bea-470c-8437-f6bd45508b45"],[{"index":{"value":11740},"size":{"value":19}},"b3303d12-aea7-43ea-9fea-2019f3763283"],[{"index":{"value":11740},"size":{"value":26}},"8acd1de9-1667-4b2c-8c43-57036b8f1ad4"],[{"index":{"value":12009},"size":{"value":17}},"492ac708-bfa6-4849-a15d-324b23d164dd"],[{"index":{"value":12009},"size":{"value":29}},"691c3752-c4f5-4ca6-b2fe-fdc011cfab4d"],[{"index":{"value":12009},"size":{"value":46}},"0b21cfa5-5f5f-4a0e-8993-3b2ebcdbff22"],[{"index":{"value":12301},"size":{"value":19}},"5fb5de09-3576-4155-aefe-b1638a9ab512"],[{"index":{"value":12301},"size":{"value":178}},"6c7a2eb2-4240-4cb9-ac17-179cf49c6b67"],[{"index":{"value":12494},"size":{"value":23}},"f298ec8b-542e-40e5-8aad-bfd974e20ad6"],[{"index":{"value":12494},"size":{"value":86}},"ef28473b-1a41-48ec-a15b-877a15ef7dbe"],[{"index":{"value":12494},"size":{"value":109}},"51baf927-cf37-41d8-a17e-3b25a8fc318e"],[{"index":{"value":12948},"size":{"value":59}},"df2a2e4a-cb55-4c0f-b7ee-7a446a4ccf27"],[{"index":{"value":12948},"size":{"value":64}},"5ad50a84-623a-4bb0-ae27-82c427d02131"],[{"index":{"value":13129},"size":{"value":19}},"2061ad1b-e12c-48a4-93b4-c59787de7f76"],[{"index":{"value":13129},"size":{"value":29}},"ce4ffc5b-59fb-4c63-841d-8ca1d532c3c5"],[{"index":{"value":13287},"size":{"value":19}},"607ae48e-1a9b-4e62-a8de-04f0646e701e"],[{"index":{"value":13287},"size":{"value":39}},"a503ff82-c50e-4747-be80-95bfc37200c5"],[{"index":{"value":13370},"size":{"value":19}},"54183939-2ade-488a-81c6-c2358a85dcb9"],[{"index":{"value":13370},"size":{"value":64}},"7064054f-6e54-464f-8571-63e730632ff0"],[{"index":{"value":13577},"size":{"value":19}},"f1d22ca0-0102-4795-9e3c-99dab12c4834"],[{"index":{"value":13577},"size":{"value":59}},"9407d952-aa10-49ae-bc54-e11eb9ee4f9b"],[{"index":{"value":13763},"size":{"value":16}},"9e4ee7a0-47c7-44f1-b3f7-435733346450"]]
+{"ide":{"node":{"7a6b6a07-a6ed-48d8-bb23-d7028be09ba5":{"position":{"vector":[-1024,721]}},"646985dc-ac5f-4821-8d5a-8861bf904ff8":{"position":{"vector":[-876,649]}},"8f6cef0d-c331-4557-8ba9-adb612b4329c":{"position":{"vector":[-765,514]}},"3350d1b6-464f-450d-8871-909cdfbc7c26":{"position":{"vector":[-848,421]}},"3addd758-8a24-4e7f-aced-70da03f75997":{"position":{"vector":[-826,349]},"visualization":{"show":true,"width":502.81198641202724,"height":264.3352446391665}},"b1d9d53e-247f-4bbe-9147-1b463b73c0b1":{"position":{"vector":[-683,13]}},"01af9746-4b49-4aaf-99a6-4a065f7f1974":{"position":{"vector":[-592,-50]},"visualization":{"show":true,"height":326.72607421875}},"88cd9951-89f4-47fb-b178-eaca2120da87":{"position":{"vector":[-814,-456]}},"dd996f45-9436-494d-a22a-9ff74dba588d":{"position":{"vector":[-814,-537]}},"8624f581-3bdf-4d2c-9cfb-9573778e0f62":{"position":{"vector":[-1024,-642]}},"6c11c15f-71fa-4c52-af14-38b2451209e0":{"position":{"vector":[-1024,-642]}},"a0e973bd-a5d6-44e9-9b5d-d935cdc975bd":{"position":{"vector":[-1024,-714]}},"e6a68dc3-298e-4630-a3bb-a5ed3d116f51":{"position":{"vector":[-233,1360]},"visualization":{"show":true,"width":2192.9837594648375}},"2062357b-c4c1-4de2-aa02-e1d290542522":{"position":{"vector":[771,-1062]},"visualization":{"show":true,"width":1388.9250517978012}},"a620a0fd-a1f8-46c3-bdcd-7ce975bb85fb":{"position":{"vector":[771,-911]}},"e8a4be48-2885-42de-b29d-0f5abc73659b":{"position":{"vector":[626,-641]}},"cffb07b9-c2b9-4a21-bf15-176eb3b9c684":{"position":{"vector":[935,-48]},"visualization":{"show":false,"width":674.101706116587,"height":308.95270416508157}},"791bc5f7-29c7-48a7-9d54-c7b045793d79":{"position":{"vector":[935,-120]}},"a7268bd5-e607-42a2-8ee9-51c71234791e":{"position":{"vector":[1027,-126]}},"dd1e9862-379f-41eb-a5a5-5a3aac8387ea":{"position":{"vector":[935,-192]},"visualization":{"show":true}},"eb779f96-e0cb-4cae-852b-b9ec60cd7394":{"position":{"vector":[1027,-608]}},"46ef9b8d-0305-41ad-8c72-fe4d3a2cf406":{"position":{"vector":[1027,-608]}},"707a6634-1bea-470c-8437-f6bd45508b45":{"position":{"vector":[935,-414]}},"4facc38e-1b77-4417-83ff-b99e4fd0c4f4":{"position":{"vector":[1064,-108]}},"8acd1de9-1667-4b2c-8c43-57036b8f1ad4":{"position":{"vector":[771,-486]},"visualization":{"show":true,"width":1457.967099860713,"height":300.15886910318886}},"b3303d12-aea7-43ea-9fea-2019f3763283":{"position":{"vector":[789,-554]}},"0b21cfa5-5f5f-4a0e-8993-3b2ebcdbff22":{"position":{"vector":[771,216]},"visualization":{"show":true,"width":2035.8110081888244}},"691c3752-c4f5-4ca6-b2fe-fdc011cfab4d":{"position":{"vector":[782,416]}},"492ac708-bfa6-4849-a15d-324b23d164dd":{"position":{"vector":[782,416]}},"6c7a2eb2-4240-4cb9-ac17-179cf49c6b67":{"position":{"vector":[771,540]}},"5fb5de09-3576-4155-aefe-b1638a9ab512":{"position":{"vector":[821,812]}},"51baf927-cf37-41d8-a17e-3b25a8fc318e":{"position":{"vector":[771,468]},"visualization":{"show":true,"width":1209.1206901786566,"height":145.78721855228196}},"ef28473b-1a41-48ec-a15b-877a15ef7dbe":{"position":{"vector":[821,732]}},"f298ec8b-542e-40e5-8aad-bfd974e20ad6":{"position":{"vector":[821,731]}},"5ad50a84-623a-4bb0-ae27-82c427d02131":{"position":{"vector":[771,682]}},"df2a2e4a-cb55-4c0f-b7ee-7a446a4ccf27":{"position":{"vector":[771,864]}},"ce4ffc5b-59fb-4c63-841d-8ca1d532c3c5":{"position":{"vector":[771,793]}},"2061ad1b-e12c-48a4-93b4-c59787de7f76":{"position":{"vector":[771,975]}},"a503ff82-c50e-4747-be80-95bfc37200c5":{"position":{"vector":[771,865]}},"607ae48e-1a9b-4e62-a8de-04f0646e701e":{"position":{"vector":[855,992]}},"7064054f-6e54-464f-8571-63e730632ff0":{"position":{"vector":[771,937]}},"54183939-2ade-488a-81c6-c2358a85dcb9":{"position":{"vector":[824,1105]}},"9407d952-aa10-49ae-bc54-e11eb9ee4f9b":{"position":{"vector":[771,1028]}},"f1d22ca0-0102-4795-9e3c-99dab12c4834":{"position":{"vector":[829,854]}},"9e4ee7a0-47c7-44f1-b3f7-435733346450":{"position":{"vector":[-233,1045]},"visualization":{"show":true,"width":878.2231443075985,"height":592.1013762169631}}},"widget":{},"import":{},"snapshot":"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"}}
