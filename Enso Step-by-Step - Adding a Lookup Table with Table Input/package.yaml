@@ -1,0 +1,4 @@
+name: Enso Step-by-Step - Adding a Lookup Table with Table Input
+namespace: local
+version: 0.0.1
+prefer-local-libraries: 'true'

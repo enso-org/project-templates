@@ -1,0 +1,99 @@
+President Number,VP Number,Pres or VP,Name,Start_Date,End_Date
+1,,President,George Washington,1789-04-30,1797-03-04
+1,1,Vice President,John Adams,1789-04-30,1797-03-04
+2,,President,John Adams,1797-03-04,1801-03-04
+2,1,Vice President,Thomas Jefferson,1797-03-04,1801-03-04
+3,,President,Thomas Jefferson,1801-03-04,1809-03-04
+3,1,Vice President,Aaron Burr,1801-03-04,1805-03-04
+3,2,Vice President,George Clinton,1805-03-04,1809-03-04
+4,,President,James Madison,1809-03-04,1817-03-04
+4,1,Vice President,Elbridge Gerry,1813-03-04,1814-11-23
+5,,President,James Monroe,1817-03-04,1825-03-04
+5,1,Vice President,Daniel D. Tompkins,1817-03-04,1825-03-04
+6,,President,John Quincy Adams,1825-03-04,1829-03-04
+6,1,Vice President,John C. Calhoun,1825-03-04,1832-12-28
+7,,President,Andrew Jackson,1829-03-04,1837-03-04
+7,1,Vice President,John C. Calhoun,1829-03-04,1832-12-28
+7,2,Vice President,Martin Van Buren,1833-03-04,1837-03-04
+8,,President,Martin Van Buren,1837-03-04,1841-03-04
+8,1,Vice President,Richard Mentor Johnson,1837-03-04,1841-03-04
+9,,President,William Henry Harrison,1841-03-04,1841-04-04
+9,1,Vice President,John Tyler,1841-03-04,1841-04-04
+10,,President,John Tyler,1841-04-04,1845-03-04
+11,,President,James K. Polk,1845-03-04,1849-03-04
+11,1,Vice President,George M. Dallas,1845-03-04,1849-03-04
+12,,President,Zachary Taylor,1849-03-04,1850-07-09
+12,1,Vice President,Millard Fillmore,1849-03-04,1850-07-09
+13,,President,Millard Fillmore,1850-07-09,1853-03-04
+14,,President,Franklin Pierce,1853-03-04,1857-03-04
+14,1,Vice President,William R. King,1853-03-04,1853-04-18
+15,,President,James Buchanan,1857-03-04,1861-03-04
+15,1,Vice President,John C. Breckinridge,1857-03-04,1861-03-04
+16,,President,Abraham Lincoln,1861-03-04,1865-04-15
+16,1,Vice President,Hannibal Hamlin,1861-03-04,1865-03-04
+16,2,Vice President,Andrew Johnson,1865-03-04,1865-04-15
+17,,President,Andrew Johnson,1865-04-15,1869-03-04
+18,,President,Ulysses S. Grant,1869-03-04,1877-03-04
+18,1,Vice President,Schuyler Colfax,1869-03-04,1873-03-04
+18,2,Vice President,Henry Wilson,1873-03-04,1875-11-22
+19,,President,Rutherford B. Hayes,1877-03-04,1881-03-04
+19,1,Vice President,William A. Wheeler,1877-03-04,1881-03-04
+20,,President,James A. Garfield,1881-03-04,1881-09-19
+20,1,Vice President,Chester A. Arthur,1881-03-04,1881-09-19
+21,,President,Chester A. Arthur,1881-09-19,1885-03-04
+22,,President,Grover Cleveland,1885-03-04,1889-03-04
+22,1,Vice President,Thomas A. Hendricks,1885-03-04,1885-11-25
+23,,President,Benjamin Harrison,1889-03-04,1893-03-04
+23,1,Vice President,Levi P. Morton,1889-03-04,1893-03-04
+24,,President,Grover Cleveland,1893-03-04,1897-03-04
+24,1,Vice President,Adlai E. Stevenson,1893-03-04,1897-03-04
+25,,President,William McKinley,1897-03-04,1901-09-14
+25,1,Vice President,Garret A. Hobart,1897-03-04,1899-11-21
+25,2,Vice President,Theodore Roosevelt,1901-03-04,1901-09-14
+26,,President,Theodore Roosevelt,1901-09-14,1909-03-04
+26,1,Vice President,Charles W. Fairbanks,1905-03-04,1909-03-04
+27,,President,William Howard Taft,1909-03-04,1913-03-04
+27,1,Vice President,James S. Sherman,1909-03-04,1912-10-30
+28,,President,Woodrow Wilson,1913-03-04,1921-03-04
+28,1,Vice President,Thomas R. Marshall,1913-03-04,1921-03-04
+29,,President,Warren G. Harding,1921-03-04,1923-08-02
+29,1,Vice President,Calvin Coolidge,1921-03-04,1923-08-02
+30,,President,Calvin Coolidge,1923-08-02,1929-03-04
+30,1,Vice President,Charles G. Dawes,1925-03-04,1929-03-04
+31,,President,Herbert Hoover,1929-03-04,1933-03-04
+31,1,Vice President,Charles Curtis,1929-03-04,1933-03-04
+32,,President,Franklin D. Roosevelt,1933-03-04,1945-04-12
+32,1,Vice President,John Nance Garner,1933-03-04,1941-01-20
+32,2,Vice President,Henry A. Wallace,1941-01-20,1945-01-20
+32,3,Vice President,Harry S. Truman,1945-01-20,1945-04-12
+33,,President,Harry S. Truman,1945-04-12,1953-01-20
+33,1,Vice President,Alben W. Barkley,1949-01-20,1953-01-20
+34,,President,Dwight D. Eisenhower,1953-01-20,1961-01-20
+34,1,Vice President,Richard Nixon,1953-01-20,1961-01-20
+35,,President,John F. Kennedy,1961-01-20,1963-11-22
+35,1,Vice President,Lyndon B. Johnson,1961-01-20,1963-11-22
+36,,President,Lyndon B. Johnson,1963-11-22,1969-01-20
+36,1,Vice President,Hubert Humphrey,1965-01-20,1969-01-20
+37,,President,Richard Nixon,1969-01-20,1974-08-09
+37,1,Vice President,Spiro Agnew,1969-01-20,1973-10-10
+37,2,Vice President,Gerald Ford,1973-12-06,1974-08-09
+38,,President,Gerald Ford,1974-08-09,1977-01-20
+38,1,Vice President,Nelson Rockefeller,1974-12-19,1977-01-20
+39,,President,Jimmy Carter,1977-01-20,1981-01-20
+39,1,Vice President,Walter Mondale,1977-01-20,1981-01-20
+40,,President,Ronald Reagan,1981-01-20,1989-01-20
+40,1,Vice President,George H. W. Bush,1981-01-20,1989-01-20
+41,,President,George H. W. Bush,1989-01-20,1993-01-20
+41,1,Vice President,Dan Quayle,1989-01-20,1993-01-20
+42,,President,Bill Clinton,1993-01-20,2001-01-20
+42,1,Vice President,Al Gore,1993-01-20,2001-01-20
+43,,President,George W. Bush,2001-01-20,2009-01-20
+43,1,Vice President,Dick Cheney,2001-01-20,2009-01-20
+44,,President,Barack Obama,2009-01-20,2017-01-20
+44,1,Vice President,Joe Biden,2009-01-20,2017-01-20
+45,,President,Donald Trump,2017-01-20,2021-01-20
+45,1,Vice President,Mike Pence,2017-01-20,2021-01-20
+46,,President,Joe Biden,2021-01-20,2025-01-20
+46,1,Vice President,Kamala Harris,2021-01-20,2025-01-20
+47,,President,Donald Trump,2025-01-20,2029-01-20
+47,1,Vice President,J.D. Vance,2025-01-20,2029-01-20
