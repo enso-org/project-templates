@@ -1,0 +1,98 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+import local.EnsoStepbyStepMultiColumnFormulas
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Duplicates and Distinct Records
+   The Duplicates and Distinct Records functionality in Enso Analytics provides essential tools for identifying and managing duplicate data or extracting unique entries from tables, enabling users to clean datasets, detect redundancies, and focus on unique records for analysis, reporting, or visualization. Centered around the duplicates and distinct components, with support from remove_columns and sort, this workflow detects duplicates based on specific columns or the entire row, returns unique records with the first occurrence of duplicates, and handles warnings for floating-point matches. It is crucial for data quality assurance and deduplication in workflows.
+
+   ## Key Components
+
+   ### duplicates
+
+   The duplicates component identifies and returns all duplicate rows in a table based on specified columns or the entire row.
+
+   - **Functionality**: Scans for matching values in selected columns (e.g., FirstName, LastName) or all columns, returning all duplicate rows, with a warning for floating-point precision issues.
+   - **Use Case**: Find all customers with matching FirstName and LastName to identify potential duplicates, or detect exact row matches after removing unique IDs.
+   - **Benefit**: Quickly uncovers redundancies for data cleaning, supporting targeted or full-row duplicate detection.
+   - **Downside**: Floating-point columns may trigger warnings due to precision; consider rounding or excluding them for exact matches.
+
+   ### distinct
+
+   The distinct component returns unique records from a table, including the first occurrence of any duplicates.
+
+   - **Functionality**: Extracts unique combinations based on specified columns or the entire row, retaining the first instance of each duplicate.
+   - **Use Case**: Get unique customers by FirstName, LastName, and Address to create a deduplicated list, or extract distinct full rows.
+   - **Benefit**: Efficiently generates unique datasets, preserving the original order of first occurrences for analysis.
+   - **Downside**: Retains only the first duplicate, potentially losing later data; sort beforehand if a specific instance is preferred.
+
+   ## Supported Features
+
+   - **Column-Specific Matching**: Detect duplicates or uniques on selected columns (e.g., FirstName, LastName).
+   - **Full-Row Matching**: Apply to all columns for exact row duplicates.
+   - **Sorting Integration**: Use sort to order results by key columns for better readability.
+   - **ID Removal**: Use remove_columns to exclude unique identifiers (e.g., CustomerID) before detection.
+   - **Warning Handling**: Floating-point warnings are expected and can be managed with remove_warnings if needed.
+   - **Integration with Enso Ecosystem**: Processed tables integrate with filter, join, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows immediate inspection of duplicates or uniques.
+
+   ## Example Workflow
+
+   In this example workflow, data from data/customer_data_with_duplicates.csv is processed to identify duplicates and uniques:
+
+   - **Data Input**: Use Data.read to load customer_data_with_duplicates.csv.
+   - **Duplicates on Name Columns**: Use duplicates on FirstName and LastName to return all matching rows, then sortby name for readability.
+   - **Full-Row Duplicates After ID Removal**: Use remove_columns to drop CustomerID, then duplicates on all columns to find exact matches, followed by sort.
+   - **Duplicates with Additional Column**: Use duplicates on FirstName, LastName, and Address to narrow matches, then sort by name and address.
+   - **Distinct on Name Columns**: Use distinct on FirstName and LastName to get unique combinations with the first occurrence.
+   - **Distinct on Name and Address**: Use distinct on FirstName, LastName, and Address for a more precise unique list.
+   - **Full-Row Distinct**: Use distinct on all columns (after ID removal) to extract unique full records.
+
+   ## Use Cases
+
+   - **Duplicate Detection**: Identify potential data entry errors by matching on key identifiers like names.
+   - **Deduplication**: Extract unique records to create clean lists for mailing or analysis.
+   - **Data Quality Check**: Use full-row duplicates to spot exact redundancies from imports.
+   - **Precision Tuning**: Add columns like Address to refine duplicate detection, reducing false positives.
+   - **Unique Extraction**: Generate distinct customer profiles for segmentation or reporting.
+
+   ## Benefits
+
+   The Duplicates and Distinct Records components in Enso Analytics provide an efficient and intuitive way to manage data redundancy, supporting column-specific or full-row detection with seamless integration of sort and remove_columns. The duplicates component uncovers all matches for cleaning, while distinct extracts uniques for streamlined analysis, handling floating-point warnings gracefully. These components integrate seamlessly with Enso’s ecosystem, supporting further processing with filter, join, or visualization tools (accessible via the eyeball icon) for immediate inspection. By simplifying duplicate handling and unique extraction, these tools empower users to ensure data quality and focus on meaningful insights in Enso Analytics.
+main =
+    any1 = Data.read 'data/customer_data_with_duplicates.csv'
+    ## Returns All Duplicate Rows where selected columns match 
+    table1 = any1.duplicates ['FirstName', 'LastName']
+    table2 = table1.sort [(..Name 'FirstName'), (..Name 'LastName')]
+    ## remove ID column as it is unique
+    table3 = any1.remove_columns ['CustomerID']
+    ## Returns All Duplicate Rows where all columns match. The warning is expected and you will see this when using a floating point number as a matching criteria
+    table4 = table3.duplicates
+    table5 = table4.sort [(..Name 'FirstName'), (..Name 'LastName')]
+    ## Returns All Duplicate Rows where selected columns match. Adding the address column to keep duplicates from appearing that are just matched by name.
+    table6 = any1.duplicates ['FirstName', 'LastName', 'Address']
+    table7 = table6.sort [(..Name 'FirstName'), (..Name 'LastName'), (..Name 'Address')]
+    ## Distinct returns all unique records along with the first duplicate found - e.g. CustomerID 13 vs CustoemrID 103
+    table8 = any1.distinct ['FirstName', 'LastName']
+    ## Distinct returns all unique records along with the first duplicate found - e.g. CustomerID 13 vs CustomerID 103
+    table9 = any1.distinct ['FirstName', 'LastName', 'Address']
+    ## Distinct returns all unique records along with the first duplicate found
+    table10 = table3.distinct
+
+
+
+#### METADATA ####
+[[{"index":{"value":5782},"size":{"value":9}},"b06f66f2-d6f2-4d00-a859-3d881140fffb"],[{"index":{"value":5782},"size":{"value":50}},"21848894-eaf0-4de1-8639-9b8f6bf7c565"],[{"index":{"value":5910},"size":{"value":15}},"bf40dd09-5a50-437a-b7a9-d3d8fddd3541"],[{"index":{"value":5910},"size":{"value":41}},"c8b4d3ef-24c9-4378-91bd-ab85a66fbd3f"],[{"index":{"value":5965},"size":{"value":11}},"9a8a5565-6eff-409f-9840-c755ea47f17e"],[{"index":{"value":5965},"size":{"value":55}},"2301172f-55dd-4a05-ad4d-c61f53bf4191"],[{"index":{"value":6074},"size":{"value":19}},"703e987e-b36b-45d0-b646-7b088b454fdb"],[{"index":{"value":6074},"size":{"value":34}},"c69101b2-2a0d-41d5-964b-58a1218bbb66"],[{"index":{"value":6285},"size":{"value":17}},"4b15aa62-2c7e-4bc3-8f91-9496246ad548"],[{"index":{"value":6316},"size":{"value":55}},"d9dc46fa-ad5f-4860-9f01-6e09805b1466"],[{"index":{"value":6540},"size":{"value":52}},"2dbec42a-7800-401e-8271-39b05d624cb1"],[{"index":{"value":6606},"size":{"value":75}},"c1ef15cc-c155-419e-8534-849a96e9dde3"],[{"index":{"value":6814},"size":{"value":13}},"913ea7e6-449c-4e15-8dcb-e57dda9f03e0"],[{"index":{"value":6814},"size":{"value":39}},"27eecae7-3fd6-4c7f-9c55-12485d765bc6"],[{"index":{"value":6986},"size":{"value":50}},"82a67a71-3170-43e5-a5e5-4a9a85ce3bdc"],[{"index":{"value":7131},"size":{"value":15}},"1224d739-8a3a-4b8c-b1be-cecbfda48102"]]
+{"ide":{"node":{"21848894-eaf0-4de1-8639-9b8f6bf7c565":{"position":{"vector":[-1033,-2024]},"visualization":{"show":true,"width":1881.8886718750002,"height":347.35546875}},"b06f66f2-d6f2-4d00-a859-3d881140fffb":{"position":{"vector":[-672,-1649]}},"c8b4d3ef-24c9-4378-91bd-ab85a66fbd3f":{"position":{"vector":[-801,-2530]},"visualization":{"show":false,"width":1151.203125,"height":449.61328125}},"bf40dd09-5a50-437a-b7a9-d3d8fddd3541":{"position":{"vector":[-916,-1758]}},"2301172f-55dd-4a05-ad4d-c61f53bf4191":{"position":{"vector":[-801,-2602]},"visualization":{"show":true,"width":1365.6328125,"height":433.609375}},"9a8a5565-6eff-409f-9840-c755ea47f17e":{"position":{"vector":[-1044,-2220]}},"c69101b2-2a0d-41d5-964b-58a1218bbb66":{"position":{"vector":[-1033,-4592]}},"703e987e-b36b-45d0-b646-7b088b454fdb":{"position":{"vector":[-1095,-3193]}},"4b15aa62-2c7e-4bc3-8f91-9496246ad548":{"position":{"vector":[-965,-4701]},"visualization":{"show":false,"width":1151.203125,"height":449.61328125}},"d9dc46fa-ad5f-4860-9f01-6e09805b1466":{"position":{"vector":[-965,-4773]},"visualization":{"show":true,"width":1365.6328125,"height":433.609375}},"2dbec42a-7800-401e-8271-39b05d624cb1":{"position":{"vector":[-929,-3526]},"visualization":{"show":false,"width":1151.203125,"height":449.61328125}},"c1ef15cc-c155-419e-8534-849a96e9dde3":{"position":{"vector":[-929,-3598]},"visualization":{"show":true,"width":1365.6328125,"height":433.609375}},"27eecae7-3fd6-4c7f-9c55-12485d765bc6":{"position":{"vector":[-847,-3159]},"visualization":{"show":true,"width":1437.4287109375,"height":225.46875}},"913ea7e6-449c-4e15-8dcb-e57dda9f03e0":{"position":{"vector":[-847,-3159]}},"82a67a71-3170-43e5-a5e5-4a9a85ce3bdc":{"position":{"vector":[-965,-4141]},"visualization":{"show":true,"width":1437.4287109375,"height":225.46875}},"1224d739-8a3a-4b8c-b1be-cecbfda48102":{"position":{"vector":[-1036,-5323]},"visualization":{"show":true,"width":1437.4287109375,"height":225.46875}}},"widget":{},"snapshot":"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","import":{}}}

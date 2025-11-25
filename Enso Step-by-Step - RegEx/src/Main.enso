@@ -1,0 +1,117 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Working with Regular Expressions in Enso Analytics
+
+
+   The Regular Expressions (regex) functionality in Enso Analytics provides a versatile set of tools for pattern matching, parsing, replacing, and tokenizing text data, enabling users to transform and extract information from strings for analysis, reporting, or visualization. Integrated into components like set, parse_to_columns, text_replace, tokenize_to_columns, and tokenize_to_rows, regex supports advanced text manipulation using patterns to identify, extract, or modify data. This example demonstrates regex operations on data from data/newport_beach_customers_100.csv, showcasing how to match, parse, replace, and tokenize text columns like Name and Address.
+
+   ## Key Components
+
+   ### set (with regex_match)
+
+   The set component with regex_match adds a boolean column indicating whether a text value matches a regex pattern.
+
+   - **Functionality**: Uses regex_match([Column], r/pattern/) to evaluate if a string matches the pattern, returning True or False, which can be set as a new column.
+   - **Use Case**: Create a has_zip4 column to flag addresses containing a 4-digit ZIP extension (e.g., matching .*-\d{4}).
+   - **Benefit**: Enables quick pattern-based flagging for conditional logic or filtering.
+
+   ### parse_to_columns
+
+   The parse_to_columns component splits a text column into multiple columns using a regex with named capture groups.
+
+   - **Functionality**: Applies a regex pattern (e.g., ^(?<First_Name>[A-Za-z'-]+)\s+(?<Last_Name>[A-Za-z'-]+)$) to extract named groups as new columns from the text.
+   - **Use Case**: Parse a Name column like "John Doe" into First_Name (John) and Last_Name (Doe), or extract Addressand Plus4 from "123 Main St-4567".
+   - **Benefit**: Transforms unstructured text into structured columns in one step, reducing manual splitting.
+
+   ### text_replace
+
+   The text_replace component replaces parts of a text column using a regex pattern and rearrangement of groups.
+
+   - **Functionality**: Uses a regex to match and replace text, with $number referencing captured groups (e.g., replacing (.*),(.*),(.*)\s(\d{5})(-\d{4})? with $4: $2, $3 to reorder ZIP, City, State).
+   - **Use Case**: Reformat an Address column from "Street, City, State 12345" to "12345: City, State".
+   - **Benefit**: Allows precise text restructuring and cleaning using captured groups for dynamic replacements.
+
+   ### tokenize_to_columns
+
+   The tokenize_to_columns component splits a text column into multiple columns based on a regex pattern, treating each match as a new column.
+
+   - **Functionality**: Applies a regex to tokenize the text, creating a column for each match (e.g., [^,]+ splits comma-separated values into sequential columns).
+   - **Use Case**: Tokenize an Address column like "Street, City, State" into separate columns for each part.
+   - **Benefit**: Converts delimited text into parallel columns for easier access and analysis.
+
+   ### tokenize_to_rows
+
+   The tokenize_to_rows component splits a text column into multiple rows based on a regex pattern, duplicating other columns for each match.
+
+   - **Functionality**: Applies a regex to tokenize the text, creating a new row for each match and copying other columns (e.g., [^,]+ expands comma-separated values into rows).
+   - **Use Case**: Expand an Address column into separate rows for each component, preserving associated data.
+   - **Benefit**: Normalizes multi-valued text into row-level detail for granular analysis.
+
+   ## Supported Features
+
+   - **Pattern Matching**: Use regex_match for boolean evaluations (e.g., r/.*-\d{4}/ for ZIP extensions).
+   - **Named Capture Groups**: Extract specific parts with named groups (e.g., ?<First_Name>).
+   - **Group Rearrangement**: Replace with $1, $2, etc., to reorder matched elements.
+   - **Tokenization**: Split into columns (tokenize_to_columns) or rows (tokenize_to_rows) using delimiters or patterns.
+   - **Integration with Enso Ecosystem**: Regex-transformed tables integrate with filter, set, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows immediate inspection of regex results.
+
+   ## Example Workflow
+
+   In this example workflow, text columns from data/newport_beach_customers_100.csv are processed using regex components:
+
+   - **Regex Match**: Use set with regex_match([Address], r/.*-\d{4}/) to create a has_zip4 boolean column flagging addresses with 4-digit ZIP extensions.
+   - **Regex Parse to Columns (Name)**: Use parse_to_columns with ^(?<First_Name>[A-Za-z'-]+)\s+(?<Last_Name>[A-Za-z'-]+)$ to split Name into First_Name and Last_Name.
+   - **Regex Parse to Columns (Address)**: Use parse_to_columns with ^(?<Address>.*?)(?:-(?<Plus4>\d{4}))?$ to extract Address and optional Plus4.
+   - **Regex Replace**: Use text_replace with (.*),(.*),(.*)\s(\d{5})(-\d{4})? and $4: $2, $3 to reorder Address components (e.g., "ZIP: City, State").
+   - **Regex Tokenize to Columns**: Use tokenize_to_columns with [^,]+ to split Address into columns for each comma-separated part.
+   - **Regex Tokenize to Rows**: Use tokenize_to_rows with [^,]+ to expand Address into rows, duplicating other columns.
+
+   ## Use Cases
+
+   - **Pattern Flagging**: Use regex_match to identify records with specific formats (e.g., addresses with ZIP+4).
+   - **Name Parsing**: Split full names into first and last names for demographic analysis.
+   - **Address Extraction**: Parse addresses to isolate street, city, state, and ZIP components.
+   - **Text Reordering**: Rearrange delimited text (e.g., "Street, City, State ZIP" to "ZIP: City, State") for reporting.
+   - **Tokenization**: Convert multi-part text to columns or rows for detailed processing (e.g., comma-separated lists).
+   - **Data Cleaning**: Use regex to standardize or validate text patterns in customer data.
+
+   ## Benefits
+
+   The Regular Expressions components in Enso Analytics provide a flexible and efficient approach to text manipulation, supporting matching, parsing, replacing, and tokenizing with powerful patterns. The set (with regex_match), parse_to_columns, text_replace, tokenize_to_columns, and tokenize_to_rows components enable precise data extraction and transformation, integrated with filter or visualization tools (accessible via the eyeball icon) for immediate inspection. By streamlining regex operations, these components empower users to prepare clean, structured datasets for advanced analysis in Enso Analytics.
+main =
+    any1 = Data.read 'data/newport_beach_customers_100.csv'
+    ## RegEx Match that returns a boolean value of True if the string matches the regular expression and false if it does not.
+    table5 = any1.set (expr 'regex_match([Address], r/.*-\\d{4}/)') "has_zip4"
+    ## RegEx Parse (First_Name and Last_Name)
+    table1 = any1.parse_to_columns 'Name' '^(?<First_Name>[A-Za-z\'-]+)\\s+(?<Last_Name>[A-Za-z\'-]+)$'
+    ## RegEx Parse (Plus4)
+    table2 = any1.parse_to_columns 'Address' '^(?<Address>.*?)(?:-(?<Plus4>\\d{4}))?$'
+    ## RegEx Replace - Groups can be rearranged and/or replaced in strings. In the new_text argument, a $ followed by a number represents the value contained in that group in the expression.
+    table4 = any1.text_replace ['Address'] (regex "(.*),(.*),(.*)\s(\d{5})(-\d{4})?") '$4: $2, $3'
+    ## RegEx Tokenize - Tokenize to Columns places each separate instance of the expression found in the text into its own column.
+    table3 = any1.tokenize_to_columns 'Address' '[^,]+'
+    ## RegEx Tokenize - Tokenize to Rows places each separate instance of the expression found in the text into its own row, with the other columns copied.
+    table6 = any1.tokenize_to_rows 'Address' '[^,]+'
+
+
+
+#### METADATA ####
+[[{"index":{"value":6966},"size":{"value":9}},"cf91181d-7548-4851-99d6-f0b588182c36"],[{"index":{"value":6966},"size":{"value":48}},"925eb8b4-df96-44d7-82ae-27625c97215b"],[{"index":{"value":7155},"size":{"value":8}},"3b9b7d09-3a78-4262-a846-46c249c9e9a2"],[{"index":{"value":7155},"size":{"value":54}},"eccccae2-a021-446e-a857-79e2cfe35cba"],[{"index":{"value":7155},"size":{"value":65}},"44044f47-f388-476e-8c96-97f68753892d"],[{"index":{"value":7280},"size":{"value":21}},"0f1e48b5-8afa-4de0-8868-a39fd8faddeb"],[{"index":{"value":7280},"size":{"value":28}},"0e221019-74d0-492f-91be-ca06884901f7"],[{"index":{"value":7280},"size":{"value":90}},"a283ab33-27b9-451a-b35b-3ad1d9d15373"],[{"index":{"value":7411},"size":{"value":73}},"b9b49b5b-96e0-4374-815b-2910d11217e7"],[{"index":{"value":7689},"size":{"value":17}},"0d483175-48dd-416a-913a-e32b7cfedb46"],[{"index":{"value":7689},"size":{"value":29}},"ee258499-7fe7-4cef-8e22-a69faa938d2d"],[{"index":{"value":7689},"size":{"value":72}},"9631269a-5153-4675-b9a3-b13dd99134d9"],[{"index":{"value":7689},"size":{"value":85}},"edde5e2e-21a6-4f95-a0e9-63209302dc61"],[{"index":{"value":7919},"size":{"value":24}},"b2ccd55c-2b85-445a-9b05-88b2275be3f6"],[{"index":{"value":7919},"size":{"value":34}},"4194dc34-0d3f-4653-9406-a5bde0eeb343"],[{"index":{"value":7919},"size":{"value":42}},"16dc3d87-6eba-4389-866b-073f01cbfc68"],[{"index":{"value":8131},"size":{"value":21}},"1a37ad71-e06b-404d-a290-2b606c120d4e"],[{"index":{"value":8131},"size":{"value":31}},"26bbbbbc-9328-4c6c-8ab8-ccfdea579e49"],[{"index":{"value":8131},"size":{"value":39}},"22e2825e-3db9-49bf-9562-00c37075c9bb"]]
+{"ide":{"node":{"925eb8b4-df96-44d7-82ae-27625c97215b":{"position":{"vector":[-2113,-348]},"visualization":{"show":true,"width":946.5816609073545}},"cf91181d-7548-4851-99d6-f0b588182c36":{"position":{"vector":[-654,-1019]}},"44044f47-f388-476e-8c96-97f68753892d":{"position":{"vector":[-1815,-606]},"visualization":{"show":true,"width":1091.103515625}},"eccccae2-a021-446e-a857-79e2cfe35cba":{"position":{"vector":[-2113,-613]}},"3b9b7d09-3a78-4262-a846-46c249c9e9a2":{"position":{"vector":[-2113,-613]}},"a283ab33-27b9-451a-b35b-3ad1d9d15373":{"position":{"vector":[-1890,-855]},"visualization":{"show":true,"width":1215.75048828125}},"0e221019-74d0-492f-91be-ca06884901f7":{"position":{"vector":[-2113,-891]}},"0f1e48b5-8afa-4de0-8868-a39fd8faddeb":{"position":{"vector":[-2113,-891]}},"b9b49b5b-96e0-4374-815b-2910d11217e7":{"position":{"vector":[-1940,-1111]},"visualization":{"show":true,"width":1215.75048828125}},"edde5e2e-21a6-4f95-a0e9-63209302dc61":{"position":{"vector":[-1991,-1364]},"visualization":{"show":true,"width":1042.5174560546875}},"9631269a-5153-4675-b9a3-b13dd99134d9":{"position":{"vector":[-2063,-1654]}},"ee258499-7fe7-4cef-8e22-a69faa938d2d":{"position":{"vector":[-2063,-1654]}},"0d483175-48dd-416a-913a-e32b7cfedb46":{"position":{"vector":[-2063,-1654]}},"16dc3d87-6eba-4389-866b-073f01cbfc68":{"position":{"vector":[-2052,-1640]},"visualization":{"show":true,"width":1268.5736083984375}},"4194dc34-0d3f-4653-9406-a5bde0eeb343":{"position":{"vector":[-2177,-1825]}},"b2ccd55c-2b85-445a-9b05-88b2275be3f6":{"position":{"vector":[-2177,-1825]}},"22e2825e-3db9-49bf-9562-00c37075c9bb":{"position":{"vector":[-2113,-1942]},"visualization":{"show":true,"width":1277.3666381835938,"height":183.56523675149677}},"26bbbbbc-9328-4c6c-8ab8-ccfdea579e49":{"position":{"vector":[-2253,-2078]}},"1a37ad71-e06b-404d-a290-2b606c120d4e":{"position":{"vector":[-2253,-2078]}}},"widget":{},"import":{},"snapshot":"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"}}

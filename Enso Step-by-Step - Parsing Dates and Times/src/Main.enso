@@ -1,0 +1,144 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+
+
+
+
+
+## ---
+   icon: group
+   ---
+   Documentation can be added here.
+utc_to_local datetime =
+    time_zone2 = Time_Zone.local
+    date_time1 = datetime.at_zone time_zone2
+    date_time1
+
+## ![image](/images/step-by-step-example.png)
+   # Date and Time Processing in Enso Analytics
+
+   The Date and Time components in Enso Analytics offer a robust suite of tools for transforming, formatting, parsing, and converting date/time data across various formats, time zones, and representations. These components, including format, parse, set with expressions, and specialized functions like utc_to_local and Date_Time.from_unix_epoch_seconds, enable users to standardize temporal data for consistency in analysis, reporting, or integration with downstream systems. This is crucial for handling datasets with mixed date formats, UTC/local conversions, or epoch timestamps, ensuring accurate chronological insights.
+
+   ## Key Components
+
+   ### format
+
+   The format component applies a specified pattern to convert date/time columns into human-readable text strings.
+
+   - **Functionality**: Transforms a date column (e.g., Join Date) using patterns like 'M/d/yyyy' or 'dddd, MMMM dd, yyyy', updating the column in place.
+   - **Use Case**: Convert a raw Join Date (e.g., 2016-08-09) to "8/9/2016" or "Tuesday, August 09, 2016" for readable reports.
+   - **Benefit**: Enhances data presentation without altering underlying values, supporting locale-aware formatting.
+
+   ### parse
+
+   The parse component interprets text-based date strings into proper date objects using predefined or custom patterns.
+
+   - **Functionality**: Parses columns like DOB or Last save date with patterns such as 'MMMM d, yyyy' or 'MM/dd/yyyy', converting strings to dates.
+   - **Use Case**: Transform "June 21, 1968" in DOB or "06/01/2025" in Last save date into standardized date types for calculations.
+   - **Benefit**: Resolves format inconsistencies in ingested data, enabling date-based filtering or arithmetic.
+
+   ### set with Expressions
+
+   The set component adds or updates columns using Enso expressions for dynamic computations.
+
+   - **Functionality**: Creates new columns via expressions like expr 'format([Join Date], "M/d/yyyy")' or expr 'truncate([Last login datetime])', deriving values from existing ones.
+   - **Use Case**: Generate a "New Join Date" column with formatted text or a "Last Login Date" by truncating datetime to date-only.
+   - **Benefit**: Allows inline transformations without separate steps, streamlining workflows for derived temporal fields.
+
+   ### utc_to_local
+
+   A custom function that converts UTC datetimes to local time zones.
+
+   - **Functionality**: Applies at_zone with Time_Zone.local to shift UTC values (e.g., from Last login UTC) to the system's local equivalent.
+   - **Use Case**: Adjust "2025-02-05T10:40:25+00:00" to local time for region-specific logging analysis.
+   - **Benefit**: Automates time zone handling, reducing errors in global datasets.
+
+   ### Date_Time.from_unix_epoch_seconds
+
+   The Date_Time.from_unix_epoch_seconds function converts UNIX timestamps to UTC datetimes.
+
+   - **Functionality**: Maps numeric epoch seconds (e.g., from Last login UNIX) to full datetime objects.
+   - **Use Case**: Turn 1738752025 into "2025-02-05 10:40:25 UTC" for chronological reconstruction.
+   - **Benefit**: Bridges legacy systems using epochs with modern datetime processing.
+
+   ## Supported Features
+
+   - **Pattern-Based Formatting and Parsing**: Use standard patterns (e.g., 'M/d/yyyy', 'h:mm a') or custom Date_Time_Formatter for flexible text conversions.
+   - **Time Zone Conversions**: Handle UTC-to-local shifts and epoch parsing for international data.
+   - **Truncation and Extraction**: Truncate datetimes to dates or format times (e.g., stripping seconds to AM/PM).
+   - **Locale Support**: Apply Locale.us for US-centric formatting in expressions.
+   - **Column Management**: Integrate with get and map for targeted operations on specific columns.
+   - **Integration with Enso Ecosystem**: Processed tables flow into filter, join, or visualization components; use the eyeball icon for instant previews.
+   - **Error Handling**: Assumes valid inputs; combine with validation steps for robustness.
+   - **Automatic ISO Parsing**: Enso will automatically parse (convert) dates that are in an ISO format (yyyy-MM-dd) and datetimes that are in an ISO formatted format to date and datetime types automatically when read from a CSV file.
+   - **Date Type for Calculations**: Enso needs dates to be a date type to do date calculations.
+   - **Custom Format Reference**: Custom format strings for both parse and format can be found [here](https://help.enso.org/docs/using-enso/custom-formats). This page details pattern codes for dates/times (e.g., M/d/yyyy for 9/27/2022, MMMM d, yyyy for September 27, 2022, h:mm A for 6:00 PM), numbers/currency (e.g., #,###.## for 1,234.5, $#,###.00 for $1,234.50), and booleans (e.g., On|Off for On/Off, Yes|No for Yes/No). Patterns use symbols like M (month 1–12), dd (day 01–31), # (digit placeholder), and (boolean separator); combine freely with literals (e.g., /, $).
+
+   ## Example Workflow
+
+   This workflow processes the dates.csv dataset (e.g., customer records with mixed date formats) to standardize and enrich temporal columns:
+
+
+   - **Format Join Date (Short)**: Update Join Date to "M/d/yyyy" (e.g., 2016-08-09 → 8/9/2016) using format.
+   - **Add New Join Date (Expression)**: Create "New Join Date" with expr 'format([Join Date], "M/d/yyyy")' via set.
+   - **Format Join Date (Long)**: Update Join Date to "dddd, MMMM dd, yyyy" (e.g., Tuesday, August 09, 2016) using format.
+   - **Parse DOB**: Convert DOB text (e.g., "June 21, 1968") to date using 'MMMM d, yyyy'.
+   - **Parse Last Save Date**: Convert Last save date (e.g., 06/01/2025) to date using 'MM/dd/yyyy'.
+   - **Truncate to Last Login Date**: Add "Last Login Date" by truncating Last login datetime to date-only via expr 'truncate([Last login datetime])'.
+   - **Format Last Login Time**: Update Last login time to "h:mm a" (e.g., 10:40:25 → 10:40 AM), stripping seconds.
+   - **Format Last Login UTC**: Apply custom Date_Time_Formatter ('d MMMM yyyy HH:mm', Locale.us) to Last login UTC.
+   - **Convert UTC to Local**: Extract Last login UTC, map via utc_to_local, and set as "Last login UTC to Local".
+   - **Convert UNIX to UTC**: Extract Last login UNIX, map via Date_Time.from_unix_epoch_seconds, and set as "Last login UNIX to UTC".
+   The result is a unified table with formatted, parsed, and converted date/time columns ready for analysis.
+
+   ## Use Cases
+
+   - **Data Standardization**: Uniformly format join dates or DOBs from disparate sources for consistent reporting.
+   - **Time Zone Adjustment**: Convert UTC logins to local times for user behavior analysis in multi-region apps.
+   - **Epoch Integration**: Parse UNIX timestamps from APIs or databases into readable datetimes.
+   - **Report Preparation**: Truncate datetimes and format times for dashboards, e.g., "Last Login Date" and "10:40 AM".
+   - **Historical Analysis**: Parse legacy text dates (e.g., "June 21, 1968") for age calculations or tenure metrics.
+
+   ## Benefits
+
+   The Date and Time components in Enso Analytics deliver efficient, pattern-driven transformations to normalize temporal data, supporting formatting, parsing, and conversions across formats like text, UTC, and UNIX epochs. Tools like format, parse, set with expressions, utc_to_local, and Date_Time.from_unix_epoch_seconds minimize steps while handling locales and time zones. Seamlessly integrating with Enso's broader toolkit—including filter, join, and visualizations (via the eyeball icon)—these components facilitate precise chronological processing. By converting raw dates into analysis-ready structures, they empower users to derive actionable insights from time-sensitive datasets in Enso Analytics.
+main =
+    any3 = Data.read 'data/dates.csv'
+    ## Update existing Join Date column with a text representation of the date
+    table1 = any3.format ['Join Date'] 'M/d/yyyy'
+    ## Create a new column with a text representation of the date.
+    table2 = any3.set (expr 'format([Join Date], "M/d/yyyy")') "New Join Date"
+    ## Update existing Join Date column with a custom formatted date string 
+    table3 = any3.format ['Join Date'] 'dddd, MMMM dd, yyyy'
+    table4 = any3.parse ['DOB'] ..Date 'MMMM d, yyyy'
+    table5 = any3.parse ['Last save date'] ..Date 'MM/dd/yyyy'
+    ## Convert Datetime to Date Format
+    table6 = any3.set (expr 'truncate([Last login datetime])') "Last Login Date"
+    ## Format the Last Login Time as text, stripping off the seconds, and converting to AM/PM format
+    table7 = any3.format ['Last login time'] 'h:mm a'
+    table9 = any3.format ['Last login UTC'] (Date_Time_Formatter.from_simple_pattern 'd MMMM yyyy HH:mm' locale=Locale.us)
+    column1 = any3.get 'Last login UTC'
+    date_time1 = Main.utc_to_local
+    column2 = column1.map date_time1 expected_value_type=..Date_Time
+    ## Convert UTC to Local Time
+    table8 = any3.set column2 "Last login UTC to Local"
+    column3 = any3.get 'Last login UNIX'
+    column4 = column3.map Date_Time.from_unix_epoch_seconds
+    ## Convert Unix Timestamp to UTC
+    table10 = any3.set column4 "Last login UNIX to UTC"
+
+
+
+#### METADATA ####
+[[{"index":{"value":427},"size":{"value":8}},"0f5277ed-3046-45e9-a260-f5cf1dc820ff"],[{"index":{"value":455},"size":{"value":15}},"a4f6ab23-9f4a-42f8-bb0d-33a0b31282e3"],[{"index":{"value":488},"size":{"value":16}},"35733b76-676e-48d1-b01a-5e8cfe9cb57b"],[{"index":{"value":488},"size":{"value":27}},"74da4ed2-37d7-4a24-a391-3d5b7508e7a5"],[{"index":{"value":520},"size":{"value":10}},"4100cae7-6098-4335-8d0d-429a374bae16"],[{"index":{"value":8281},"size":{"value":9}},"7d839699-f17c-41d2-9bcb-d2e2dfc3b8a8"],[{"index":{"value":8281},"size":{"value":26}},"01003628-242e-4b29-897f-80f8694e0dc8"],[{"index":{"value":8400},"size":{"value":11}},"c341d1bb-c9c3-442f-b377-e23bd6788369"],[{"index":{"value":8400},"size":{"value":25}},"9ef2aae0-c38c-408f-831e-3926fd693462"],[{"index":{"value":8400},"size":{"value":36}},"c1d47719-2377-4644-bd90-f5239ef8e0be"],[{"index":{"value":8517},"size":{"value":8}},"04b5d6a6-1fde-4f0e-a702-b9fc8d183604"],[{"index":{"value":8517},"size":{"value":49}},"fa1af94b-f5f1-4c75-b874-2f98800c5a33"],[{"index":{"value":8517},"size":{"value":65}},"27fc6573-1989-4e23-964d-ff4222484597"],[{"index":{"value":8673},"size":{"value":11}},"2be66bf8-26fa-407f-8e51-401e98545d97"],[{"index":{"value":8673},"size":{"value":25}},"d89cc83d-918e-49d3-bcc0-025986198418"],[{"index":{"value":8673},"size":{"value":47}},"a20b2a1c-6e15-4a40-91d1-bc05aee1fcd2"],[{"index":{"value":8734},"size":{"value":10}},"e7ade902-a2d7-458f-bee0-838612becbd5"],[{"index":{"value":8734},"size":{"value":18}},"8df17571-f879-435a-9bd9-16f81e4c9190"],[{"index":{"value":8734},"size":{"value":25}},"b83be9fa-226d-4cee-99bc-d4f81067840c"],[{"index":{"value":8734},"size":{"value":40}},"f1058462-6144-4234-acad-5eeb7b4815a9"],[{"index":{"value":8788},"size":{"value":10}},"aff843d9-4627-4c2a-9782-e6ac1ba3bb3d"],[{"index":{"value":8788},"size":{"value":29}},"b6812ce7-3e07-46f1-b945-9bd36b5950d1"],[{"index":{"value":8788},"size":{"value":36}},"0edb5a1c-7f1b-406d-8141-e07318d3af42"],[{"index":{"value":8788},"size":{"value":49}},"ee5461c1-9735-496b-b722-b2fc484ae797"],[{"index":{"value":8890},"size":{"value":8}},"950d1b35-f733-4970-bc79-8e4a18c491ea"],[{"index":{"value":8890},"size":{"value":49}},"8ef5529b-eb20-45d9-b3f2-357c4a2f4962"],[{"index":{"value":8890},"size":{"value":67}},"4911ca33-091d-43ce-ac15-73de32b854c2"],[{"index":{"value":9072},"size":{"value":11}},"91f91e4f-828f-4146-ae48-ef00071bea8e"],[{"index":{"value":9072},"size":{"value":31}},"4969ebe1-6765-48ed-90b7-f264f796c591"],[{"index":{"value":9072},"size":{"value":40}},"2019e3e1-d989-4b2e-82f8-d3f9878546de"],[{"index":{"value":9126},"size":{"value":11}},"7edbc816-b526-4eac-a843-b3f25b4867fa"],[{"index":{"value":9126},"size":{"value":30}},"82218d81-3f4d-49ce-aa2e-cf0085b25403"],[{"index":{"value":9126},"size":{"value":109}},"3d8d9b0e-eb99-455a-b28f-6ec79ca5bee2"],[{"index":{"value":9250},"size":{"value":8}},"0f81382a-55a2-4cee-adb6-f136cd0c1455"],[{"index":{"value":9250},"size":{"value":25}},"e460d9f0-4597-4b44-9b2d-ce4b43c94f36"],[{"index":{"value":9293},"size":{"value":17}},"143b3fcb-cf19-4b92-96ab-8405fa363aca"],[{"index":{"value":9325},"size":{"value":11}},"cd75edaa-422e-49b1-b7a8-7a53a312bcf5"],[{"index":{"value":9325},"size":{"value":22}},"5e2637bb-5ad8-4e8d-8292-155a2adec583"],[{"index":{"value":9325},"size":{"value":54}},"29da32c5-6e32-4309-a26e-f4364b496d11"],[{"index":{"value":9426},"size":{"value":8}},"58d7690d-caa5-4560-8f1f-1a02a02f30fc"],[{"index":{"value":9426},"size":{"value":16}},"938a8c16-f709-4bc1-9d78-014d84afb660"],[{"index":{"value":9426},"size":{"value":42}},"c28e6671-04cd-474e-9ff7-78eb5d8a7492"],[{"index":{"value":9483},"size":{"value":26}},"0859a416-36c5-4693-9df7-12bfc1a11bd9"],[{"index":{"value":9524},"size":{"value":11}},"9ebbce20-e3e1-46ea-a7ce-fe30eee09a1f"],[{"index":{"value":9524},"size":{"value":45}},"68929cda-b45c-47be-a93c-d1ff2255fc4c"],[{"index":{"value":9621},"size":{"value":41}},"09e27cac-0a34-4583-b78d-464d9c171667"]]
+{"ide":{"node":{"0f5277ed-3046-45e9-a260-f5cf1dc820ff":{"position":{"vector":[-429,-2911]}},"a4f6ab23-9f4a-42f8-bb0d-33a0b31282e3":{"position":{"vector":[-316,-2983]}},"74da4ed2-37d7-4a24-a391-3d5b7508e7a5":{"position":{"vector":[-429,-3055]}},"35733b76-676e-48d1-b01a-5e8cfe9cb57b":{"position":{"vector":[-429,-3055]}},"4100cae7-6098-4335-8d0d-429a374bae16":{"position":{"vector":[-429,-3127]}},"01003628-242e-4b29-897f-80f8694e0dc8":{"position":{"vector":[-144,267]},"visualization":{"show":true,"width":1423.390625,"height":243.15625}},"7d839699-f17c-41d2-9bcb-d2e2dfc3b8a8":{"position":{"vector":[147,-45]}},"c1d47719-2377-4644-bd90-f5239ef8e0be":{"position":{"vector":[671,-98]},"visualization":{"show":true,"width":1341.85546875}},"9ef2aae0-c38c-408f-831e-3926fd693462":{"position":{"vector":[-144,-58]}},"c341d1bb-c9c3-442f-b377-e23bd6788369":{"position":{"vector":[-144,-58]}},"27fc6573-1989-4e23-964d-ff4222484597":{"position":{"vector":[629,-348]},"visualization":{"show":true,"width":1395.27734375}},"fa1af94b-f5f1-4c75-b874-2f98800c5a33":{"position":{"vector":[-102,-376]}},"04b5d6a6-1fde-4f0e-a702-b9fc8d183604":{"position":{"vector":[-102,-376]}},"a20b2a1c-6e15-4a40-91d1-bc05aee1fcd2":{"position":{"vector":[576,-591]},"visualization":{"show":true,"width":1452.91015625}},"d89cc83d-918e-49d3-bcc0-025986198418":{"position":{"vector":[-185,-634]}},"2be66bf8-26fa-407f-8e51-401e98545d97":{"position":{"vector":[-185,-634]}},"f1058462-6144-4234-acad-5eeb7b4815a9":{"position":{"vector":[511,-848]},"visualization":{"show":true,"width":1534.3046875,"height":178.87109375}},"b83be9fa-226d-4cee-99bc-d4f81067840c":{"position":{"vector":[29,-841]}},"8df17571-f879-435a-9bd9-16f81e4c9190":{"position":{"vector":[29,-841]}},"e7ade902-a2d7-458f-bee0-838612becbd5":{"position":{"vector":[29,-841]}},"ee5461c1-9735-496b-b722-b2fc484ae797":{"position":{"vector":[450,-1149]},"visualization":{"show":true,"width":1605.98046875}},"0edb5a1c-7f1b-406d-8141-e07318d3af42":{"position":{"vector":[-32,-1142]}},"b6812ce7-3e07-46f1-b945-9bd36b5950d1":{"position":{"vector":[-32,-1142]}},"aff843d9-4627-4c2a-9782-e6ac1ba3bb3d":{"position":{"vector":[-32,-1142]}},"4911ca33-091d-43ce-ac15-73de32b854c2":{"position":{"vector":[379,-1433]},"visualization":{"show":true,"width":1701.2291666666667}},"8ef5529b-eb20-45d9-b3f2-357c4a2f4962":{"position":{"vector":[-103,-1426]}},"950d1b35-f733-4970-bc79-8e4a18c491ea":{"position":{"vector":[-103,-1426]}},"2019e3e1-d989-4b2e-82f8-d3f9878546de":{"position":{"vector":[292,-1710]},"visualization":{"show":true,"width":1878.5833333333333}},"4969ebe1-6765-48ed-90b7-f264f796c591":{"position":{"vector":[-176,-1976]}},"91f91e4f-828f-4146-ae48-ef00071bea8e":{"position":{"vector":[-176,-1976]}},"3d8d9b0e-eb99-455a-b28f-6ec79ca5bee2":{"position":{"vector":[211,-1962]},"visualization":{"show":true}},"82218d81-3f4d-49ce-aa2e-cf0085b25403":{"position":{"vector":[-213,-2038]}},"7edbc816-b526-4eac-a843-b3f25b4867fa":{"position":{"vector":[-213,-2038]}},"e460d9f0-4597-4b44-9b2d-ce4b43c94f36":{"position":{"vector":[126,-2238]}},"0f81382a-55a2-4cee-adb6-f136cd0c1455":{"position":{"vector":[-667,-2450]}},"143b3fcb-cf19-4b92-96ab-8405fa363aca":{"position":{"vector":[472,-2348]}},"29da32c5-6e32-4309-a26e-f4364b496d11":{"position":{"vector":[126,-2420]}},"5e2637bb-5ad8-4e8d-8292-155a2adec583":{"position":{"vector":[-655,-3049]}},"cd75edaa-422e-49b1-b7a8-7a53a312bcf5":{"position":{"vector":[-655,-3049]}},"c28e6671-04cd-474e-9ff7-78eb5d8a7492":{"position":{"vector":[53,-2514]},"visualization":{"show":true,"width":1992.8129528037434}},"938a8c16-f709-4bc1-9d78-014d84afb660":{"position":{"vector":[-776,-3324]}},"58d7690d-caa5-4560-8f1f-1a02a02f30fc":{"position":{"vector":[-373,-2098]}},"0859a416-36c5-4693-9df7-12bfc1a11bd9":{"position":{"vector":[-76,-2787]}},"68929cda-b45c-47be-a93c-d1ff2255fc4c":{"position":{"vector":[-76,-2859]}},"9ebbce20-e3e1-46ea-a7ce-fe30eee09a1f":{"position":{"vector":[99,-3191]}},"09e27cac-0a34-4583-b78d-464d9c171667":{"position":{"vector":[-144,-2950]},"visualization":{"show":true,"width":2040.8013234465811}}},"widget":{},"snapshot":"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","import":{}}}

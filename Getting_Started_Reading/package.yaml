@@ -1,4 +1,3 @@
 name: "Enso Getting Started - Exercise 1 - Reading and Filtering Data"
-namespace: local
 version: 0.0.1
-prefer-local-libraries: 'true'
+prefer-local-libraries: true

@@ -1,0 +1,97 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Dynamically Rename Columns in Enso Analytics
+
+   The `rename_columns` component in Enso Analytics provides a versatile toolkit for dynamically renaming table columns, enhancing dataset clarity and structure for analysis, reporting, or visualization. This example uses data from `data/customer_data_100_OC_header.csv` to demonstrate renaming techniques, including direct pair-based renaming, regex-based transformations, positional renaming via vectors or tables, and name-based renaming with two-column tables. These methods enable efficient standardization and cleanup of column names within Enso workflows.
+
+   ## Key Component
+   ### rename_columns
+   The `rename_columns` component renames table columns using multiple input methods.
+   - **Functionality**: Supports renaming via direct old-to-new name pairs (e.g., `FirstName` to `First`), regex patterns in `Pair.Value` for bulk changes, positional renaming with vectors or single-column tables, and name-based renaming with two-column tables (**Original** and **New** names).
+   - **Use Case**: Rename `FirstName` to `First` using a pair, append "_Code" to ZIP columns, prefix "Total_" to Visits and Spend, remove "Name" from columns, or rename positionally or by name matching.
+   - **Benefit**: Offers flexible, scalable renaming with seamless integration into Enso’s ecosystem for filtering, joining, or visualization.
+   - **Downside**: Pair-based or positional inputs require precise matching; regex patterns need validation to avoid errors. Use `column_info` to verify results.
+
+   ## Supported Features
+   - **Direct Pair Renaming**: Rename columns using a list of `Pair.Value` with old-to-new name pairs (e.g., `FirstName` to `First`, `LastName` to `Last`).
+   - **Regex-Based Renaming**: Apply regex patterns in `Pair.Value` for bulk renaming (e.g., adding "_Code" to ZIP columns or removing "Name" from FirstName).
+   - **Vector-Based Positional Renaming**: Extract names with `column_names`, modify via `to_table` and `set`, and apply positionally with `rename_columns`.
+   - **Table-Based Positional Renaming**: Rename columns using a single-column table of new names.
+   - **Name-Based Table Renaming**: Use a two-column table (**Original** and **New** names) for order-independent renaming.
+   - **Selective Renaming**: Combine with `select_columns` to target specific columns.
+   - **Visualization Support**: Inspect renamed columns instantly via built-in table visualization (eyeball icon).
+   - **Ecosystem Integration**: Renamed tables integrate with Enso’s `filter`, `join`, and visualization tools.
+
+   ## Example Workflow
+   This workflow processes `data/customer_data_100_OC_header.csv` using dynamic renaming techniques:
+   - **Data Input**: Load CSV with `Data.read` (`..Delimited skip_rows=1 headers=..Has_Headers`).
+   - **Direct Pair Renaming**: Rename columns using a list of pairs, e.g., `Pair.Value "FirstName" "First", Pair.Value "LastName" "Last"`.
+   - **Regex-Based Renaming**:
+     - Append "_Code" to ZIP columns using `rename_columns` with `Pair.Value` and regex (`^(ZIP.*)` to `$1 Code`).
+     - Remove "Name" from columns (e.g., FirstName, LastName) using regex (`^(\w+)Name` to `$1`).
+     - Prefix "Total_" to Visits and Spend using regex (`^(Visits.*|Spend.*)` to `Total $1`).
+   - **Formula-Based Positional Renaming**: Extract column names with `column_names`, convert to a table with `to_table`, apply a formula via `set` (e.g., append "_Code" to ZIP columns), and rename using `rename_columns`.
+   - **Table-Based Positional Renaming**: Use a single-column table (e.g., node2 with **Value** column) to rename columns positionally with `rename_columns`.
+   - **Name-Based Renaming**: Use a two-column table (e.g., node3 with **Original** and **New** columns) for order-independent renaming with `rename_columns`.
+   - **Vector-Based Renaming**: Rename columns using a vector of names from another table’s `column_names`.
+
+   ## Use Cases
+   - **Direct Renaming**: Rename specific columns like `FirstName` to `First` using pair-based inputs.
+   - **Standardizing Names**: Append "_Code" to ZIP columns using regex or formulas.
+   - **Prefixing for Clarity**: Add "Total_" to columns like Visits and Spend for aggregated views.
+   - **Cleaning Names**: Remove "Name" from FirstName and LastName for consistency.
+   - **Positional Renaming**: Update column names by position using vectors or single-column tables.
+   - **Name-Based Renaming**: Rename columns using a two-column table for large or reordered datasets.
+   - **Bulk Renaming**: Apply regex patterns for automated, pattern-based changes.
+
+   ## Benefits
+   The `rename_columns` component offers a robust solution for dynamic column renaming, supporting direct pair-based, regex, positional, and name-based methods. Integration with `column_names`, `to_table`, `set`, and `select_columns` enables targeted and scalable renaming, while compatibility with Enso’s ecosystem ensures seamless data preparation and visualization. The built-in visualization tool (eyeball icon) allows immediate inspection, empowering users to create analysis-ready datasets efficiently.
+main =
+    any1 = Data.read 'data/customer_data_100_OC_header.csv' (..Delimited skip_rows=1 headers=..Has_Headers)
+    ## Rename the ZIP column to ZIP Code
+    table8 = any1.rename_columns [(Pair.Value (regex '^(ZIP.*)') '$1 Code')]
+    ## Rename all columns that end in "Name" with the Prefix before "Name"
+    table17 = any1.rename_columns [(Pair.Value (regex '^(\\w+)Name') '$1')]
+    ## Rename the Visits and Spend columns as Total Visits and Total Spend
+    table16 = any1.rename_columns [(Pair.Value (regex '^(Visits.*|Spend.*)') 'Total $1')]   
+    
+    ## ALTERNATE METHOD FOR RENAMING THE ZIP CODE COLUMN: Get the names of the columns
+    vector1 = any1.column_names
+    ## Convert from a vector to a table
+    table1 = vector1.to_table
+    ## Formula to add _Code to every column that contains the word ZIP
+    table2 = table1.set (expr 'if contains([Value],"ZIP") then\n[Value] + "_Code"\nElse\n[Value]') "New Value"
+    ## Rename the columns using the output from the set component
+    table3 = any1.rename_columns table2
+    node1 = Table.input [['A', ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']], ['B', ['PAUL', 'AMY', 'KAREN', 'BARBARA', 'MICHELE', 'MICHELE', 'SUSAN', 'ROBERT', 'CHARLES', 'DANELL', 'MURIEL', 'JESSICA', 'CONSTANTI', 'MICHELE', 'DIANNE', 'ANDREA', 'ROBERT', 'THOMAS', 'BARBARA', 'CHARLES']], ['C', ['WRIGHT', 'THOMAS', 'KRYWONIS', 'BROWN', 'JONES', 'WRIGHT', 'BRUN', 'RUFF', 'WRIGHT', 'DAVIS', 'SMITH', 'MENDIOLA', 'LOCKEMER', 'PENTICO', 'MOORE', 'LOCKEMER', 'RINEHART', 'MENDIOLA', 'ARUSTAMYAN', 'PENTICO']], ['D', ['Irvine', 'Tustin', 'Huntington Beach', 'Santa Ana', 'Costa Mesa', 'Costa Mesa', 'Newport Beach', 'Laguna Beach', 'Fountain Valley', 'Laguna Beach', 'Laguna Beach', 'Garden Grove', 'Costa Mesa', 'Westminster', 'Tustin', 'Westminster', 'Santa Ana', 'Laguna Beach', 'Newport Beach', 'Santa Ana']], ['E', ['CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA', 'CA']], ['F', ['92690', '92641', '92679', '92644', '92699', '92742', '92744', '92741', '92699', '92732', '92656', '92656', '92764', '92748', '92641', '92791', '92746', '92716', '92624', '92630']], ['G', ['Corporate', 'Consumer', 'Home Office', 'Small Business', 'Home Office', 'Small Business', 'Corporate', 'Home Office', 'Consumer', 'Small Business', 'Small Business', 'Small Business', 'Consumer', 'Small Business', 'Home Office', 'Consumer', 'Home Office', 'Consumer', 'Home Office', 'Consumer']], ['H', ['3', '5', '4', '1', '7', '2', '4', '5', '5', '3', '3', '1', '3', '3', '4', '3', '5', '2', '7', '4']], ['I', ['4189.22', '871.94', '3614.63', '6896.15', '5138.73', '7688.46', '7086.97', '5131.02', '4556.95', '2856.9', '6712.38', '2935.29', '326.09', '6445.48', '4102.57', '1515.46', '6138.53', '5093.56', '4790.34', '416.7']], ['J', ['2025-06-17', '2024-08-15', '2025-04-06', '2020-04-11', '2023-10-26', '2024-01-07', '2024-03-26', '2020-08-30', '2021-03-01', '2021-07-21', '2021-09-07', '2020-12-23', '2022-04-08', '2024-08-01', '2020-07-28', '2023-05-02', '2024-10-13', '2023-01-08', '2020-06-25', '2021-01-07']]]
+    node2 = Table.input [['Value', ['CustomerID', 'FirstName', 'LastName', 'City', 'State', 'ZIP', 'CustomerSegment', 'Visits', 'Spend', 'JoinDate']]]
+    ## Rename from a column in a table (positional)
+    table14 = node1.rename_columns node2
+    node3 = Table.input [['Original', ['E', 'I', 'A', 'B', 'C', 'D', 'F', 'G', 'H', 'J']], ['New', ['State', 'Spend', 'CustomerID', 'FirstName', 'LastName', 'City', 'ZIP', 'CustomerSegment', 'Visits', 'JoinDate']]]
+    ## Rename by Column Name - Order does not matter. Requires 2 columns. The first has the current column names and the second has the desired column names.
+    table15 = node1.rename_columns node3
+    vector4 = any1.column_names
+    ## Take column names from another table's list of column names
+    table13 = node1.rename_columns vector4
+
+
+
+#### METADATA ####
+[[{"index":{"value":5585},"size":{"value":9}},"843a090a-7095-4a3c-b245-e794de24e64b"],[{"index":{"value":5585},"size":{"value":48}},"9a511ddb-199d-4e21-a112-d1b4df78907b"],[{"index":{"value":5585},"size":{"value":96}},"e53fe0c1-612e-4b7f-9ae9-69ba4cdc514b"],[{"index":{"value":5736},"size":{"value":63}},"1d4fd364-d36a-42b6-970d-1ca2229b347d"],[{"index":{"value":5889},"size":{"value":61}},"bf1394f1-5369-4f7f-8d13-16e7212b9701"],[{"index":{"value":6040},"size":{"value":75}},"ccb93d2a-fb9f-47c1-9cdc-5860acf46255"],[{"index":{"value":6225},"size":{"value":17}},"1882f996-8149-459d-88ee-df72ab195cfe"],[{"index":{"value":6296},"size":{"value":16}},"4117e76b-abd3-42f0-9bd4-732b241ee7c9"],[{"index":{"value":6397},"size":{"value":97}},"ca9acc39-ae86-4b96-aaca-21fb3c4c6ea0"],[{"index":{"value":6574},"size":{"value":26}},"bd79f54c-df91-4da5-8c67-f428e78d8e5a"],[{"index":{"value":6613},"size":{"value":2111}},"ab4062d9-fe48-4f37-bc0d-8448cbdb14b7"],[{"index":{"value":8737},"size":{"value":138}},"65385fc7-e121-4bd8-93a0-dc0518372a78"],[{"index":{"value":8942},"size":{"value":26}},"28ae5d2a-1277-4c5b-a703-89034768b65d"],[{"index":{"value":8981},"size":{"value":202}},"5b2d3cf6-f5a9-46ea-adec-25f1eceee27e"],[{"index":{"value":9356},"size":{"value":26}},"31ed8c63-bcf0-49c2-bc3e-be2f6c70ce8e"],[{"index":{"value":9397},"size":{"value":17}},"82a3f1f1-07b0-4a07-9068-5aaa8402c121"],[{"index":{"value":9496},"size":{"value":28}},"ace926a5-d9a7-4452-9634-eb91a8daabbd"]]
+{"ide":{"node":{"e53fe0c1-612e-4b7f-9ae9-69ba4cdc514b":{"position":{"vector":[-719,-1716]},"visualization":{"show":true,"width":1254.9454793109232,"height":280.9292297363281}},"9a511ddb-199d-4e21-a112-d1b4df78907b":{"position":{"vector":[319,-1614]},"visualization":{"show":true,"width":1254.9454793109232,"height":280.9292297363281}},"843a090a-7095-4a3c-b245-e794de24e64b":{"position":{"vector":[536,-1776]}},"1d4fd364-d36a-42b6-970d-1ca2229b347d":{"position":{"vector":[-341,-2101]},"visualization":{"show":true,"width":1055.7870802238806}},"bf1394f1-5369-4f7f-8d13-16e7212b9701":{"position":{"vector":[-572,-2605]},"visualization":{"show":true,"width":1295.2702891791046}},"ccb93d2a-fb9f-47c1-9cdc-5860acf46255":{"position":{"vector":[-433,-2335]},"visualization":{"show":true,"width":1359.2472014925372}},"1882f996-8149-459d-88ee-df72ab195cfe":{"position":{"vector":[-671,-2894]},"visualization":{"show":false,"width":816.109375}},"4117e76b-abd3-42f0-9bd4-732b241ee7c9":{"position":{"vector":[-671,-2966]}},"ca9acc39-ae86-4b96-aaca-21fb3c4c6ea0":{"position":{"vector":[-671,-3062]}},"bd79f54c-df91-4da5-8c67-f428e78d8e5a":{"position":{"vector":[-719,-3211]},"visualization":{"show":true,"width":1310.8994869402984,"height":229.94986007462686}},"ab4062d9-fe48-4f37-bc0d-8448cbdb14b7":{"position":{"vector":[1004,-1692]}},"65385fc7-e121-4bd8-93a0-dc0518372a78":{"position":{"vector":[1228,-2450]}},"28ae5d2a-1277-4c5b-a703-89034768b65d":{"position":{"vector":[1131,-2696]},"visualization":{"show":true,"width":968.9200093283582}},"5b2d3cf6-f5a9-46ea-adec-25f1eceee27e":{"position":{"vector":[1545,-2918]}},"31ed8c63-bcf0-49c2-bc3e-be2f6c70ce8e":{"position":{"vector":[1004,-3182]},"visualization":{"show":true,"width":1237.1704757462687,"height":253.99370335820893}},"82a3f1f1-07b0-4a07-9068-5aaa8402c121":{"position":{"vector":[807,-2156]}},"ace926a5-d9a7-4452-9634-eb91a8daabbd":{"position":{"vector":[1267,-2228]},"visualization":{"show":true,"width":1996.57276119403}}},"widget":{"ab4062d9-fe48-4f37-bc0d-8448cbdb14b7":{"WidgetTableEditor":{"size":{"x":1310.7276119402984,"y":329.5009328358209}}},"65385fc7-e121-4bd8-93a0-dc0518372a78":{"WidgetTableEditor":{"size":{"x":520.5515391791045,"y":150}}},"5b2d3cf6-f5a9-46ea-adec-25f1eceee27e":{"WidgetTableEditor":{"size":{"x":517.1233675373134,"y":150}}}},"snapshot":"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","import":{}}}

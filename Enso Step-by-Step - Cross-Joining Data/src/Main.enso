@@ -1,0 +1,71 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+import local.EnsoStepbyStepMultiColumnFormulas
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Cross-Join Data in Enso Analytics
+   The Cross-Join functionality in Enso Analytics provides a straightforward tool for creating Cartesian products between tables, combining every row from one table with every row from another to generate all possible pairings for analysis, reporting, or visualization. Centered around the cross_join component, this operation is ideal for scenario planning, forecasting, or expanding datasets with combinations (e.g., states × quarters). Unlike unions (vertical stacking) or joins (conditional matching), a cross-join produces a full grid of rows, useful for exhaustive enumerations in workflows.
+
+   ## Key Component
+
+   ### cross_join
+
+   The cross_join component combines two tables by pairing every row from the left table with every row from the right table.
+
+   - **Functionality**: Performs a Cartesian product, multiplying the row counts (e.g., 50 states × 4 quarters = 200 rows), preserving all columns from both tables. The order of input tables affects the resulting structure but not the total rows.
+   - **Use Case**: Pair each state with every quarter to create a template for quarterly state-level reporting, or reverse the inputs to group by quarter first.
+   - **Benefit**: Generates complete combinations efficiently, enabling quick dataset expansion for modeling or simulations.
+   - **Downside**: Can produce large outputs for sizable tables (e.g., 1,000 rows × 100 categories = 100,000 rows), requiring caution with scale.
+
+   ## Supported Features
+
+   - **Cartesian Product**: Pairs all left rows with all right rows, duplicating columns as needed.
+   - **Order Flexibility**: Reversing left/right inputs changes grouping but maintains row count.
+   - **Integration with Enso Ecosystem**: Cross-joined tables integrate with filter, aggregate, or visualization tools.
+   - **Visualization Support**: Built-in table visualization (accessible via the eyeball icon) allows immediate inspection of combinations.
+
+   ## Example Workflow
+
+   In this example workflow, tables with states/population and quarters are cross-joined:
+
+   - **Data Input - States**: Use Table.input to load states and 2024 population data.
+   - **Data Input - Quarters**: Use Table.input to load quarters (Q1 to Q4).
+   - **Simple Cross-Join**: Use cross_join to pair each state row with every quarter, resulting in 50 states × 4 quarters = 200 rows.
+   - **Reversed Cross-Join**: Use cross_join with quarters as left and states as right, producing the same 200 rows but grouped by quarter first.
+
+   ## Use Cases
+
+   - **Scenario Planning**: Cross-join products with price tiers for pricing simulations.
+   - **Forecasting Templates**: Pair regions with time periods for seasonal forecasting grids.
+   - **Combinatorial Analysis**: Generate all customer-segment × product combinations for market analysis.
+   - **Data Expansion**: Expand sparse datasets with categorical cross-products for complete coverage.
+   - **Testing Frameworks**: Create test cases by pairing users with scenarios.
+
+   ## Benefits
+
+   The Cross-Join component in Enso Analytics offers a simple and efficient way to generate Cartesian products, expanding datasets for comprehensive analysis without complex scripting. The cross_join component's order flexibility and scalability support diverse use cases, integrating seamlessly with Enso’s ecosystem for filtering, aggregation, or visualization (accessible via the eyeball icon). By enabling rapid combination generation, this functionality empowers users to explore exhaustive pairings and build analysis-ready datasets in Enso Analytics.
+main =
+    node1 = Table.input [['State', ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']], ['Population 2024', ['5157699', '740133', '7582384', '3088354', '39431263', '5957493', '3675069', '1051917', '702250', '23372215', '11180878', '1446146', '2001619', '12710158', '6924275', '3241488', '2970606', '4588372', '4597740', '1405012', '6263220', '7136171', '10140459', '5793151', '2943045', '6245466', '1137233', '2005465', '3267467', '1409032', '9500851', '2130256', '19867248', '11046024', '796568', '11883304', '4095393', '4272371', '13078751', '1112308', '5478831', '924669', '7227750', '31290831', '3503613', '648493', '8811195', '7958180', '1769979', '5960975', '587618']]]
+    any1 = Table.input [['Quarter', ['Q1', 'Q2', 'Q3', 'Q4']]]
+    ## Simple Cross-Join - Each State Row is duplicated for each Quarter from the Right table.
+    table1 = node1.cross_join any1
+    ## Simple Cross-Join with the left and right tables reversed. The outpur of each quarter is duplicated for each state record.
+    table2 = any1.cross_join node1
+
+
+
+#### METADATA ####
+[[{"index":{"value":4099},"size":{"value":1259}},"c4fb75a6-eb4f-42d5-946f-ec0a411b9f14"],[{"index":{"value":5370},"size":{"value":11}},"fd6a3d65-4205-4a7f-ac4b-98933fde773a"],[{"index":{"value":5370},"size":{"value":51}},"64e93166-150e-48ad-b5d4-7626ef025179"],[{"index":{"value":5530},"size":{"value":16}},"a45b3da0-6e11-4864-acd4-58f7e09b4a16"],[{"index":{"value":5530},"size":{"value":21}},"ceeb7848-7236-419c-a4ba-414b7098829e"],[{"index":{"value":5695},"size":{"value":15}},"f3229195-2c90-407a-8d23-91b66b307211"],[{"index":{"value":5695},"size":{"value":21}},"578a0bd1-8efd-46cc-89ee-a49e99e3b865"]]
+{"ide":{"node":{"c4fb75a6-eb4f-42d5-946f-ec0a411b9f14":{"position":{"vector":[-3365,-2205]}},"64e93166-150e-48ad-b5d4-7626ef025179":{"position":{"vector":[-2743,-2831]}},"fd6a3d65-4205-4a7f-ac4b-98933fde773a":{"position":{"vector":[-3316,-2978]}},"ceeb7848-7236-419c-a4ba-414b7098829e":{"position":{"vector":[-3365,-3057]},"visualization":{"show":true,"width":596.4204757462686,"height":343.84328358208955}},"a45b3da0-6e11-4864-acd4-58f7e09b4a16":{"position":{"vector":[-2752,-2956]}},"578a0bd1-8efd-46cc-89ee-a49e99e3b865":{"position":{"vector":[-2369,-3079]},"visualization":{"show":true,"width":676.5452425373135,"height":349.79011194029846}},"f3229195-2c90-407a-8d23-91b66b307211":{"position":{"vector":[-2369,-3079]}}},"widget":{"c4fb75a6-eb4f-42d5-946f-ec0a411b9f14":{"WidgetTableEditor":{"size":{"x":532.1013918077263,"y":625.9203367564253}}}},"import":{},"snapshot":"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"}}

@@ -1,4 +1,3 @@
 name: Enso Step-by-Step - Cross-tab Data
-namespace: local
 version: 0.0.1
 prefer-local-libraries: true
