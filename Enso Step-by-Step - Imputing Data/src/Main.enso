@@ -1,0 +1,90 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.DuckDB import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+
+## ![step-by-step-example](/images/step-by-step-example.png)
+
+   # Imputing Data in Enso Analytics
+   The Data Imputation components in Enso Analytics offer essential tools for handling missing values in datasets, allowing users to replace "Nothing" (null) entries with appropriate substitutes like zeros or calculated averages. This ensures data completeness for accurate analysis, modeling, or visualization. Centered around the `fill_nothing` component, along with supporting tools like `compute`, `get`, and `set`, these features support methods such as zero-filling for simple placeholders or mean imputation for statistical preservation of data distribution. When combined with other Enso capabilities, these components facilitate robust data cleaning and preparation, making this project an illustrative demonstration of imputation strategies.
+
+   ## Key Components
+   ### fill_nothing
+   The `fill_nothing` component replaces missing "Nothing" values in specified columns or across types with a provided value, such as a constant or computed result.
+   - **Functionality**: Targets columns by name or type (e.g., `..By_Type ..Integer`), filling gaps with zeros for baseline imputation or with aggregates like means to maintain data integrity.
+   - **Use Case**: Fill all integer-type "Nothing" values with 0 across a table, or replace missing sales data in a specific column with its average to prepare for trend analysis.
+   - **Benefit**: Provides a straightforward way to address missing data, preventing errors in downstream computations and enabling complete datasets for reliable insights.
+
+   ### get
+   The `get` component extracts a specific column from a table as a vector for further operations.
+   - **Functionality**: Retrieves a single column (e.g., '2022_sales') to perform isolated calculations, such as computing statistics without affecting the full table.
+   - **Use Case**: Extract the '2023_sales' column to calculate its mean, which can then be used for imputation in the original table.
+   - **Benefit**: Allows targeted data manipulation, making it easier to derive values for imputation without redundant processing of the entire dataset.
+
+   ### compute
+   The `compute` component performs aggregate calculations on vectors, such as finding the mean, sum, or other statistics.
+   - **Functionality**: Applies operations like `..Mean` to a vector, often ignoring "Nothing" values to produce accurate results for imputation fillers.
+   - **Use Case**: Compute the average of a sales column to use as a replacement for missing entries, ensuring the imputed values align with existing data trends.
+   - **Benefit**: Enables data-driven imputation by generating context-aware fillers, improving the quality of cleaned datasets over arbitrary constants.
+
+   ### set
+   The `set` component adds or updates columns in a table using expressions, including imputation logic.
+   - **Functionality**: Evaluates expressions like `fill_nothing([column], value)` or combines with `compute` for dynamic fillers, creating new imputed columns (e.g., "2022_sales_imputed").
+   - **Use Case**: Add a new column with '2024_sales' filled by its mean, preserving the original data while providing an imputed version for analysis.
+   - **Benefit**: Supports non-destructive imputation by generating parallel columns, allowing users to compare original and cleaned data easily.
+
+   ## Example Workflow
+   In this example workflow, a sample dataset with columns like 'item_id', '2022_sales', '2023_sales', and '2024_sales' (containing some "Nothing" values) is processed using imputation components to demonstrate handling missing data:
+   - **Input Data**: Use `Table.input` to create a table with sample data, including missing values in sales columns.
+   - **Zero-Filling Across Types**: Apply `fill_nothing` with `..By_Type ..Integer` and 0 to replace all integer "Nothing" values with zeros in one branch.
+   - **Mean Calculation**: Use `get` to extract each sales column, then `compute` with `..Mean` to find the average (e.g., for '2022_sales').
+   - **Mean Imputation**: Chain `fill_nothing` on specific columns using the computed means, progressively filling '2022_sales', '2023_sales', and '2024_sales' to create a fully imputed table.
+   - **Zero-Imputed Columns**: Use `set` with expressions like `fill_nothing([2022_sales],0)` to add new columns such as "2022_sales_imputed", "2023_sales_imputed", and "2024_sales_imputed" filled with zeros.
+   - **Mean-Imputed Columns**: Similarly, use `set` with expressions incorporating `compute([column],..Mean)` to add imputed columns filled with each sales year's average, enabling side-by-side comparison.
+
+   ## Use Cases
+   - **Data Cleaning for Analysis**: Use `fill_nothing` with zeros to quickly handle missing entries in numerical columns, ensuring compatibility with aggregation functions.
+   - **Statistical Imputation**: Apply `compute` and `fill_nothing` to replace missing values with column means, preserving data distribution for machine learning or reporting.
+   - **Non-Destructive Editing**: Leverage `set` to create imputed versions of columns, allowing users to retain originals for validation while using cleaned data.
+   - **Handling Mixed Missing Data**: Combine type-based filling for broad imputation with column-specific means for precision in datasets with varying null patterns.
+   - **Exploratory Data Preparation**: Extract columns with `get` and compute statistics to inform imputation choices, such as deciding between zero or mean based on data skew.
+   - **Batch Imputation Workflows**: Chain multiple `fill_nothing` and `set` operations to process multi-year sales data, creating comprehensive imputed datasets for trend visualization.
+
+   ## Benefits
+   The Imputation components in Enso Analytics deliver a versatile and user-friendly method for managing missing data, supporting both simple constant fills and advanced statistical approaches. The `fill_nothing` component efficiently handles nulls at scale, while `compute` and `get` provide the foundation for intelligent, data-informed replacements. The `set` component adds flexibility by enabling new imputed columns without altering originals, promoting iterative experimentation. Integrated with Enso's broader ecosystem, including visualization via the eyeball icon, these tools allow instant review of imputed results. By streamlining missing data handling, the Imputation components enhance data reliability and workflow efficiency, empowering users to derive actionable insights from incomplete datasets in Enso Analytics.
+main =
+    node1 = Table.input [['item_id', ['1', '2', '3', '4', '5']], ['2022_sales', ['915', '610', Nothing, '31', '445']], ['2023_sales', ['1280', Nothing, '57', '18', '102']], ['2024_sales', [Nothing, '342', '1650', '172', Nothing]]]
+    ## fill nothing values with zeros
+    any1 = node1.fill_nothing [(..By_Type ..Integer)] 0
+    column1 = node1.get '2022_sales'
+    any2 = column1.compute ..Mean
+    ## fill nothing values with the average of the column
+    any3 = node1.fill_nothing ['2022_sales'] any2
+    column2 = node1.get '2023_sales'
+    any4 = column2.compute ..Mean
+    column3 = node1.get '2024_sales'
+    any5 = column3.compute ..Mean
+    any6 = any3.fill_nothing ['2023_sales'] any4
+    any7 = any6.fill_nothing ['2024_sales'] any5
+    ## Fill imputed zeros to new columns
+    any8 = node1.set (expr 'fill_nothing([2022_sales],0)') "2022_sales_imputed"
+    any9 = any8.set (expr 'fill_nothing([2023_sales],0)') "2023_sales_imputed"
+    any10 = any9.set (expr 'fill_nothing([2024_sales],0)') "2024_sales_imputed"
+    ## Fill imputed averages to new columnns
+    any11 = node1.set (expr 'fill_nothing([2022_sales],compute([2022_sales],..Mean))') "2022_sales_imputed"
+    any12 = any11.set (expr 'fill_nothing([2023_sales],compute([2023_sales],..Mean))') "2023_sales_imputed"
+    any13 = any12.set (expr 'fill_nothing([2024_sales],compute([2024_sales],..Mean))') "2024_sales_imputed"
+
+
+
+#### METADATA ####
+[[{"index":{"value":6977},"size":{"value":218}},"d79e7688-6a2f-43e6-b2b1-fd08ba699e1a"],[{"index":{"value":7245},"size":{"value":18}},"caffb513-ea82-4709-9b9f-872d833a083d"],[{"index":{"value":7245},"size":{"value":42}},"c70bc4bd-6ea8-4daa-ae97-e6c54e1b5161"],[{"index":{"value":7245},"size":{"value":44}},"6be7b922-10fd-41ce-83dd-c3a635d17890"],[{"index":{"value":7304},"size":{"value":9}},"9cc76473-151c-4363-a82f-6aedabb4424d"],[{"index":{"value":7304},"size":{"value":22}},"921496b1-206a-453d-b60f-6d9eb8a56184"],[{"index":{"value":7338},"size":{"value":15}},"33134ac6-afc6-4ebd-bc64-d6e8fbdfb297"],[{"index":{"value":7338},"size":{"value":22}},"eca51ee7-2040-4090-aa04-ca65d22af33f"],[{"index":{"value":7430},"size":{"value":18}},"f89ae06b-7caa-4e12-a557-9f09fcbdc4b6"],[{"index":{"value":7430},"size":{"value":33}},"00d8a898-9fe2-448e-8db5-ee9fd6a9dcf1"],[{"index":{"value":7430},"size":{"value":38}},"0bc87fb0-3d1e-497f-bc68-1b84eacc452e"],[{"index":{"value":7483},"size":{"value":22}},"d807d1c6-c074-4d70-a3c0-13a381d91fb4"],[{"index":{"value":7517},"size":{"value":22}},"9395f43d-3a9f-47aa-8f30-ec3db14a5337"],[{"index":{"value":7554},"size":{"value":22}},"fe957b35-5e10-49c1-9178-75da3ca3cb94"],[{"index":{"value":7588},"size":{"value":22}},"be3b477a-f256-42e2-9003-633d0f6e1e6a"],[{"index":{"value":7622},"size":{"value":37}},"3d2cd4d3-6058-4bec-8692-33563fc8c9e5"],[{"index":{"value":7671},"size":{"value":37}},"09814a66-395e-41f6-b738-b3ddad26161a"],[{"index":{"value":7761},"size":{"value":9}},"ac72e1c1-93da-4f83-b38e-7e43d97ecf85"],[{"index":{"value":7761},"size":{"value":47}},"eda720c4-8349-4289-b319-bdbc38859cb6"],[{"index":{"value":7761},"size":{"value":68}},"a4e40cc0-39f9-4a6b-8892-1c5cc1819039"],[{"index":{"value":7841},"size":{"value":67}},"5f48ee61-ffc6-4c7b-af42-541082c4ee1d"],[{"index":{"value":7921},"size":{"value":67}},"d25111ea-8167-4840-8473-4a1762dfeec1"],[{"index":{"value":8046},"size":{"value":95}},"97cce0c0-29ce-45d7-aea9-a394480c6e52"],[{"index":{"value":8154},"size":{"value":95}},"784886b1-03c7-4af6-824c-aa23bd9c7f2d"],[{"index":{"value":8262},"size":{"value":95}},"52c7cdc2-8cce-49cd-b50f-441680de9e4e"]]
+{"ide":{"node":{"d79e7688-6a2f-43e6-b2b1-fd08ba699e1a":{"position":{"vector":[-1169,590]}},"6be7b922-10fd-41ce-83dd-c3a635d17890":{"position":{"vector":[-409,347]},"visualization":{"show":true,"width":982.47265625}},"c70bc4bd-6ea8-4daa-ae97-e6c54e1b5161":{"position":{"vector":[-380,281]}},"caffb513-ea82-4709-9b9f-872d833a083d":{"position":{"vector":[-380,281]}},"921496b1-206a-453d-b60f-6d9eb8a56184":{"position":{"vector":[-919,197]}},"9cc76473-151c-4363-a82f-6aedabb4424d":{"position":{"vector":[-252,319]}},"eca51ee7-2040-4090-aa04-ca65d22af33f":{"position":{"vector":[-919,125]}},"33134ac6-afc6-4ebd-bc64-d6e8fbdfb297":{"position":{"vector":[-252,247]}},"0bc87fb0-3d1e-497f-bc68-1b84eacc452e":{"position":{"vector":[-1051,18]}},"00d8a898-9fe2-448e-8db5-ee9fd6a9dcf1":{"position":{"vector":[169,-99]}},"f89ae06b-7caa-4e12-a557-9f09fcbdc4b6":{"position":{"vector":[-238,-83]}},"d807d1c6-c074-4d70-a3c0-13a381d91fb4":{"position":{"vector":[-684,70]}},"9395f43d-3a9f-47aa-8f30-ec3db14a5337":{"position":{"vector":[-684,-74]}},"fe957b35-5e10-49c1-9178-75da3ca3cb94":{"position":{"vector":[-465,70]}},"be3b477a-f256-42e2-9003-633d0f6e1e6a":{"position":{"vector":[-465,-175]}},"3d2cd4d3-6058-4bec-8692-33563fc8c9e5":{"position":{"vector":[-1051,-146]}},"09814a66-395e-41f6-b738-b3ddad26161a":{"position":{"vector":[-1051,-247]},"visualization":{"show":true,"width":1006.7421875}},"a4e40cc0-39f9-4a6b-8892-1c5cc1819039":{"position":{"vector":[-1106,-521]},"visualization":{"show":false,"width":881.17578125,"height":259.7734375}},"eda720c4-8349-4289-b319-bdbc38859cb6":{"position":{"vector":[19,-593]}},"ac72e1c1-93da-4f83-b38e-7e43d97ecf85":{"position":{"vector":[19,-593]}},"5f48ee61-ffc6-4c7b-af42-541082c4ee1d":{"position":{"vector":[-1106,-593]},"visualization":{"show":false,"width":881.17578125,"height":259.7734375}},"d25111ea-8167-4840-8473-4a1762dfeec1":{"position":{"vector":[-1106,-665]},"visualization":{"show":true,"width":1554.5703125,"height":259.7734375}},"97cce0c0-29ce-45d7-aea9-a394480c6e52":{"position":{"vector":[-1169,-1031]},"visualization":{"show":false,"width":881.17578125,"height":259.7734375}},"784886b1-03c7-4af6-824c-aa23bd9c7f2d":{"position":{"vector":[-1169,-1103]},"visualization":{"show":false,"width":881.17578125,"height":259.7734375}},"52c7cdc2-8cce-49cd-b50f-441680de9e4e":{"position":{"vector":[-1169,-1175]},"visualization":{"show":true,"width":1554.5703125,"height":259.7734375}}},"widget":{"d79e7688-6a2f-43e6-b2b1-fd08ba699e1a":{"WidgetTableEditor":{"size":{"x":801.09375,"y":150}}}},"import":{},"snapshot":"eJyVWdlyGzcWfddXYKwHSS6SERd5SVUeZFnJuGacSo0846pRqUywGyQx6m4wQDcp5uvnLgAaJJt08iJKxHaXc89dNLemFA+1rHJp88EH6ZTQ5crYWsiiOJvvrH6Rs+LE8kdZy9nJCz422fPHD8fXb78+HF/8RZkTi8YsTsn2WWfWODOvj295qMxmXsjn7xlANukG/2vccv8iy1Wh3MHCf7RrZKH/kLU21dnZ+bn426Or1ao/2/bpU/HJp8sfdCkXyv3QtTpYVYurszMhxLn4VK6aWlcLgYYXuhL3lTPitpLFttaZw01flopXaS89LTIDklWqqt3hGWHmc2WFcg7WtSxEbUzhxNxYsQQ9Cnyt1M7h51oWjaI7cnjBqdr10CJmg4uNU9bBaWHVqpCZEq9+NfUSVl6Jy6opiisBD1gN5ze6Xgq5WlmzslrWSrhm5mpdNzUsFhrc8YcC1wkQIZNF1hSwJxdyrSwaaQAqageXucbCfpSEFCxUrSpQg0SXWdZYvFqink6DoKXJFWrTw3vXqWsG4g5EUxYfsaapclGDEadzXRTfKtZh2toQVTagL2nhmhX6HPVnu5H4U9wM2kx7YrpQNXyAJcXU0a9wNwTMXMma5Pc3iFLVS5Pj3xkYx5EJ+igC3o0qOY06CrLt0hQ5Whu+LpWsEJ3B17QVfweLgvXECh5Rds2LZs72ymHV6lnD2n9dKsLITFdgAtILtAZQEFIyuZIzXegaXBekTwA1lxkuoq2tmTWu9h6BqKlQdNQcZFhJSyKAH+QzmQudCBD4n8ogrECFooDDuGmtRK5KU/FfLHWiIH2tFiDNgKPiXPxDbcVdFIm/PBep/0JkHHNqAK2LWG/R26LerVSm5xqMlJmiKStygESaAeBvVxHaqNda57CPzvaiUxGpoJeEBxHcjJIcHndNUQ9QyL54/frnpspQVQBovX39+kfxRVqAkYuvzraikqXCO/BZcakGiwFgbTD4sP32Bb8ZDD4BohfKTq96IqBoIVdeQo4vhAqyNyyq1MLwNeuxWFi1kDEqEWoU4aXUVS09DYBh4CULokYF/g0QuYOLUfaf4XEkCd6mbJ8kPrAuPXgdjClFjbxLoRroJDjGySKEPUggg1Mybx2+SYO1PGGgwAxARRrXVgEkAy9EmT8Aecx1jSL/xt5DMRBserGs4eAGKF1s5Bbvk3lukWqCTChND19ZI4nCF8paY5kpzQaRrGTp/U02dhQXqgItcXvgr8irJKkFz3D+rRwKEQF/LgAOEdLIMAmS1QvInNWuwzSU2rxtGY5riD54CV+bN5aC3qwUx507Dsh/KWTyNZsIFChUeMJD8WJ0PRp9I1ddXJEHlIVHSqGdYToPzI4PtQHCJiI3Bw5jbJgGWAIyVcZcC3rPIaewKp24u2cz0FaUZuylCYLWpk0uBBdEd09slhokyYCQamTFmcK8lpOBkgjRtAzo1AtdyX0xEijdYnaEmKEAhnsItiUw48rrHvlQg+ek0+AAkAzIHWnQx8be48EckK8gVyGXAN0AdRESgStRMoShjXBqceMpJ2InJKoEP95Trg3/HV8JkIBRk7htrqs8+IXt6JqSopcTSevM45i6Xa0KrA5a/PlkOhh8hiunFHf+abh6Dtle6EUFPuhiawp6kzdAHLEWYJo9sCfSIyTTThTdsX1IscAnYGLpWajFEqCEI8rTVYmmxIcCRfjip8eFSzCW9hnASw3GWHgGUy9oMM8tTFqdZHWPHOIJsZ8jbHbKAUgVC9iMFiWeARJ+qftyQ2zIivdwP1Kel+n3hnyCelIW97AlWjJgAyiSZhqCy25jNkuYySXM5HaZCViTMmazyimphHRGNM6k1LCtXrBqcUwNusqKhtCVqFWYhc6OY+ke7UlvJFd5OKUVwOUjy/DUYw9cTX1exlLIJ6U2RtCd+RYyLzBqtF0G1E62rdQmujNo5tnwVcuG3/yWV1edeLvNITXRVWk2Q/6aBP6il3N0bMtavsgLHoy8RNgBSsO6kZIaV2Qt7ECFUDSeyogPXKQ6UZmqD5mxtk1GhdpRpGG9B3IWwRRdjQIaFnEYxcWcmEKOGLHYxjrPd1riq7HPc7gNv/5UcSnpuyWx8Ws9ClL6yqOXbRlcQ2C40LUqv+n8Yjdj9XYyBlfvOz64xECCAogSlSkP65krwdUt0jIow7DWnR0Z0X0od9Vh04XS/xh88qmCK6i/Q7cgcqbUoQ40LhBHEiBVjChuU1pDpAF12NeltNYi4b/Yi/zsq8hbLtGwzHSBt7f7hTVHTlc9Ssa8TvvEpDg8UhdyuQrigcnEzMoqW0bZMDdA+MQEFe1CZRE84+shwFK23NGvxym+je8gdEw3mNZ2qN/HM4bLToWzK03beVMKWWKlvGcfU+0XZ86DBJ+LjQFV3BjeZkEstlZg6lDO/yXEpsDAymkbOWC3diFXf/JLdyxZNCnxuc9Op2m1Fe2pd3019TVzQmxto9tFjkyZ44NvUa1XrVpxJZBii5Ydj3Qp9KBLXUhbbHuUu4/oBrFiLFAfk1qASps2GCytgvsJIJUrAeBWSXsRO5Re2wg46DtoAASfnh+hYq4iA4Zc4YJ6NOq5C802AvPW83j0WkdkckCBzL83OnsGMBDrqP1iBUOuakooRnGSEJk8VjAkYK1pOrDd7Rkpq/i03DrjIRlM7EaJZ5EYizQw2ZU8oYw94kqIvQ2ZmBEPJh5cl4E3sO8F01myHbeaPMyJAv8K+e5jku/uc43rKPE/lScFhk4bYHvJ1VEhdTwLWkWtdEiCXJ6CYjr35T6lbyaHNDlGGf8eMsZn/QJrn71tQpK442qGJgV9bPdzkY6VZtbIfL+98PL2I0dx64/7wbCZdr4JinUhHVpDSUiVEHZmAIxa2cT39y+rAgPJQN1IqP2tnQqlDVsIHWZjYnGqC3wlnvSFYDxdcVeZZNal0ZlKepMc5KVsN1P1RgHhI/jj5IwNYvwowz2rTVv/yBpuSMaooexwLa2X0FBoTK17WI3zvrSd4Z4ko8EBnusjDSTzjKSYRG2tgvTkYpWVluHtHGN3kBlowpducSD8Z2fBOCGlCp/ACwdwTlDlBNb+HCgBkLb1o0ofRZVc7FcrvXQsOjNYf/DsMg6/0Fg8ApH5GtI56JbOLGk2DPHJw94TUzs1B3CCVHWkMEfog7tr4eAq1fPxs8csBCs/peNpAs592wkq1iMQIwua91JrxUijYV1s8IJ4XX3OvIAOzjMjlMaR4bvahDjgKCBkmIs8GVDuL03NEwLlx6OQoWAfSuDn11RcWZqrUNigWyG/UGzjcD8zbuug1E2Lvx3kwF+SBwdbNaOCLDNVmPbyZJuYC0dR5EGr1ho0CaPZOMQEk3zYCh54FVwgp9CI5S3dfQSXqloiJvgAD8HYjui6UN9H32eQwRWc3bDpIq/6GYrkzjAdo/EcDFP7/tTtICIGZzjrFD9hIEHzk6uh+EkkFbd4fEx6iMeLIVVi+GOMPyb44+bi6QnXdsq1x4v3wxtcfTO8hg9f9uI5umIySU6Nk1PD0bvd/Tdvcf/wHf28HrWnJu2p5PYJCTd8c3NNn29H7WVPT0+kph+dCx9vh5U47ZLVFm1BNhmk8SkeLzvq/qsncU3nGPPtUYjEnUo2XD6CHX7vIHA/V1vfFXJvWMMVNd4U7h4fETyV44mESEQeHYg83hN5EkUedYnMS+ODayZ719zEa8Zd18CON7AD1egQf5yKPwkH3vKBNx0HJumBm2BbmtqHyI7VYlK+h5vfRXWww77E2llcnOoFLq46K/5w33uW9N3J68YH1+23ChGi13zf+5P3TQ7u228wOu0S/iO5a5rWNsPhXzNO7C7SL32H8T27DUes6PD0W+Out8ZH3jpq1LF/a/TnrJq+NTny1oHB/w9Fz1qA"}}

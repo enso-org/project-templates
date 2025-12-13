@@ -1,0 +1,83 @@
+from Standard.Base import all
+from Standard.Table import all
+from Standard.Database import all
+from Standard.AWS import all
+from Standard.Geo import all
+from Standard.Google import all
+from Standard.Microsoft import all
+from Standard.Snowflake import all
+from Standard.Tableau import all
+import Standard.Examples
+import Standard.Visualization
+from Standard.Base.Meta import Enso_Project
+
+
+
+
+
+## ![image](/images/step-by-step-example.png)
+   # Dynamically Select Columns in Enso Analytics
+
+   The select_columns component in Enso Analytics offers powerful capabilities for dynamically selecting table columns based on various criteria, enabling targeted data extraction for focused analysis, reduction of dataset size, or preparation for downstream operations. This example uses data from data/customer_city_data.csv to illustrate selection techniques, including by data type, expression-based filtering via column metadata, and regex patterns. These methods facilitate efficient column subsetting, allowing users to adapt workflows to specific data characteristics without manual specification in Enso projects.
+
+   ## Key Component
+
+   ### select_columns
+
+   The select_columns component subsets table columns using flexible input methods.
+
+   - **Functionality**: Supports selection by explicit names, data types (e.g., ..By_Type ..Float), vectors of names derived from metadata, or regex patterns for pattern-matching (e.g., columns starting with 'C' or 'L').
+   - **Use Case**: Select numeric columns (Float or Integer), filter columns based on type or name using expressions on column_info, or apply regex for bulk selection like prefix-based columns.
+   - **Benefit**: Provides scalable, dynamic selection that integrates with Enso’s table manipulation tools for aggregation, joining, or visualization, reducing processing overhead on large datasets.
+   - **Downside**: Expression or regex-based selections require accurate patterns to avoid missing columns; validate with column_info post-selection to ensure completeness.
+
+   ## Supported Features
+
+   - **Type-Based Selection**: Choose columns by data type using ..By_Type (e.g., ..Float, ..Integer, ..Char) for quick numeric or text filtering.
+   - **Metadata-Driven Selection**: Extract column details with column_info, apply casts (e.g., cast to ..Char), filter via expressions (e.g., containing 'Char' or matching a specific name like "CustomerID"), and retrieve names with get for input to select_columns.
+   - **Regex-Based Selection**: Use regex patterns (e.g., ^[CL].* for columns starting with 'C' or 'L') for pattern-matched bulk selection.
+   - **Vector Input Support**: Pass vectors of column names (e.g., from filtered metadata) for dynamic, order-independent selection.
+   - **Expression Integration**: Build complex filters with expr for conditional logic on column properties.
+   - **Visualization Support**: Instantly view selected columns via built-in table visualization (eyeball icon).
+   - **Ecosystem Integration**: Selected subsets flow into Enso’s filter, aggregate, join, and visualization components for streamlined workflows.
+
+   ## Example Workflow
+
+   This workflow processes data/customer_city_data.csv using dynamic column selection techniques:
+
+   - **Data Input**: Load CSV with Data.read.
+   - **Type-Based Selection**: Use select_columns with [(..By_Type ..Float), (..By_Type ..Integer)] to extract numeric columns.
+   - **Metadata and Expression-Based Selection**: Retrieve metadata with column_info, cast 'Value Type' to ..Char, filter using expr (e.g., contains([Value Type],'Char') or [Column] = "CustomerID"), extract names with get 'Column', and apply to select_columns.
+   - **Regex-Based Selection**: Directly select with select_columns [regex '^[CL].*'] for columns matching the pattern.
+
+   ## Use Cases
+
+   - **Numeric Data Extraction**: Select Float or Integer columns for statistical analysis or modeling.
+   - **Conditional Column Filtering**: Use expressions on metadata to target text columns or specific names like CustomerID for categorical processing.
+   - **Pattern-Matched Subsetting**: Apply regex to select prefixed columns (e.g., starting with 'C' or 'L') for thematic grouping.
+   - **Dynamic Workflow Adaptation**: Derive column lists at runtime from metadata for handling variable schemas in imported data.
+   - **Data Reduction**: Trim datasets to relevant columns before heavy operations like joins or aggregations.
+   - **Preprocessing Pipelines**: Integrate with casts and filters for type-specific cleaning or transformation.
+
+   ## Benefits
+
+   The select_columns component delivers a versatile solution for dynamic column selection in Enso Analytics, accommodating type-based, metadata-driven, and regex methods. By leveraging column_info, cast, filter, expr, and get, users can create adaptive selections tailored to data properties, enhancing efficiency in data preparation. Seamless integration with Enso’s broader toolkit supports comprehensive workflows, while the visualization feature (eyeball icon) enables quick verification, empowering users to build focused, performant analytics pipelines.
+main =
+    any1 = Data.read 'Data/customer_city_data.csv'
+    ## Select by Data Type
+    any3 = any1.select_columns [(..By_Type ..Float), (..By_Type ..Integer)]
+    ## Build an expression to find columns that are Char type or have a name of CustomerID
+    any2 = any1.column_info
+    any5 = any2.cast ['Value Type'] ..Char
+    any4 = any5.filter (expr 'contains([Value Type],\'Char\') or [Column] = "CustomerID" ')
+    column1 = any4.get 'Column'
+    any6 = any1.select_columns column1
+    ## Regular Expression to select columns that start with a C or an L
+    any9 = any1.select_columns [regex '^[CL].*']   
+
+
+
+
+#### METADATA ####
+[[{"index":{"value":5148},"size":{"value":9}},"d37f19c3-e6fe-4717-b863-fe083e8f939f"],[{"index":{"value":5148},"size":{"value":39}},"fe7bb0ae-a49e-47d3-b105-87c9353dbbba"],[{"index":{"value":5226},"size":{"value":19}},"b5b59d26-8f6b-45a0-a1ca-55c32e5eb577"],[{"index":{"value":5226},"size":{"value":64}},"ea2ab32c-70de-4e67-8e89-d7f398b07c02"],[{"index":{"value":5393},"size":{"value":16}},"c0e2f69e-5ed8-4c06-a839-b1e32c2ae47e"],[{"index":{"value":5421},"size":{"value":9}},"a417d191-0902-4e57-97f8-069bbb4a810b"],[{"index":{"value":5421},"size":{"value":24}},"254559a6-b071-4c84-8583-cf3d10282d09"],[{"index":{"value":5421},"size":{"value":31}},"e33fd969-054c-4514-9534-f1d21d162003"],[{"index":{"value":5464},"size":{"value":11}},"e19e2240-ed80-48ee-94ae-aaee2174f24c"],[{"index":{"value":5464},"size":{"value":80}},"c74df5cc-4159-4fdd-af63-8288f3280104"],[{"index":{"value":5559},"size":{"value":8}},"839ec2cc-629b-40e0-96ef-e9c5b2b3e694"],[{"index":{"value":5559},"size":{"value":17}},"1874475d-8ac4-488d-8c7e-55bf3b179899"],[{"index":{"value":5588},"size":{"value":19}},"683f93d0-bb72-4276-b3de-1799881bdf6c"],[{"index":{"value":5588},"size":{"value":27}},"fb41b293-3fb2-42df-a14b-b79e65a514fc"],[{"index":{"value":5699},"size":{"value":19}},"674d0460-1bfa-4ee1-95d9-4e81aecdef41"],[{"index":{"value":5699},"size":{"value":37}},"186c3b6a-884d-4ccf-8105-4a81dc24c817"]]
+{"ide":{"node":{"fe7bb0ae-a49e-47d3-b105-87c9353dbbba":{"position":{"vector":[-1891,-191]},"visualization":{"show":true,"width":955.84765625}},"d37f19c3-e6fe-4717-b863-fe083e8f939f":{"position":{"vector":[-1347,-1219]}},"ea2ab32c-70de-4e67-8e89-d7f398b07c02":{"position":{"vector":[-1386,-463]},"visualization":{"show":true}},"b5b59d26-8f6b-45a0-a1ca-55c32e5eb577":{"position":{"vector":[-1712,-916]}},"c0e2f69e-5ed8-4c06-a839-b1e32c2ae47e":{"position":{"vector":[-1701,-994]},"visualization":{"show":true,"width":1179.703125}},"e33fd969-054c-4514-9534-f1d21d162003":{"position":{"vector":[-1701,-1216]}},"254559a6-b071-4c84-8583-cf3d10282d09":{"position":{"vector":[-1552,-1156]}},"a417d191-0902-4e57-97f8-069bbb4a810b":{"position":{"vector":[-1552,-1156]}},"c74df5cc-4159-4fdd-af63-8288f3280104":{"position":{"vector":[-1701,-1288]}},"e19e2240-ed80-48ee-94ae-aaee2174f24c":{"position":{"vector":[-1755,-1218]}},"1874475d-8ac4-488d-8c7e-55bf3b179899":{"position":{"vector":[-1701,-1360]},"visualization":{"show":true}},"839ec2cc-629b-40e0-96ef-e9c5b2b3e694":{"position":{"vector":[-1734,-1473]}},"fb41b293-3fb2-42df-a14b-b79e65a514fc":{"position":{"vector":[-1835,-1582]},"visualization":{"show":true,"width":1260.640625,"height":249.421875}},"683f93d0-bb72-4276-b3de-1799881bdf6c":{"position":{"vector":[-1907,-1575]}},"186c3b6a-884d-4ccf-8105-4a81dc24c817":{"position":{"vector":[-1576,-713]},"visualization":{"show":true}},"674d0460-1bfa-4ee1-95d9-4e81aecdef41":{"position":{"vector":[-779,-606]}}},"widget":{},"import":{},"snapshot":"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"}}
