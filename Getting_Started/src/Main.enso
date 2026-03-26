@@ -19,11 +19,11 @@ import Standard.Visualization
    1. Check out [Getting Started](<https://community.ensoanalytics.com/c/start-here/>) on the Enso Community!
    2. There you will find a self-paced course [Enso Analytics 101](<https://community.ensoanalytics.com/c/enso-analytics-101/>) which will quickly get you **prepping, blending, analyzing** and **automating** in Enso Analytics.
 main =
-    file1 = Data.read 'Data/Sales Targets and Results.xlsx'
+    file1 = Data.read enso_project.data/'Sales Targets and Results.xlsx'
     targets = file1.read 'Targets'
     results_2024 = file1.read '2024 Results'
     results_2025 = file1.read '2025 Results'
-    table1 = targets.join results_2025 ..Inner [(..Equals 'Quarter')]
+    table1 = targets.join results_2024 ..Inner [(..Equals 'Quarter')]
     ## Adjust Targets 
     any2 = table1.set (..Simple_Expr (..Name 'Target') (..Add 2000)) set_mode=..Update
     any1 = any2.set (expr 'IF [Sales]>[Target] THEN "✅" ELSE "❌"') "Met Target"
